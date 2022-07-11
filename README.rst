@@ -2,6 +2,17 @@ METS builder
 ============
 A library for easy composing of METS files.
 
+Usage
+-----
+Development
+^^^^^^^^^^^
+Create virtual environment and install requirements::
+
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install --upgrade pip
+    pip install -r requirements_dev.txt
+
 Copyright
 ---------
 Copyright (C) 2022 CSC - IT Center for Science Ltd.
@@ -15,5 +26,5 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 See the GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along with
-this program.  If not, see <https://www.gnu.org/licenses/>.
+this program. If not, see https://www.gnu.org/licenses/.
 
