@@ -2,9 +2,8 @@
 from collections import namedtuple
 from datetime import datetime
 from datetime import timezone
+import string
 from typing import Optional, List, NamedTuple
-
-from mets_builder.utils import is_printable_us_ascii
 
 METS_CATALOG = "1.7.4"
 METS_SPECIFICATION = "1.7.4"
@@ -17,6 +16,18 @@ METS_PROFILES = [
     "https://digitalpreservation.fi/mets-profiles/cultural-heritage",
     "https://digitalpreservation.fi/mets-profiles/research-data"
 ]
+
+
+# TODO: In Python 3.8 this can be done more simply with
+# word.isascii() and word.isprintable()
+def _is_printable_us_ascii(word: str) -> bool:
+    """Checks whether a string contains only printable US-ASCII
+    characters.
+    """
+    for letter in word:
+        if letter not in string.printable:
+            return False
+    return True
 
 
 class METS:
@@ -136,7 +147,7 @@ class METS:
         if value is None:
             raise ValueError("package_id can not be None")
 
-        if not is_printable_us_ascii(value):
+        if not _is_printable_us_ascii(value):
             raise ValueError(
                 f"package_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -154,7 +165,7 @@ class METS:
         if value is None:
             raise ValueError("contract_id can not be None")
 
-        if not is_printable_us_ascii(value):
+        if not _is_printable_us_ascii(value):
             raise ValueError(
                 f"contract_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -169,7 +180,7 @@ class METS:
     @content_id.setter
     def content_id(self, value: str) -> None:
         """Setter for content_id."""
-        if value is not None and not is_printable_us_ascii(value):
+        if value is not None and not _is_printable_us_ascii(value):
             raise ValueError(
                 f"content_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
