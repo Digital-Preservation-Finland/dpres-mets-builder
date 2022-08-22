@@ -42,7 +42,7 @@ class METS:
         creator_type: str = "ORGANIZATION",
         content_id: Optional[str] = None,
         label: Optional[str] = None,
-        create_date: datetime = datetime.now(tz=timezone.utc),
+        create_date: Optional[datetime] = None,
         last_mod_date: Optional[datetime] = None,
         record_status: Optional[str] = None,
         catalog_version: Optional[str] = METS_CATALOG,
@@ -109,6 +109,9 @@ class METS:
             type=creator_type,
             name=creator_name
         )
+
+        if create_date is None:
+            create_date = datetime.now(tz=timezone.utc)
 
         self.mets_profile = mets_profile
         self.package_id = package_id
