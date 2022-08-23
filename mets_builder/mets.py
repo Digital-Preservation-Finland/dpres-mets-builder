@@ -65,8 +65,16 @@ class METS:
             printable US-ASCII characters.
         :param str creator_name: Name of the person or entity who created the
             information package.
-        :param str creator_type: Who or what created the information package,
-            e.g. "ORGANIZATION" or "INDIVIDUAL".
+        :param str creator_type: Specifies the type of creator. The pre-defined
+            values are:
+
+            - INDIVIDUAL: Use if an individual has served as the creator.
+            - ORGANIZATION: Use if an institution, corporate body, association,
+              non-profit enterprise, government, religious body, etc. has
+              served as the creator.
+
+            Any other values will be set to the OTHERTYPE attribute in the
+            final METS document.
         :param str content_id: Identifier for the content in the package.
             Attribute value should be expressed in printable US-ASCII
             characters.
