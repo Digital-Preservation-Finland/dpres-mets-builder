@@ -1,9 +1,16 @@
 """Module for serializing METS objects."""
+from typing import TYPE_CHECKING
+
 import lxml.etree
 import mets as mets_elements
 import xml_helpers
 
-from mets_builder import METS
+# Prevent circular import caused by type hints with special
+# typing.TYPE_CHECKING constant. See
+# https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING for more
+# info
+if TYPE_CHECKING:
+    from mets_builder import METS
 
 _NAMESPACES = {
     "mets": "http://www.loc.gov/METS/",
@@ -144,7 +151,7 @@ def _parse_mets_header(mets):
     return mets_header
 
 
-def to_xml_string(mets: METS) -> bytes:
+def to_xml_string(mets: "METS") -> bytes:
     """Serialize METS object to XML string.
 
     :param METS mets: METS object

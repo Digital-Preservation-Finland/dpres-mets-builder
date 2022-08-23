@@ -158,3 +158,26 @@ def test_add_agents():
     assert mets.agents[1].type == "TYPE"
 
     assert mets.agents[1].name == "name"
+
+
+def test_serialization():
+    """Test serializing METS object.
+
+    More thorough testing should be done in serialize module tests.
+    """
+    mets = METS(
+        mets_profile=(
+            "https://digitalpreservation.fi/mets-profiles/"
+            "cultural-heritage"
+        ),
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+
+    result = mets.serialize()
+
+    # bytes.index raises ValueError if subsection is not found
+    result.index(b"package_id")
+    result.index(b"contract_id")
+    result.index(b"Mr. Foo")

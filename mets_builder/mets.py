@@ -5,6 +5,8 @@ from datetime import timezone
 import string
 from typing import Optional, List, NamedTuple
 
+from mets_builder.serialize import to_xml_string
+
 METS_CATALOG = "1.7.4"
 METS_SPECIFICATION = "1.7.4"
 RECORD_STATUSES = [
@@ -255,3 +257,7 @@ class METS:
         METSAgent = namedtuple("METSAgent", ["role", "type", "name"])
         agent = METSAgent(role, type, name)
         self.agents.append(agent)
+
+    def serialize(self) -> bytes:
+        """Serialize this METS object into xml-formatted string."""
+        return to_xml_string(self)
