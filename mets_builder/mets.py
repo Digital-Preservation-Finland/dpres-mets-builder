@@ -2,8 +2,9 @@
 from collections import namedtuple
 from datetime import datetime
 from datetime import timezone
+from enum import Enum
 import string
-from typing import Optional, List, NamedTuple
+from typing import Optional, List, NamedTuple, Union
 
 from mets_builder.serialize import to_xml_string
 
@@ -32,6 +33,62 @@ def _is_printable_us_ascii(word: str) -> bool:
     return True
 
 
+class AgentRole(Enum):
+    """Enum for METS agent roles."""
+
+    CREATOR = "CREATOR"
+    """The person(s) or institution(s) responsible for the METS document."""
+
+    EDITOR = "EDITOR"
+    """The person(s) or institution(s) that prepares the metadata for
+    encoding.
+    """
+
+    ARCHIVIST = "ARCHIVIST"
+    """The person(s) or institution(s) responsible for the
+    document/collection.
+    """
+
+    PRESERVATION = "PRESERVATION"
+    """The person(s) or institution(s) responsible for preservation
+    functions.
+    """
+
+    DISSEMINATOR = "DISSEMINATOR"
+    """The person(s) or institution(s) responsible for dissemination
+    functions.
+    """
+
+    CUSTODIAN = "CUSTODIAN"
+    """The person(s) or institution(s) charged with the oversight of a
+    document/collection.
+    """
+
+    IPOWNER = "IPOWNER"
+    """Intellectual Property Owner: The person(s) or institution holding
+    copyright, trade or service marks or other intellectual property rights for
+    the object.
+    """
+
+    OTHER = "OTHER"
+    """Use if none of the other options apply to the agent role."""
+
+
+class AgentType(Enum):
+    """Enum for METS agent types."""
+
+    INDIVIDUAL = "INDIVIDUAL"
+    """Use if an individual has served as the agent."""
+
+    ORGANIZATION = "ORGANIZATION"
+    """Use if an institution, corporate body, association, non-profit
+    enterprise, government, religious body, etc. has served as the agent.
+    """
+
+    OTHER = "OTHER"
+    """Use if none of the other options apply to the agent type."""
+
+
 class METS:
     """Class representing a METS document."""
 
@@ -41,7 +98,8 @@ class METS:
         package_id: str,
         contract_id: str,
         creator_name: str,
-        creator_type: str = "ORGANIZATION",
+        creator_type: Union[AgentType, str, None] = AgentType.ORGANIZATION,
+        creator_other_type: str = None,
         content_id: Optional[str] = None,
         label: Optional[str] = None,
         create_date: Optional[datetime] = None,
@@ -65,16 +123,20 @@ class METS:
             printable US-ASCII characters.
         :param str creator_name: Name of the person or entity who created the
             information package.
-        :param str creator_type: Specifies the type of creator. The pre-defined
-            values are:
+        :param AgentType, str creator_type: Specifies the type of creator. The
+            pre-defined values are:
 
             - INDIVIDUAL: Use if an individual has served as the creator.
             - ORGANIZATION: Use if an institution, corporate body, association,
               non-profit enterprise, government, religious body, etc. has
               served as the creator.
 
-            Any other values will be set to the OTHERTYPE attribute in the
-            final METS document.
+            Any other values should be given using the 'creator_other_type'
+            attribute.
+        :param str creator_other_type: Can be used to describe the creator
+            type, if none of the pre-defined types in 'creator_type' attribute
+            apply. If set, 'creator_other_type' overrides any value set to
+            'creator_type' with AgentType.OTHER.
         :param str content_id: Identifier for the content in the package.
             Attribute value should be expressed in printable US-ASCII
             characters.
@@ -115,9 +177,10 @@ class METS:
 
         self.agents: List[NamedTuple] = []
         self.add_agent(
-            role="CREATOR",
+            name=creator_name,
+            role=AgentRole.CREATOR,
             type=creator_type,
-            name=creator_name
+            other_type=creator_other_type
         )
 
         if create_date is None:
@@ -215,15 +278,26 @@ class METS:
             )
         self._record_status = value
 
-    def add_agent(self, role: str, type: str, name: str) -> None:
+    def add_agent(
+        self,
+        name: str,
+        *,  # This forces the rest to be given as keyword arguments
+        role: Union[AgentRole, str, None] = None,
+        other_role: Optional[str] = None,
+        type: Union[AgentType, str, None] = None,
+        other_type: Optional[str] = None
+    ) -> None:
         """Add an agent to the METS object.
 
         Agents are a way to document different peoples' and parties' role in
         making of the information package. These agents will become agent
         elements in the metsHdr element in the final METS document.
 
-        :param str role: Specifies the function of the agent with respect to
-            the METS record. The pre-defined values are:
+        :param str name: The name of the agent. For example, if agent type is
+            set as "ORGANIZATION", the name should be set as the name of the
+            organization.
+        :param AgentRole, str role: Specifies the function of the agent with
+            respect to the METS record. The pre-defined values are:
 
             - CREATOR: The person(s) or institution(s) responsible for the METS
               document.
@@ -241,29 +315,73 @@ class METS:
               institution holding copyright, trade or service marks or other
               intellectual property rights for the object.
 
-            Any other values will be set to the OTHERROLE attribute in the
-            final METS document.
-        :param str type: Specifies the type of agent. The pre-defined values
-            are:
+            Any other values should be given using the 'other_role' attribute.
+        :param str other_role: Can be used to describe the agent role, if none
+            of the pre-defined roles in 'role' attribute apply. If set,
+            'other_role' overrides any value set to 'role' with
+            AgentRole.OTHER.
+        :param AgentType, str type: Specifies the type of agent. The
+            pre-defined values are:
 
             - INDIVIDUAL: Use if an individual has served as the agent.
             - ORGANIZATION: Use if an institution, corporate body, association,
               non-profit enterprise, government, religious body, etc. has
               served as the agent.
 
-            Any other values will be set to the OTHERTYPE attribute in the
-            final METS document.
-        :param str name: The name of the agent. For example, if agent type is
-            set as "ORGANIZATION", the name should be set as the name of the
-            organization.
+            Any other values should be given using the 'other_type' attribute.
+        :param str other_type: Can be used to describe the agent type, if none
+            of the pre-defined types in 'type' attribute apply. If set,
+            'other_type' overrides any value set to 'type' with
+            AgentType.OTHER.
+
+        :raises ValueError: if the given attributes are invalid
 
         :returns: None
         """
-        role = role.upper()
-        type = type.upper()
+        # Handle agent role
+        if other_role:
+            # other_role is set, use other_role and override role
+            role = AgentRole.OTHER
+        elif role:
+            # other_role is not set but role is, use role.
 
-        METSAgent = namedtuple("METSAgent", ["role", "type", "name"])
-        agent = METSAgent(role, type, name)
+            # Cast role to AgentRole.
+            # This fails if role isn't a valid agent role
+            role = AgentRole(role)
+
+            if role == AgentRole.OTHER:
+                raise ValueError(
+                    "Agent role is 'OTHER' but 'other_role' is not given."
+                )
+        else:
+            raise ValueError(
+                "Either 'role' or 'other_role' has to be set for the agent."
+            )
+
+        # Handle agent type
+        if other_type:
+            # other_type is set, use other_type and override type
+            type = AgentType.OTHER
+        elif type:
+            # other_type is not set but type is, use type.
+
+            # Cast type to AgentType.
+            # This fails if type isn't a valid agent type
+            type = AgentType(type)
+
+            if type == AgentType.OTHER:
+                raise ValueError(
+                    "Agent type is 'OTHER' but 'other_type' is not given."
+                )
+        else:
+            raise ValueError(
+                "Either 'type' or 'other_type' has to be set for the agent."
+            )
+
+        METSAgent = namedtuple(
+            "METSAgent", ["name", "role", "other_role", "type", "other_type"]
+        )
+        agent = METSAgent(name, role, other_role, type, other_type)
         self.agents.append(agent)
 
     def serialize(self) -> bytes:

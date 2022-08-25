@@ -2,6 +2,7 @@
 import pytest
 
 from mets_builder import METS
+from mets_builder.mets import AgentRole, AgentType
 
 
 def test_invalid_mets_profile():
@@ -136,8 +137,8 @@ def test_no_specification_or_catalog_version():
     )
 
 
-def test_add_agents():
-    """Test that agents can be added to a METS object."""
+def test_add_agent():
+    """Test that agent can be added to a METS object."""
     mets = METS(
         mets_profile=(
             "https://digitalpreservation.fi/mets-profiles/"
@@ -147,15 +148,83 @@ def test_add_agents():
         contract_id="contract_id",
         creator_name="Mr. Foo"
     )
-    mets.add_agent(role="role", type="type", name="name")
+    mets.add_agent(name="name", role="EDITOR", type="INDIVIDUAL")
 
     # Creator agent has been added on initialization, so there should be two
     # agents
     assert len(mets.agents) == 2
 
-    # role and type should have been capitalized
-    assert mets.agents[1].role == "ROLE"
-    assert mets.agents[1].type == "TYPE"
+    # role and type are casted to their enum types
+    assert mets.agents[1].role == AgentRole.EDITOR
+    assert mets.agents[1].type == AgentType.INDIVIDUAL
+
+    assert mets.agents[1].name == "name"
+
+
+@pytest.mark.parametrize(
+    ["role", "other_role", "type", "other_type"],
+    [
+        # Invalid role
+        ("invalid", None, "ORGANIZATION", None),
+        # role is OTHER but other_role is not set
+        ("OTHER", None, "ORGANIZATION", None),
+        # No role or other_role
+        (None, None, "ORGANIZATION", None),
+        # Invalid type
+        ("CREATOR", None, "invalid", None),
+        # type is OTHER but other_type is not set
+        ("CREATOR", None, "OTHER", None),
+        # No type or other_type
+        ("CREATOR", None, None, None)
+    ]
+)
+def test_add_agent_invalid_arguments(role, other_role, type, other_type):
+    """Test adding agents with invalid roles and types."""
+    mets = METS(
+        mets_profile=(
+            "https://digitalpreservation.fi/mets-profiles/"
+            "cultural-heritage"
+        ),
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+
+    with pytest.raises(ValueError):
+        mets.add_agent(
+            name="name",
+            role=role,
+            other_role=other_role,
+            type=type,
+            other_type=other_type
+        )
+
+
+def test_add_agent_with_other_role_and_type():
+    """Test giving other_role or other_type to agent overrides role and type
+    values.
+    """
+    mets = METS(
+        mets_profile=(
+            "https://digitalpreservation.fi/mets-profiles/"
+            "cultural-heritage"
+        ),
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+    mets.add_agent(
+        name="name",
+        role="CREATOR",
+        other_role="other_role",
+        type="INDIVIDUAL",
+        other_type="other_type"
+    )
+
+    assert mets.agents[1].role == AgentRole.OTHER
+    assert mets.agents[1].other_role == "other_role"
+    assert mets.agents[1].type == AgentType.OTHER
+    assert mets.agents[1].other_type == "other_type"
 
     assert mets.agents[1].name == "name"
 

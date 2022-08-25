@@ -25,19 +25,6 @@ _NAMESPACES = {
     "videomd": "http://www.loc.gov/videoMD/"
 }
 _METS_FI_SCHEMA = "http://digitalpreservation.fi/schemas/mets/mets.xsd"
-_METS_AGENT_TYPES = [
-    "INDIVIDUAL",
-    "ORGANIZATION"
-]
-_METS_AGENT_ROLES = [
-    "CREATOR",
-    "EDITOR",
-    "ARCHIVIST",
-    "PRESERVATION",
-    "DISSEMINATOR",
-    "CUSTODIAN",
-    "IPOWNER"
-]
 
 
 def _use_namespace(namespace, attribute):
@@ -109,28 +96,12 @@ def _parse_mets_header(mets):
     # Parse agents
     agents = []
     for agent in mets.agents:
-        # If agent type is not one of the pre-defined values, TYPE should be
-        # set to "OTHER" and "OTHERTYPE" attribute should be used
-        agent_type = agent.type
-        othertype = None
-        if agent.type not in _METS_AGENT_TYPES:
-            agent_type = "OTHER"
-            othertype = agent.type
-
-        # If agent role is not one of the pre-defined values, ROLE should be
-        # set to "OTHER" and "OTHERROLE" attribute should be used
-        agent_role = agent.role
-        otherrole = None
-        if agent.role not in _METS_AGENT_ROLES:
-            agent_role = "OTHER"
-            otherrole = agent.role
-
         agent_element = mets_elements.agent(
             organisation_name=agent.name,
-            agent_role=agent_role,
-            otherrole=otherrole,
-            agent_type=agent_type,
-            othertype=othertype
+            agent_role=agent.role.value,
+            otherrole=agent.other_role,
+            agent_type=agent.type.value,
+            othertype=agent.other_type
 
         )
         agents.append(agent_element)

@@ -29,9 +29,9 @@ def mets_object():
         specification="2.0",
     )
     mets.add_agent(
-        role="Foo",
-        type="Bar",
-        name="Ms. Bar"
+        name="Ms. Bar",
+        other_role="Foo",
+        other_type="Bar"
     )
 
     return mets
@@ -103,9 +103,9 @@ def test_parse_mets_header(mets_object):
     # OTHERTYPE
     assert len(agents[1].items()) == 4
     assert agents[1].get("ROLE") == "OTHER"
-    assert agents[1].get("OTHERROLE") == "FOO"
+    assert agents[1].get("OTHERROLE") == "Foo"
     assert agents[1].get("TYPE") == "OTHER"
-    assert agents[1].get("OTHERTYPE") == "BAR"
+    assert agents[1].get("OTHERTYPE") == "Bar"
     name_element = list(agents[1])
     assert len(name_element) == 1
     assert name_element[0].text == "Ms. Bar"
