@@ -2,9 +2,6 @@
 
 variables:
   CI_PYTHON_3: "yes"
-  CI_SKIP_RPM_BUILD: "yes"
-  CI_SKIP_STATIC_ANALYSIS: "yes"
-  CI_SKIP_SYSTEM_UNIT_TESTS: "yes"
 
 include:
   - project: 'dpres/gitlab-ci-pipeline'
