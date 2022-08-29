@@ -10,7 +10,7 @@ Create virtual environment and install requirements::
 
     python3 -m venv venv
     source venv/bin/activate
-    pip install --upgrade pip
+    pip install --upgrade pip setuptools
     pip install -r requirements_dev.txt
 
 Copyright
