@@ -8,10 +8,7 @@ setup(
         "mets_builder": "mets_builder"
     },
     install_requires=[
-        "lxml",
-        "mets@git+https://gitlab.ci.csc.fi/dpres/mets.git@develop#egg=mets",
-        "xml_helpers@git+https://gitlab.ci.csc.fi/dpres/xml-helpers.git"
-        "@develop#egg=xml_helpers"
+        "lxml"
     ],
     python_requires=">=3.6",
     use_scm_version=True
