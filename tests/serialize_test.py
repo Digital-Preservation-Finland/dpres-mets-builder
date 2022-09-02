@@ -1,11 +1,10 @@
 """Tests for serialize.py."""
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import pytest
 
-from mets_builder.mets import METS
 from mets_builder import serialize
+from mets_builder.mets import METS
 from mets_builder.serialize import _NAMESPACES
 
 

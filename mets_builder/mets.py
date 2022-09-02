@@ -1,10 +1,9 @@
 """Module for METS class representing a METS document."""
-from collections import namedtuple
-from datetime import datetime
-from datetime import timezone
-from enum import Enum
 import string
-from typing import Optional, List, NamedTuple, Union
+from collections import namedtuple
+from datetime import datetime, timezone
+from enum import Enum
+from typing import List, NamedTuple, Optional, Union
 
 from mets_builder.serialize import to_xml_string
 
