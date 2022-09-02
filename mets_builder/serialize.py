@@ -10,7 +10,7 @@ import xml_helpers
 # https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING for more
 # info
 if TYPE_CHECKING:
-    from mets_builder import METS
+    from mets_builder.mets import METS
 
 _NAMESPACES = {
     "mets": "http://www.loc.gov/METS/",

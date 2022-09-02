@@ -1,8 +1,7 @@
 """Tests for mets.py."""
 import pytest
 
-from mets_builder import METS
-from mets_builder.mets import AgentRole, AgentType
+from mets_builder.mets import METS, AgentRole, AgentType
 
 
 def test_invalid_mets_profile():
