@@ -1,9 +1,12 @@
 """Module for serializing METS objects."""
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import lxml.etree
 import mets as mets_elements
 import xml_helpers
+
+from mets_builder.metadata import MetadataBase, MetadataType
 
 # Prevent circular import caused by type hints with special
 # typing.TYPE_CHECKING constant. See
@@ -42,6 +45,8 @@ def _parse_mets(mets):
     """
     mets_root = _parse_mets_root_element(mets)
     mets_root.append(_parse_mets_header(mets))
+    _append_metadata(mets_root, mets)
+
     return mets_root
 
 
@@ -120,6 +125,83 @@ def _parse_mets_header(mets):
     )
 
     return mets_header
+
+
+def _append_metadata(mets_root, mets):
+    """Parse metadata from METS object and append them to a lxml element.
+
+    :param lxml.etree._Element mets_root: Element to which metadata are
+        appended
+    :param METS mets: The METS object
+    """
+    amdsec_metadata = []
+
+    for metadata in mets.metadata:
+        parsed_metadata = _parse_metadata_element(metadata)
+        if metadata.metadata_type == MetadataType.DESCRIPTIVE:
+            # Descriptive metadata are added to mets root element
+            mets_root.append(parsed_metadata)
+        else:
+            # Other metadata are added to administrative metadata element
+            # (amdSec)
+            amdsec_metadata.append(parsed_metadata)
+
+    amdsec = mets_elements.amdsec(child_elements=amdsec_metadata)
+    mets_root.append(amdsec)
+
+
+def _parse_metadata_element(metadata: MetadataBase):
+    """Parse given metadata object.
+
+    :param MetadataBase metadata: The metadata object that should be parsed.
+
+    :returns: The metadata wrapped in the correct base element (dmdSec, techMD
+        etc.) as lxml.etree._Element
+    """
+    # Serialize metadata
+    serialized_metadata = metadata.serialize()
+
+    # Metadata has to be wrapped in mdWrap and xmlData elements
+    xml_data = mets_elements.xmldata(child_elements=[serialized_metadata])
+    md_wrap = mets_elements.mdwrap(
+        mdtype=metadata.metadata_format.value,
+        mdtypeversion=metadata.format_version,
+        othermdtype=metadata.other_format,
+        child_elements=[xml_data]
+    )
+
+    # Format create time and determine whether the time is an estimation (it
+    # was given as a string)
+    created = metadata.created
+    created_is_estimation = True
+    if isinstance(metadata.created, datetime):
+        created = metadata.created.isoformat(timespec="seconds")
+        created_is_estimation = False
+
+    # Determine base element (techMD, dmdSec etc.)
+    if metadata.metadata_type == MetadataType.TECHNICAL:
+        element_builder_function = mets_elements.techmd
+    elif metadata.metadata_type == MetadataType.DIGITAL_PROVENANCE:
+        element_builder_function = mets_elements.digiprovmd
+    elif metadata.metadata_type == MetadataType.DESCRIPTIVE:
+        element_builder_function = mets_elements.dmdsec
+
+    # Create element
+    metadata_element = element_builder_function(
+        element_id=metadata.identifier,
+        created_date=created,
+        child_elements=[md_wrap]
+    )
+
+    # If created is an estimated time, it has to be declared using Finnish
+    # national METS namespace
+    if created_is_estimation:
+        # delete CREATED attribute from the metadata element
+        del metadata_element.attrib["CREATED"]
+        # add it back with fi namespace
+        metadata_element.set(_use_namespace("fi", "CREATED"), created)
+
+    return metadata_element
 
 
 def to_xml_string(mets: "METS") -> bytes:

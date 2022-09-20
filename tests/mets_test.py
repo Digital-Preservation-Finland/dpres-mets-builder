@@ -1,6 +1,7 @@
 """Tests for mets.py."""
 import pytest
 
+from mets_builder import metadata
 from mets_builder.mets import METS, AgentRole, AgentType
 
 
@@ -226,6 +227,28 @@ def test_add_agent_with_other_role_and_type():
     assert mets.agents[1].other_type == "other_type"
 
     assert mets.agents[1].name == "name"
+
+
+def test_add_metadata():
+    """Test adding metadata to METS object."""
+    mets = METS(
+        mets_profile=(
+            "https://digitalpreservation.fi/mets-profiles/"
+            "cultural-heritage"
+        ),
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+
+    data = metadata.MetadataBase(
+        metadata_type="technical",
+        metadata_format="PREMIS:OBJECT",
+        format_version="1.0"
+    )
+
+    mets.add_metadata(data)
+    assert mets.metadata == {data}
 
 
 def test_serialization():

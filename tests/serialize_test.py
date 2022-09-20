@@ -1,11 +1,12 @@
 """Tests for serialize.py."""
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
-from mets_builder import serialize
+from mets_builder import metadata, serialize
 from mets_builder.mets import METS
-from mets_builder.serialize import _NAMESPACES
+from mets_builder.serialize import _NAMESPACES, _use_namespace
 
 
 @pytest.fixture()
@@ -33,6 +34,25 @@ def mets_object():
         other_type="Bar"
     )
 
+    md_1 = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="descriptive",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="1"
+    )
+    md_2 = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="technical",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="2"
+    )
+    mets.add_metadata(md_1)
+    mets.add_metadata(md_2)
+
     return mets
 
 
@@ -44,10 +64,17 @@ def test_parse_mets(mets_object):
     elements more thoroughly.
     """
     element = serialize._parse_mets(mets_object)
-    subelements = list(element)
 
-    assert len(subelements) == 1
+    assert len(element) == 3
     assert element.find("mets:metsHdr", namespaces=_NAMESPACES) is not None
+    assert element.find("mets:dmdSec", namespaces=_NAMESPACES) is not None
+
+    # Assert administrative metadata exists and contains other metadata than
+    # descriptive metadata
+    amd_sec = element.find("mets:amdSec", namespaces=_NAMESPACES)
+    assert amd_sec is not None
+    assert len(amd_sec) == 1
+    assert amd_sec.find("mets:techMD", namespaces=_NAMESPACES) is not None
 
 
 def test_parse_root_element(mets_object):
@@ -108,6 +135,78 @@ def test_parse_mets_header(mets_object):
     name_element = list(agents[1])
     assert len(name_element) == 1
     assert name_element[0].text == "Ms. Bar"
+
+
+@pytest.mark.parametrize(
+    ["metadata_type", "root_element_tag"],
+    [
+        (metadata.MetadataType.DESCRIPTIVE, "dmdSec"),
+        (metadata.MetadataType.TECHNICAL, "techMD"),
+        (metadata.MetadataType.DIGITAL_PROVENANCE, "digiprovMD")
+    ]
+)
+def test_parse_metadata_element(metadata_type, root_element_tag):
+    """Test that a metadata object is parsed correctly."""
+    data = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type=metadata_type,
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="identifier",
+        created=datetime(2000, 1, 2, 3, 4, 5, 6, tzinfo=timezone.utc)
+    )
+    root_element = serialize._parse_metadata_element(data)
+
+    # The root element tag depends on metadata type
+    assert root_element.tag == _use_namespace("mets", root_element_tag)
+    assert len(root_element.items()) == 2
+    assert root_element.get("ID") == "identifier"
+    assert root_element.get("CREATED") == "2000-01-02T03:04:05+00:00"
+
+    # The root element wraps mdWrap element
+    assert len(root_element) == 1
+    md_wrap = root_element[0]
+    assert md_wrap.tag == _use_namespace("mets", "mdWrap")
+    assert len(md_wrap.items()) == 3
+    assert md_wrap.get("MDTYPE") == "OTHER"
+    assert md_wrap.get("MDTYPEVERSION") == "1.0"
+    assert md_wrap.get("OTHERMDTYPE") == "PAS-special"
+
+    # Which wraps xmlData element
+    assert len(md_wrap) == 1
+    xml_data = md_wrap[0]
+    assert xml_data.tag == _use_namespace("mets", "xmlData")
+
+    # Which wraps the actual metadata
+    assert len(xml_data) == 1
+    metadata_element = xml_data[0]
+
+    # The metadata content is
+    # <root>
+    #   <sub1></sub1>
+    #   <sub2></sub2>
+    # </root>
+    assert metadata_element.tag == "root"
+    assert len(metadata_element) == 2
+    assert metadata_element[0].tag == "sub1"
+    assert metadata_element[1].tag == "sub2"
+
+
+def test_parse_metadata_with_estimated_create_time():
+    """Test that if estimated create time is given to metadata, it is written
+    using fi:CREATED attribute and CREATED attribute does not exist.
+    """
+    data = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="technical",
+        metadata_format="NISOIMG",
+        format_version="1.0",
+        created="2011?"
+    )
+    root_element = serialize._parse_metadata_element(data)
+    assert root_element.get(_use_namespace("fi", "CREATED")) == "2011?"
+    assert root_element.get("CREATED") is None
 
 
 def test_to_xml_string(mets_object):

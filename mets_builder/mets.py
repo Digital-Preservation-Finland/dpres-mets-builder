@@ -3,8 +3,9 @@ import string
 from collections import namedtuple
 from datetime import datetime, timezone
 from enum import Enum
-from typing import List, NamedTuple, Optional, Union
+from typing import List, NamedTuple, Optional, Set, Union
 
+from mets_builder.metadata import MetadataBase
 from mets_builder.serialize import to_xml_string
 
 METS_CATALOG = "1.7.4"
@@ -196,6 +197,8 @@ class METS:
         self.catalog_version = catalog_version
         self.specification = specification
 
+        self.metadata: Set[MetadataBase] = set()
+
     @property
     def mets_profile(self) -> str:
         """Getter for mets_profile."""
@@ -382,6 +385,16 @@ class METS:
         )
         agent = METSAgent(name, role, other_role, type, other_type)
         self.agents.append(agent)
+
+    def add_metadata(self, metadata: MetadataBase) -> None:
+        """Add a metadata object to this METS.
+
+        :param MetadataBase metadata: The metadata object that is added to this
+            METS object.
+
+        :returns: None.
+        """
+        self.metadata.add(metadata)
 
     def serialize(self) -> bytes:
         """Serialize this METS object into xml-formatted string."""
