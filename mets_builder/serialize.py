@@ -1,10 +1,11 @@
 """Module for serializing METS objects."""
+
 from datetime import datetime
+from io import BytesIO
 from typing import TYPE_CHECKING
 
-import lxml.etree
 import mets as mets_elements
-import xml_helpers
+from lxml import etree
 
 from mets_builder.metadata import MetadataBase, MetadataType
 
@@ -33,21 +34,6 @@ _METS_FI_SCHEMA = "http://digitalpreservation.fi/schemas/mets/mets.xsd"
 def _use_namespace(namespace, attribute):
     """Get a string prepended with a namespace prefix."""
     return f"{{{_NAMESPACES[namespace]}}}{attribute}"
-
-
-def _parse_mets(mets):
-    """Parse METS XML tree for given METS object.
-
-    :param METS mets: METS object
-
-    :returns: Root element (mets:mets) of the fully parsed METS object as
-        lxml.etree._Element
-    """
-    mets_root = _parse_mets_root_element(mets)
-    mets_root.append(_parse_mets_header(mets))
-    _append_metadata(mets_root, mets)
-
-    return mets_root
 
 
 def _parse_mets_root_element(mets):
@@ -86,7 +72,7 @@ def _parse_mets_root_element(mets):
     )
 
     # Remove unused namespaces
-    lxml.etree.cleanup_namespaces(mets_root)
+    etree.cleanup_namespaces(mets_root)
 
     return mets_root
 
@@ -107,7 +93,6 @@ def _parse_mets_header(mets):
             otherrole=agent.other_role,
             agent_type=agent.type.value,
             othertype=agent.other_type
-
         )
         agents.append(agent_element)
 
@@ -125,29 +110,6 @@ def _parse_mets_header(mets):
     )
 
     return mets_header
-
-
-def _append_metadata(mets_root, mets):
-    """Parse metadata from METS object and append them to a lxml element.
-
-    :param lxml.etree._Element mets_root: Element to which metadata are
-        appended
-    :param METS mets: The METS object
-    """
-    amdsec_metadata = []
-
-    for metadata in mets.metadata:
-        parsed_metadata = _parse_metadata_element(metadata)
-        if metadata.metadata_type == MetadataType.DESCRIPTIVE:
-            # Descriptive metadata are added to mets root element
-            mets_root.append(parsed_metadata)
-        else:
-            # Other metadata are added to administrative metadata element
-            # (amdSec)
-            amdsec_metadata.append(parsed_metadata)
-
-    amdsec = mets_elements.amdsec(child_elements=amdsec_metadata)
-    mets_root.append(amdsec)
 
 
 def _parse_metadata_element(metadata: MetadataBase):
@@ -204,6 +166,52 @@ def _parse_metadata_element(metadata: MetadataBase):
     return metadata_element
 
 
+def _write_mets(mets, output_file):
+    """Write METS object to file serialized as XML.
+
+    :param METS mets: METS object to serialize
+    :param BytesIO, str output_file: File to write the serialized METS to. It
+        can be given as a BytesIO file object or as path to the output file. If
+        BytesIO is given, the caller should take care of closing the file
+        themselves.
+
+    :returns: The given output_file.
+    """
+    # Use incremental XML generation with context managers.
+    # This saves memory by writing elements incrementally rather than
+    # constructing the entire tree in memory before writing
+    with etree.xmlfile(output_file, encoding="utf-8") as xml:
+
+        # METS root element
+        mets_root = _parse_mets_root_element(mets)
+        with xml.element(mets_root.tag, mets_root.attrib, mets_root.nsmap):
+
+            # METS Header
+            xml.write(_parse_mets_header(mets))
+
+            # Descriptive metadata
+            descriptive_metadata = [
+                metadata for metadata in mets.metadata
+                if metadata.metadata_type == MetadataType.DESCRIPTIVE
+            ]
+            for metadata in descriptive_metadata:
+                metadata_element = _parse_metadata_element(metadata)
+                xml.write(metadata_element)
+
+            # Administrative metadata
+            administrative_metadata = [
+                metadata for metadata in mets.metadata
+                if metadata.metadata_type != MetadataType.DESCRIPTIVE
+            ]
+            amdsec = mets_elements.amdsec()
+            with xml.element(amdsec.tag):
+                for metadata in administrative_metadata:
+                    metadata_element = _parse_metadata_element(metadata)
+                    xml.write(metadata_element)
+
+    return output_file
+
+
 def to_xml_string(mets: "METS") -> bytes:
     """Serialize METS object to XML string.
 
@@ -211,5 +219,8 @@ def to_xml_string(mets: "METS") -> bytes:
 
     :returns: Given METS object as XML-formatted byte string.
     """
-    parsed_mets = _parse_mets(mets)
-    return xml_helpers.utils.serialize(parsed_mets)
+    output_file = BytesIO()
+    result = _write_mets(mets, output_file).getvalue()
+    output_file.close()
+
+    return result

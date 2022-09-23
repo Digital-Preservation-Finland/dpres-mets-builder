@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from lxml import etree
 
 from mets_builder import metadata, serialize
 from mets_builder.mets import METS
@@ -63,7 +64,10 @@ def test_parse_mets(mets_object):
     first-level elements, as the other functions test the contents of the
     elements more thoroughly.
     """
-    element = serialize._parse_mets(mets_object)
+    # Serialize the entire mets, then read it to lxml.etree._Element for
+    # inspection
+    serialized = serialize.to_xml_string(mets_object)
+    element = etree.fromstring(serialized)
 
     assert len(element) == 3
     assert element.find("mets:metsHdr", namespaces=_NAMESPACES) is not None
