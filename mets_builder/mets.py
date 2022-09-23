@@ -4,6 +4,7 @@ from collections import namedtuple
 from datetime import datetime, timezone
 from enum import Enum
 from typing import List, NamedTuple, Optional, Set, Union
+import uuid
 
 from mets_builder.metadata import MetadataBase
 from mets_builder.serialize import to_xml_string
@@ -95,11 +96,11 @@ class METS:
     def __init__(
         self,
         mets_profile: str,
-        package_id: str,
         contract_id: str,
         creator_name: str,
         creator_type: Union[AgentType, str, None] = AgentType.ORGANIZATION,
         creator_other_type: str = None,
+        package_id: Optional[str] = None,
         content_id: Optional[str] = None,
         label: Optional[str] = None,
         create_date: Optional[datetime] = None,
@@ -115,9 +116,6 @@ class METS:
             "https://digitalpreservation.fi/mets-profiles/cultural-heritage".
             For research data resources the attribute value must be
             "https://digitalpreservation.fi/mets-profiles/research-data".
-        :param str package_id: Organization’s unique identifier for the
-            information package (objid). Attribute value should be expressed in
-            printable US-ASCII characters.
         :param str contract_id: Contract identifier of a DPS contract to which
             the package content belongs. Attribute value should be expressed in
             printable US-ASCII characters.
@@ -137,6 +135,10 @@ class METS:
             type, if none of the pre-defined types in 'creator_type' attribute
             apply. If set, 'creator_other_type' overrides any value set to
             'creator_type' with AgentType.OTHER.
+        :param str package_id: Organization’s unique identifier for the
+            information package (objid). Attribute value should be expressed in
+            printable US-ASCII characters. If set to None, an UUID is generated
+            as the default value.
         :param str content_id: Identifier for the content in the package.
             Attribute value should be expressed in printable US-ASCII
             characters.
@@ -186,6 +188,9 @@ class METS:
         if create_date is None:
             create_date = datetime.now(tz=timezone.utc)
 
+        if package_id is None:
+            package_id = str(uuid.uuid4())
+
         self.mets_profile = mets_profile
         self.package_id = package_id
         self.contract_id = contract_id
@@ -222,8 +227,8 @@ class METS:
     @package_id.setter
     def package_id(self, value: str) -> None:
         """Setter for package_id."""
-        if value is None:
-            raise ValueError("package_id can not be None")
+        if value in (None, ""):
+            raise ValueError("package_id cannot be empty")
 
         if not _is_printable_us_ascii(value):
             raise ValueError(

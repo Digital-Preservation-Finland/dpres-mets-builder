@@ -27,7 +27,7 @@ def test_invalid_mets_profile():
 @pytest.mark.parametrize(
     ["invalid_value", "error_message"],
     [
-        (None, "package_id can not be None"),
+        ("", "package_id cannot be empty"),
         ("ä", ("package_id 'ä' contains characters that are not printable "
                "US-ASCII characters"))
     ]
