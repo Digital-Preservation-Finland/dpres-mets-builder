@@ -71,9 +71,6 @@ def _parse_mets_root_element(mets):
         f"{_NAMESPACES['mets']} {_METS_FI_SCHEMA}"
     )
 
-    # Remove unused namespaces
-    etree.cleanup_namespaces(mets_root)
-
     return mets_root
 
 
