@@ -16,10 +16,6 @@ RECORD_STATUSES = [
     "update",
     "dissemination"
 ]
-METS_PROFILES = [
-    "https://digitalpreservation.fi/mets-profiles/cultural-heritage",
-    "https://digitalpreservation.fi/mets-profiles/research-data"
-]
 
 
 # TODO: In Python 3.8 this can be done more simply with
@@ -32,6 +28,18 @@ def _is_printable_us_ascii(word: str) -> bool:
         if letter not in string.printable:
             return False
     return True
+
+
+class MetsProfile(Enum):
+    """Enum for METS profiles."""
+
+    CULTURAL_HERITAGE = (
+        "https://digitalpreservation.fi/mets-profiles/cultural-heritage")
+    """Profile for cultural heritage resources."""
+
+    RESEARCH_DATA = (
+        "https://digitalpreservation.fi/mets-profiles/research-data")
+    """Profile for research data resources."""
 
 
 class AgentRole(Enum):
@@ -95,7 +103,7 @@ class METS:
 
     def __init__(
         self,
-        mets_profile: str,
+        mets_profile: Union[MetsProfile, str],
         contract_id: str,
         creator_name: str,
         creator_type: Union[AgentType, str, None] = AgentType.ORGANIZATION,
@@ -111,11 +119,11 @@ class METS:
     ) -> None:
         """Constructor for METS class.
 
-        :param str mets_profile: The METS profile for this METS document. For
-            cultural heritage resources the attribute value must be
-            "https://digitalpreservation.fi/mets-profiles/cultural-heritage".
-            For research data resources the attribute value must be
-            "https://digitalpreservation.fi/mets-profiles/research-data".
+        :param MetsProfile, str mets_profile: The METS profile for this
+            METS document, given as MetsProfile enum or string. If given as
+            string, the value is cast to MetsProfile and results in error if it
+            is not a valid mets profile. The allowed values can be found from
+            MetsProfile documentation.
         :param str contract_id: Contract identifier of a DPS contract to which
             the package content belongs. Attribute value should be expressed in
             printable US-ASCII characters.
@@ -191,7 +199,7 @@ class METS:
         if package_id is None:
             package_id = str(uuid.uuid4())
 
-        self.mets_profile = mets_profile
+        self.mets_profile = MetsProfile(mets_profile)
         self.package_id = package_id
         self.contract_id = contract_id
         self.content_id = content_id
@@ -203,21 +211,6 @@ class METS:
         self.specification = specification
 
         self.metadata: Set[MetadataBase] = set()
-
-    @property
-    def mets_profile(self) -> str:
-        """Getter for mets_profile."""
-        return self._mets_profile
-
-    @mets_profile.setter
-    def mets_profile(self, value: str) -> None:
-        """Setter for mets_profile."""
-        if value not in METS_PROFILES:
-            raise ValueError(
-                f"'{value}' is not a valid value for mets_profile. "
-                f"Value must be one of {METS_PROFILES}"
-            )
-        self._mets_profile = value
 
     @property
     def package_id(self) -> str:

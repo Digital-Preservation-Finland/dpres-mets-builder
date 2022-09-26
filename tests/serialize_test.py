@@ -6,7 +6,7 @@ import pytest
 from lxml import etree
 
 from mets_builder import metadata, serialize
-from mets_builder.mets import METS
+from mets_builder.mets import METS, MetsProfile
 from mets_builder.serialize import _NAMESPACES, _use_namespace
 
 
@@ -14,9 +14,7 @@ from mets_builder.serialize import _NAMESPACES, _use_namespace
 def mets_object():
     """Get valid METS object."""
     mets = METS(
-        mets_profile=(
-            "https://digitalpreservation.fi/mets-profiles/cultural-heritage"
-        ),
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo",

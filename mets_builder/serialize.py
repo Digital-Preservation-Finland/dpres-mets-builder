@@ -45,7 +45,7 @@ def _parse_mets_root_element(mets):
     """
     # Create the root element
     mets_root = mets_elements.mets(
-        profile=mets.mets_profile,
+        profile=mets.mets_profile.value,
         objid=mets.package_id,
         label=mets.label,
         namespaces=_NAMESPACES

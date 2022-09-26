@@ -2,7 +2,7 @@
 import pytest
 
 from mets_builder import metadata
-from mets_builder.mets import METS, AgentRole, AgentType
+from mets_builder.mets import METS, MetsProfile, AgentRole, AgentType
 
 
 def test_invalid_mets_profile():
@@ -17,10 +17,7 @@ def test_invalid_mets_profile():
             creator_name="Mr. Foo"
         )
     assert str(error.value) == (
-        "'invalid' is not a valid value for mets_profile. "
-        "Value must be one of "
-        "['https://digitalpreservation.fi/mets-profiles/cultural-heritage', "
-        "'https://digitalpreservation.fi/mets-profiles/research-data']"
+        "'invalid' is not a valid MetsProfile"
     )
 
 
@@ -38,10 +35,7 @@ def test_invalid_package_id(invalid_value, error_message):
     """
     with pytest.raises(ValueError) as error:
         METS(
-            mets_profile=(
-                "https://digitalpreservation.fi/mets-profiles/"
-                "cultural-heritage"
-            ),
+            mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id=invalid_value,
             contract_id="contract_id",
             creator_name="Mr. Foo"
@@ -63,10 +57,7 @@ def test_invalid_contract_id(invalid_value, error_message):
     """
     with pytest.raises(ValueError) as error:
         METS(
-            mets_profile=(
-                "https://digitalpreservation.fi/mets-profiles/"
-                "cultural-heritage"
-            ),
+            mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
             contract_id=invalid_value,
             creator_name="Mr. Foo"
@@ -80,10 +71,7 @@ def test_invalid_content_id():
     """
     with pytest.raises(ValueError) as error:
         METS(
-            mets_profile=(
-                "https://digitalpreservation.fi/mets-profiles/"
-                "cultural-heritage"
-            ),
+            mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
             contract_id="contract_id",
             creator_name="Mr. Foo",
@@ -101,10 +89,7 @@ def test_invalid_record_status():
     """
     with pytest.raises(ValueError) as error:
         METS(
-            mets_profile=(
-                "https://digitalpreservation.fi/mets-profiles/"
-                "cultural-heritage"
-            ),
+            mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
             contract_id="contract_id",
             creator_name="Mr. Foo",
@@ -122,10 +107,7 @@ def test_no_specification_or_catalog_version():
     """
     with pytest.raises(ValueError) as error:
         METS(
-            mets_profile=(
-                "https://digitalpreservation.fi/mets-profiles/"
-                "cultural-heritage"
-            ),
+            mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
             contract_id="contract_id",
             creator_name="Mr. Foo",
@@ -140,10 +122,7 @@ def test_no_specification_or_catalog_version():
 def test_add_agent():
     """Test that agent can be added to a METS object."""
     mets = METS(
-        mets_profile=(
-            "https://digitalpreservation.fi/mets-profiles/"
-            "cultural-heritage"
-        ),
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo"
@@ -183,10 +162,7 @@ def test_add_agent_invalid_arguments(
 ):
     """Test adding agents with invalid roles and types."""
     mets = METS(
-        mets_profile=(
-            "https://digitalpreservation.fi/mets-profiles/"
-            "cultural-heritage"
-        ),
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo"
@@ -207,10 +183,7 @@ def test_add_agent_with_other_role_and_type():
     values.
     """
     mets = METS(
-        mets_profile=(
-            "https://digitalpreservation.fi/mets-profiles/"
-            "cultural-heritage"
-        ),
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo"
@@ -234,10 +207,7 @@ def test_add_agent_with_other_role_and_type():
 def test_add_metadata():
     """Test adding metadata to METS object."""
     mets = METS(
-        mets_profile=(
-            "https://digitalpreservation.fi/mets-profiles/"
-            "cultural-heritage"
-        ),
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo"
@@ -259,10 +229,7 @@ def test_serialization():
     More thorough testing should be done in serialize module tests.
     """
     mets = METS(
-        mets_profile=(
-            "https://digitalpreservation.fi/mets-profiles/"
-            "cultural-heritage"
-        ),
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo"
