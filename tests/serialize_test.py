@@ -90,11 +90,11 @@ def test_parse_root_element(mets_object):
     )
     assert element.get("OBJID") == "package_id"
     assert element.get("LABEL") == "label"
-    assert element.get(f"{{{_NAMESPACES['fi']}}}CONTRACTID") == "contract_id"
-    assert element.get(f"{{{_NAMESPACES['fi']}}}CONTENTID") == "content_id"
-    assert element.get(f"{{{_NAMESPACES['fi']}}}CATALOG") == "1.0"
-    assert element.get(f"{{{_NAMESPACES['fi']}}}SPECIFICATION") == "2.0"
-    assert element.get(f"{{{_NAMESPACES['xsi']}}}schemaLocation") == (
+    assert element.get(_use_namespace("fi", "CONTRACTID")) == "contract_id"
+    assert element.get(_use_namespace("fi", "CONTENTID")) == "content_id"
+    assert element.get(_use_namespace("fi", "CATALOG")) == "1.0"
+    assert element.get(_use_namespace("fi", "SPECIFICATION")) == "2.0"
+    assert element.get(_use_namespace("xsi", "schemaLocation")) == (
         "http://www.loc.gov/METS/ "
         "http://digitalpreservation.fi/schemas/mets/mets.xsd"
     )
