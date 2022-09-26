@@ -11,11 +11,6 @@ from mets_builder.serialize import to_xml_string
 
 METS_CATALOG = "1.7.4"
 METS_SPECIFICATION = "1.7.4"
-RECORD_STATUSES = [
-    "submission",
-    "update",
-    "dissemination"
-]
 
 
 # TODO: In Python 3.8 this can be done more simply with
@@ -40,6 +35,22 @@ class MetsProfile(Enum):
     RESEARCH_DATA = (
         "https://digitalpreservation.fi/mets-profiles/research-data")
     """Profile for research data resources."""
+
+
+class MetsRecordStatus(Enum):
+    """Enum for METS record statuses."""
+
+    SUBMISSION = "submission"
+    """The information package is a new SIP. If the package identifier is the
+    same as in some other information package ingested earlier belonging to the
+    same contract, the package will be rejected.
+    """
+
+    UPDATE = "update"
+    """The SIP is an updated version of a previous SIP."""
+
+    DISSEMINATION = "dissemination"
+    """The information package is a DIP."""
 
 
 class AgentRole(Enum):
@@ -113,7 +124,8 @@ class METS:
         label: Optional[str] = None,
         create_date: Optional[datetime] = None,
         last_mod_date: Optional[datetime] = None,
-        record_status: Optional[str] = None,
+        record_status: Union[MetsRecordStatus, str] = (
+            MetsRecordStatus.SUBMISSION),
         catalog_version: Optional[str] = METS_CATALOG,
         specification: Optional[str] = METS_SPECIFICATION
     ) -> None:
@@ -158,17 +170,11 @@ class METS:
             modified since the initial creation, the modification time must be
             expressed with last_mod_date using the same resolution as
             create_date.
-        :param str record_status: If the attribute is not present or its value
-            is “submission”, the information package is a new SIP. If the
-            package identifier is the same as in some other information package
-            ingested earlier belonging to the same contract, the package will
-            be rejected.
-
-            The value “update” means the SIP is an updated version of a
-            previous SIP. If the package identifier is not found from the DPS,
-            the package will be rejected.
-
-            The value “dissemination” means the information package is a DIP.
+        :param MetsRecordStatus, str record_status: The record status of the
+            information package, given as MetsRecordStatus enum or string. If
+            given as string, the value is cast to MetsRecordStatus and results
+            in error if it is not a valid record status. The allowed values can
+            be found from MetsRecordStatus documentation.
         :param str catalog_version: Version number of the schema catalog used
             when data package is created. If there is no "catalog_version"
             present, it has to be replaced by "specification" attribute.
@@ -206,7 +212,7 @@ class METS:
         self.label = label
         self.create_date = create_date
         self.last_mod_date = last_mod_date
-        self.record_status = record_status
+        self.record_status = MetsRecordStatus(record_status)
         self.catalog_version = catalog_version
         self.specification = specification
 
@@ -262,21 +268,6 @@ class METS:
                 "printable US-ASCII characters"
             )
         self._content_id = value
-
-    @property
-    def record_status(self) -> Optional[str]:
-        """Getter for record_status."""
-        return self._record_status
-
-    @record_status.setter
-    def record_status(self, value: str) -> None:
-        """Setter for record_status."""
-        if value is not None and value not in RECORD_STATUSES:
-            raise ValueError(
-                f"'{value}' is not a valid value for record_status. "
-                f"Value must be one of {RECORD_STATUSES}"
-            )
-        self._record_status = value
 
     def add_agent(
         self,

@@ -102,7 +102,7 @@ def _parse_mets_header(mets):
     mets_header = mets_elements.metshdr(
         create_date=mets.create_date.isoformat(timespec="seconds"),
         last_mod_date=last_mod_date,
-        record_status=mets.record_status,
+        record_status=mets.record_status.value,
         agents=agents
     )
 

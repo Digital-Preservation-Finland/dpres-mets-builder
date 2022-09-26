@@ -95,10 +95,7 @@ def test_invalid_record_status():
             creator_name="Mr. Foo",
             record_status="invalid"
         )
-    assert str(error.value) == (
-        "'invalid' is not a valid value for record_status. Value must be one "
-        "of ['submission', 'update', 'dissemination']"
-    )
+    assert str(error.value) == "'invalid' is not a valid MetsRecordStatus"
 
 
 def test_no_specification_or_catalog_version():
