@@ -86,9 +86,9 @@ def _parse_mets_header(mets):
     for agent in mets.agents:
         agent_element = mets_elements.agent(
             organisation_name=agent.name,
-            agent_role=agent.role.value,
+            agent_role=agent.agent_role.value,
             otherrole=agent.other_role,
-            agent_type=agent.type.value,
+            agent_type=agent.agent_type.value,
             othertype=agent.other_type
         )
         agents.append(agent_element)

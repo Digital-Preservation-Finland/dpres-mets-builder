@@ -180,8 +180,8 @@ class METS:
         self.agents: List[NamedTuple] = []
         self.add_agent(
             name=creator_name,
-            role=AgentRole.CREATOR,
-            type=creator_type,
+            agent_role=AgentRole.CREATOR,
+            agent_type=creator_type,
             other_type=creator_other_type
         )
 
@@ -289,9 +289,9 @@ class METS:
         self,
         name: str,
         *,  # This forces the rest to be given as keyword arguments
-        role: Union[AgentRole, str, None] = None,
+        agent_role: Union[AgentRole, str, None] = None,
         other_role: Optional[str] = None,
-        type: Union[AgentType, str, None] = None,
+        agent_type: Union[AgentType, str, None] = None,
         other_type: Optional[str] = None
     ) -> None:
         """Add an agent to the METS object.
@@ -303,8 +303,8 @@ class METS:
         :param str name: The name of the agent. For example, if agent type is
             set as "ORGANIZATION", the name should be set as the name of the
             organization.
-        :param AgentRole, str role: Specifies the function of the agent with
-            respect to the METS record. The pre-defined values are:
+        :param AgentRole, str agent_role: Specifies the function of the agent
+            with respect to the METS record. The pre-defined values are:
 
             - CREATOR: The person(s) or institution(s) responsible for the METS
               document.
@@ -324,10 +324,10 @@ class METS:
 
             Any other values should be given using the 'other_role' attribute.
         :param str other_role: Can be used to describe the agent role, if none
-            of the pre-defined roles in 'role' attribute apply. If set,
-            'other_role' overrides any value set to 'role' with
+            of the pre-defined roles in 'agent_role' attribute apply. If set,
+            'other_role' overrides any value set to 'agent_role' with
             AgentRole.OTHER.
-        :param AgentType, str type: Specifies the type of agent. The
+        :param AgentType, str agent_type: Specifies the type of agent. The
             pre-defined values are:
 
             - INDIVIDUAL: Use if an individual has served as the agent.
@@ -337,8 +337,8 @@ class METS:
 
             Any other values should be given using the 'other_type' attribute.
         :param str other_type: Can be used to describe the agent type, if none
-            of the pre-defined types in 'type' attribute apply. If set,
-            'other_type' overrides any value set to 'type' with
+            of the pre-defined types in 'agent_type' attribute apply. If set,
+            'other_type' overrides any value set to 'agent_type' with
             AgentType.OTHER.
 
         :raises ValueError: if the given attributes are invalid
@@ -347,48 +347,51 @@ class METS:
         """
         # Handle agent role
         if other_role:
-            # other_role is set, use other_role and override role
-            role = AgentRole.OTHER
-        elif role:
-            # other_role is not set but role is, use role.
+            # other_role is set, use other_role and override agent_role
+            agent_role = AgentRole.OTHER
+        elif agent_role:
+            # other_role is not set but agent_role is, use agent_role.
 
-            # Cast role to AgentRole.
-            # This fails if role isn't a valid agent role
-            role = AgentRole(role)
+            # Cast agent_role to AgentRole.
+            # This fails if agent_role isn't a valid agent role
+            agent_role = AgentRole(agent_role)
 
-            if role == AgentRole.OTHER:
+            if agent_role == AgentRole.OTHER:
                 raise ValueError(
                     "Agent role is 'OTHER' but 'other_role' is not given."
                 )
         else:
             raise ValueError(
-                "Either 'role' or 'other_role' has to be set for the agent."
+                "Either 'agent_role' or 'other_role' has to be set for the "
+                "agent."
             )
 
         # Handle agent type
         if other_type:
-            # other_type is set, use other_type and override type
-            type = AgentType.OTHER
-        elif type:
-            # other_type is not set but type is, use type.
+            # other_type is set, use other_type and override agent_type
+            agent_type = AgentType.OTHER
+        elif agent_type:
+            # other_type is not set but agent_type is, use agent_type.
 
-            # Cast type to AgentType.
-            # This fails if type isn't a valid agent type
-            type = AgentType(type)
+            # Cast agent_type to AgentType.
+            # This fails if agent_type isn't a valid agent type
+            agent_type = AgentType(agent_type)
 
-            if type == AgentType.OTHER:
+            if agent_type == AgentType.OTHER:
                 raise ValueError(
                     "Agent type is 'OTHER' but 'other_type' is not given."
                 )
         else:
             raise ValueError(
-                "Either 'type' or 'other_type' has to be set for the agent."
+                "Either 'agent_type' or 'other_type' has to be set for the "
+                "agent."
             )
 
         METSAgent = namedtuple(
-            "METSAgent", ["name", "role", "other_role", "type", "other_type"]
+            "METSAgent",
+            ["name", "agent_role", "other_role", "agent_type", "other_type"]
         )
-        agent = METSAgent(name, role, other_role, type, other_type)
+        agent = METSAgent(name, agent_role, other_role, agent_type, other_type)
         self.agents.append(agent)
 
     def add_metadata(self, metadata: MetadataBase) -> None:

@@ -148,21 +148,21 @@ def test_add_agent():
         contract_id="contract_id",
         creator_name="Mr. Foo"
     )
-    mets.add_agent(name="name", role="EDITOR", type="INDIVIDUAL")
+    mets.add_agent(name="name", agent_role="EDITOR", agent_type="INDIVIDUAL")
 
     # Creator agent has been added on initialization, so there should be two
     # agents
     assert len(mets.agents) == 2
 
     # role and type are casted to their enum types
-    assert mets.agents[1].role == AgentRole.EDITOR
-    assert mets.agents[1].type == AgentType.INDIVIDUAL
+    assert mets.agents[1].agent_role == AgentRole.EDITOR
+    assert mets.agents[1].agent_type == AgentType.INDIVIDUAL
 
     assert mets.agents[1].name == "name"
 
 
 @pytest.mark.parametrize(
-    ["role", "other_role", "type", "other_type"],
+    ["agent_role", "other_role", "agent_type", "other_type"],
     [
         # Invalid role
         ("invalid", None, "ORGANIZATION", None),
@@ -178,7 +178,9 @@ def test_add_agent():
         ("CREATOR", None, None, None)
     ]
 )
-def test_add_agent_invalid_arguments(role, other_role, type, other_type):
+def test_add_agent_invalid_arguments(
+    agent_role, other_role, agent_type, other_type
+):
     """Test adding agents with invalid roles and types."""
     mets = METS(
         mets_profile=(
@@ -193,9 +195,9 @@ def test_add_agent_invalid_arguments(role, other_role, type, other_type):
     with pytest.raises(ValueError):
         mets.add_agent(
             name="name",
-            role=role,
+            agent_role=agent_role,
             other_role=other_role,
-            type=type,
+            agent_type=agent_type,
             other_type=other_type
         )
 
@@ -215,15 +217,15 @@ def test_add_agent_with_other_role_and_type():
     )
     mets.add_agent(
         name="name",
-        role="CREATOR",
+        agent_role="CREATOR",
         other_role="other_role",
-        type="INDIVIDUAL",
+        agent_type="INDIVIDUAL",
         other_type="other_type"
     )
 
-    assert mets.agents[1].role == AgentRole.OTHER
+    assert mets.agents[1].agent_role == AgentRole.OTHER
     assert mets.agents[1].other_role == "other_role"
-    assert mets.agents[1].type == AgentType.OTHER
+    assert mets.agents[1].agent_type == AgentType.OTHER
     assert mets.agents[1].other_type == "other_type"
 
     assert mets.agents[1].name == "name"
