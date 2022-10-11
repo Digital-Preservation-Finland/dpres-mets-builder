@@ -65,9 +65,9 @@ def test_generated_identifier():
     # First character is underscore
     assert data.identifier[0] == "_"
 
-    # Rest shoud be valid UUID v4.
-    # This raises error if identifier is not valid UUID v4
-    UUID(data.identifier[1:], version=4)
+    # Rest shoud be valid UUID.
+    # This raises error if identifier is not valid UUID
+    UUID(data.identifier[1:])
 
 
 def test_generated_created_time():
