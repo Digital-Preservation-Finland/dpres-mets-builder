@@ -187,19 +187,19 @@ def _write_mets(mets, output_file):
             xml.write(_parse_mets_header(mets))
 
             # Descriptive metadata
-            descriptive_metadata = [
+            descriptive_metadata = iter(
                 metadata for metadata in mets.metadata
                 if metadata.metadata_type == MetadataType.DESCRIPTIVE
-            ]
+            )
             for metadata in descriptive_metadata:
                 metadata_element = _parse_metadata_element(metadata)
                 xml.write(metadata_element)
 
             # Administrative metadata
-            administrative_metadata = [
+            administrative_metadata = iter(
                 metadata for metadata in mets.metadata
                 if metadata.metadata_type != MetadataType.DESCRIPTIVE
-            ]
+            )
             amdsec = mets_elements.amdsec()
             with xml.element(amdsec.tag):
                 for metadata in administrative_metadata:
