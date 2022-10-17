@@ -54,6 +54,10 @@ class MetadataBase:
         other_format: Optional[str] = None,
         identifier: Optional[str] = None,
         created: Union[datetime, str, None] = None,
+        # Allow users to give entire file-scraper output as init attributes
+        # when instantiating metadata classes, extra parameters go to waste
+        # here
+        **_
     ) -> None:
         """Constructor for MetadataBase class.
 

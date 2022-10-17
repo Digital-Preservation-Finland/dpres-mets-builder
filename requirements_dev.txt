@@ -5,4 +5,5 @@ pytest-cov
 mypy
 
 git+https://gitlab.ci.csc.fi/dpres/mets.git@develop#egg=mets
+git+https://gitlab.ci.csc.fi/dpres/nisomix.git@develop#egg=nisomix
 git+https://gitlab.ci.csc.fi/dpres/xml-helpers.git@develop#egg=xml-helpers

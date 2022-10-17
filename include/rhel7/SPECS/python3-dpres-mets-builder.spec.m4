@@ -24,6 +24,7 @@ Requires:       python3
 Requires:       python36-lxml
 Requires:       python3-xml-helpers
 Requires:       python3-mets
+Requires:       python3-nisomix
 
 %description
 A library for easy composing of METS files.

@@ -4,3 +4,4 @@ pytest
 
 git+https://github.com/Digital-Preservation-Finland/xml-helpers.git#egg=xml_helpers
 git+https://github.com/Digital-Preservation-Finland/mets.git#egg=mets
+git+https://github.com/Digital-Preservation-Finland/nisomix.git#egg=nisomix
