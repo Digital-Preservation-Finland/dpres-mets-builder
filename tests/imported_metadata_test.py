@@ -31,7 +31,7 @@ def test_serializing_imported_metadata():
         other_format="PAS-special",
         format_version="1.0"
     )
-    root_element = data.serialize()
+    root_element = data.to_xml()
 
     # The xml file content is
     # <root>

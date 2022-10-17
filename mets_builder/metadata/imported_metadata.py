@@ -27,7 +27,7 @@ class ImportedMetadata(MetadataBase):
             raise ValueError(f"Given path '{str(data_path)}' is not a file.")
         self.data_path = data_path
 
-    def serialize(self) -> etree._Element:
+    def to_xml(self) -> etree._Element:
         """Serialize this metadata object to XML.
 
         :returns: The root element of the metadata serialized into XML.

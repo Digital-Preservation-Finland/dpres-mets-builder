@@ -67,7 +67,7 @@ def test_serialization():
         icc_profile_name="Adobe RGB"
     )
 
-    root_element = md.serialize()
+    root_element = md.to_xml()
 
     # Root element
     assert len(root_element) == 3

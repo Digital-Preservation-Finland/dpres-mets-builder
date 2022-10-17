@@ -93,7 +93,7 @@ class TechnicalImageMetadata(MetadataBase):
                     f"{value}."
                 )
 
-    def serialize(self) -> etree._Element:
+    def to_xml(self) -> etree._Element:
         """Serialize this metadata object to XML.
 
         :returns: The root element of the metadata serialized into XML.

@@ -118,7 +118,7 @@ def _parse_metadata_element(metadata: MetadataBase):
         etc.) as lxml.etree._Element
     """
     # Serialize metadata
-    serialized_metadata = metadata.serialize()
+    serialized_metadata = metadata.to_xml()
 
     # Metadata has to be wrapped in mdWrap and xmlData elements
     xml_data = mets_elements.xmldata(child_elements=[serialized_metadata])
