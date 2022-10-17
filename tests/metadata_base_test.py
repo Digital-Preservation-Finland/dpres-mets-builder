@@ -1,6 +1,5 @@
 """Tests for metadata objects."""
 from datetime import datetime, timezone
-from pathlib import Path
 from uuid import UUID
 
 import pytest
@@ -83,40 +82,3 @@ def test_generated_created_time():
     assert data.created.tzinfo == timezone.utc
     # Date matches to current date
     assert data.created.date() == datetime.now().date()
-
-
-def test_importing_metadata_with_invalid_data_path():
-    """Test that giving ImportedMetadata an invalid data path results in error.
-    """
-    with pytest.raises(ValueError) as error:
-        metadata.ImportedMetadata(
-            data_path=Path("/this/file/does/not/exist"),
-            metadata_type=metadata.MetadataType.DESCRIPTIVE,
-            metadata_format=metadata.MetadataFormat.DC,
-            format_version="1.0"
-        )
-    assert str(error.value) == (
-        "Given path '/this/file/does/not/exist' is not a file."
-    )
-
-
-def test_serializing_imported_metadata():
-    """Test that imported metadata is serialized correctly."""
-    data = metadata.ImportedMetadata(
-        data_path=Path("tests/data/imported_metadata.xml"),
-        metadata_type=metadata.MetadataType.DESCRIPTIVE,
-        metadata_format=metadata.MetadataFormat.OTHER,
-        other_format="PAS-special",
-        format_version="1.0"
-    )
-    root_element = data.serialize()
-
-    # The xml file content is
-    # <root>
-    #   <sub1></sub1>
-    #   <sub2></sub2>
-    # </root>
-    assert root_element.tag == "root"
-    assert len(root_element) == 2
-    assert root_element[0].tag == "sub1"
-    assert root_element[1].tag == "sub2"
