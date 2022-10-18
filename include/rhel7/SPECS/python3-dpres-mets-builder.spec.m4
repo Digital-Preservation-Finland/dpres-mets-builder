@@ -20,7 +20,6 @@ BuildArch:      noarch
 BuildRequires:  python3-setuptools
 BuildRequires:  python36-pytest
 BuildRequires:  python36-setuptools_scm
-BuildRequires:  python3-file-scraper-full
 Requires:       python3
 Requires:       python36-lxml
 Requires:       python3-xml-helpers
