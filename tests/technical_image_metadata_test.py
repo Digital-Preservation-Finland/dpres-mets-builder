@@ -1,7 +1,9 @@
+from pathlib import Path
 import pytest
 
+from lxml import etree
+
 from mets_builder.metadata import TechnicalImageMetadata
-from mets_builder.serialize import _NAMESPACES
 
 
 @pytest.mark.parametrize(
@@ -54,7 +56,7 @@ def test_invalid_parameters(invalid_modifications):
 
 def test_serialization():
     """Test serializing the TechnicalImageMetadata object."""
-    md = TechnicalImageMetadata(
+    data = TechnicalImageMetadata(
         compression="jpeg",
         colorspace="rgb",
         width="100",
@@ -67,111 +69,10 @@ def test_serialization():
         icc_profile_name="Adobe RGB"
     )
 
-    root_element = md.to_xml()
+    result = etree.tostring(data.to_xml(), pretty_print=True, encoding="UTF-8")
 
-    # Root element
-    assert len(root_element) == 3
-    basic_do_info = root_element.find(
-        "mix:BasicDigitalObjectInformation",
-        namespaces=_NAMESPACES
-    )
-    img_info = root_element.find(
-        "mix:BasicImageInformation",
-        namespaces=_NAMESPACES
-    )
-    img_assessment = root_element.find(
-        "mix:ImageAssessmentMetadata",
-        namespaces=_NAMESPACES
-    )
-    assert basic_do_info is not None
-    assert img_info is not None
-    assert img_assessment is not None
+    expected_xml = Path(
+        "tests/data/expected_technical_image_metadata.xml"
+    ).read_bytes()
 
-    # Basic digital object information
-    assert len(basic_do_info) == 2
-    compression = basic_do_info.find("mix:Compression", namespaces=_NAMESPACES)
-    assert compression is not None
-    assert len(compression) == 1
-    compression_scheme = compression.find(
-        "mix:compressionScheme",
-        namespaces=_NAMESPACES
-    )
-    assert compression_scheme is not None
-    assert compression_scheme.text == "jpeg"
-    byte_order = basic_do_info.find("mix:byteOrder", namespaces=_NAMESPACES)
-    assert byte_order is not None
-    assert byte_order.text == "little endian"
-
-    # Basic image information
-    assert len(img_info) == 1
-    image_characteristics = img_info.find(
-        "mix:BasicImageCharacteristics",
-        namespaces=_NAMESPACES
-    )
-    assert image_characteristics is not None
-    assert len(image_characteristics) == 3
-    width = image_characteristics.find(
-        "mix:imageWidth",
-        namespaces=_NAMESPACES
-    )
-    assert width.text == "100"
-    height = image_characteristics.find(
-        "mix:imageHeight",
-        namespaces=_NAMESPACES
-    )
-    assert height.text == "200"
-    photometric_interpretation = image_characteristics.find(
-        "mix:PhotometricInterpretation",
-        namespaces=_NAMESPACES
-    )
-    assert photometric_interpretation is not None
-    assert len(photometric_interpretation) == 2
-    colorspace = photometric_interpretation.find(
-        "mix:colorSpace",
-        namespaces=_NAMESPACES
-    )
-    assert colorspace.text == "rgb"
-    color_profile = photometric_interpretation.find(
-        "mix:ColorProfile",
-        namespaces=_NAMESPACES
-    )
-    assert color_profile is not None
-    icc_profile = color_profile.find(
-        "mix:IccProfile",
-        namespaces=_NAMESPACES
-    )
-    assert icc_profile is not None
-    icc_profile_name = icc_profile.find(
-        "mix:iccProfileName",
-        namespaces=_NAMESPACES
-    )
-    assert icc_profile_name.text == "Adobe RGB"
-
-    # Image assessment metadata
-    assert len(img_assessment) == 1
-    color_encoding = img_assessment.find(
-        "mix:ImageColorEncoding",
-        namespaces=_NAMESPACES
-    )
-    assert color_encoding is not None
-    assert len(color_encoding) == 2
-    bits_per_sample = color_encoding.find(
-        "mix:BitsPerSample",
-        namespaces=_NAMESPACES
-    )
-    assert len(bits_per_sample) == 2
-    bits_per_sample_value = bits_per_sample.find(
-        "mix:bitsPerSampleValue",
-        namespaces=_NAMESPACES
-    )
-    assert bits_per_sample_value.text == "8"
-    bits_per_sample_unit = bits_per_sample.find(
-        "mix:bitsPerSampleUnit",
-        namespaces=_NAMESPACES
-    )
-    assert bits_per_sample_unit.text == "integer"
-    samples_per_pixel = color_encoding.find(
-        "mix:samplesPerPixel",
-        namespaces=_NAMESPACES
-    )
-    assert samples_per_pixel.text == "3"
+    assert result == expected_xml
