@@ -146,7 +146,4 @@ class TechnicalImageMetadata(MetadataBase):
             child_elements=[basic_do_info, img_info, img_assessment]
         )
 
-        if mix_root is None:
-            raise ValueError("Image info could not be constructed.")
-
         return mix_root
