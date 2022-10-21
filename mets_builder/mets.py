@@ -388,6 +388,6 @@ class METS:
         """
         self.metadata.add(metadata)
 
-    def to_xml_string(self) -> bytes:
-        """Serialize this METS object into xml-formatted string."""
+    def to_xml(self) -> bytes:
+        """Serialize this METS object into XML-formatted bytestring."""
         return to_xml_string(self)

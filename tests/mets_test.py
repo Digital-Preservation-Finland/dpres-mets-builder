@@ -232,7 +232,7 @@ def test_serialization():
         creator_name="Mr. Foo"
     )
 
-    result = mets.to_xml_string()
+    result = mets.to_xml()
 
     # bytes.index raises ValueError if subsection is not found
     result.index(b"package_id")

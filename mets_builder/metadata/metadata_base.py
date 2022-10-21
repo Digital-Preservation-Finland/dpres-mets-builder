@@ -137,8 +137,8 @@ class MetadataBase:
             created = datetime.now(tz=timezone.utc)
         self.created = created
 
-    def to_xml(self) -> etree._Element:
-        """Serialize this metadata object to XML.
+    def to_xml_element_tree(self) -> etree._Element:
+        """Serialize this metadata object to XML using lxml elements.
 
         :returns: The root element of the metadata serialized into XML.
         """

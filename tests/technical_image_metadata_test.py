@@ -69,7 +69,11 @@ def test_serialization():
         icc_profile_name="Adobe RGB"
     )
 
-    result = etree.tostring(data.to_xml(), pretty_print=True, encoding="UTF-8")
+    result = etree.tostring(
+        data.to_xml_element_tree(),
+        pretty_print=True,
+        encoding="UTF-8"
+    )
 
     expected_xml = Path(
         "tests/data/expected_technical_image_metadata.xml"
