@@ -73,10 +73,10 @@ def test_serialization():
         data.to_xml_element_tree(),
         pretty_print=True,
         encoding="UTF-8"
-    )
+    ).decode("utf-8")
 
     expected_xml = Path(
         "tests/data/expected_technical_image_metadata.xml"
-    ).read_bytes()
+    ).read_text()
 
     assert result == expected_xml
