@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 
-from lxml import etree
+import xml_helpers
 
 from mets_builder.metadata import TechnicalImageMetadata
 
@@ -69,10 +69,8 @@ def test_serialization():
         icc_profile_name="Adobe RGB"
     )
 
-    result = etree.tostring(
-        data.to_xml_element_tree(),
-        pretty_print=True,
-        encoding="UTF-8"
+    result = xml_helpers.utils.serialize(
+        data.to_xml_element_tree()
     ).decode("utf-8")
 
     expected_xml = Path(
