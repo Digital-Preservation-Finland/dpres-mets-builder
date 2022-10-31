@@ -171,7 +171,7 @@ def _parse_file_references_file(digital_object: DigitalObject):
     for stream in digital_object.streams:
         administrative_metadata_identifiers = [
             metadata.identifier for metadata in stream.metadata
-            if metadata.metadata_type != MetadataType.DESCRIPTIVE
+            if metadata.is_administrative
         ]
         streams.append(
             mets_elements.stream(administrative_metadata_identifiers)
@@ -180,7 +180,7 @@ def _parse_file_references_file(digital_object: DigitalObject):
     # File
     administrative_metadata_identifiers = [
         metadata.identifier for metadata in digital_object.metadata
-        if metadata.metadata_type != MetadataType.DESCRIPTIVE
+        if metadata.is_administrative
     ]
     digital_object_element = mets_elements.file_elem(
         file_id=digital_object.identifier,
@@ -232,7 +232,7 @@ def _write_mets(mets, output_file):
             # Descriptive metadata
             descriptive_metadata = iter(
                 metadata for metadata in mets.metadata
-                if metadata.metadata_type == MetadataType.DESCRIPTIVE
+                if metadata.is_descriptive
             )
             for metadata in descriptive_metadata:
                 metadata_element = _parse_metadata_element(metadata)
@@ -241,7 +241,7 @@ def _write_mets(mets, output_file):
             # Administrative metadata
             administrative_metadata = iter(
                 metadata for metadata in mets.metadata
-                if metadata.metadata_type != MetadataType.DESCRIPTIVE
+                if metadata.is_administrative
             )
             amdsec = mets_elements.amdsec()
             with xml.element(amdsec.tag):

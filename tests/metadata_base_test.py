@@ -82,3 +82,45 @@ def test_generated_created_time():
     assert data.created.tzinfo == timezone.utc
     # Date matches to current date
     assert data.created.date() == datetime.now().date()
+
+
+@pytest.mark.parametrize(
+    ["metadata_type", "expected_result"],
+    [
+        ("technical", True),
+        ("digital provenance", True),
+        ("descriptive", False)
+    ]
+)
+def test_is_administrative(metadata_type, expected_result):
+    """Test if metadata object can tell correctly that it is administrative
+    metadata.
+    """
+    data = metadata.MetadataBase(
+        metadata_type=metadata_type,
+        metadata_format=None,
+        other_format="PAS-special",
+        format_version="1.0"
+    )
+    assert data.is_administrative == expected_result
+
+
+@pytest.mark.parametrize(
+    ["metadata_type", "expected_result"],
+    [
+        ("technical", False),
+        ("digital provenance", False),
+        ("descriptive", True)
+    ]
+)
+def test_is_descriptive(metadata_type, expected_result):
+    """Test if metadata object can tell correctly that it is descriptive
+    metadata.
+    """
+    data = metadata.MetadataBase(
+        metadata_type=metadata_type,
+        metadata_format=None,
+        other_format="PAS-special",
+        format_version="1.0"
+    )
+    assert data.is_descriptive == expected_result

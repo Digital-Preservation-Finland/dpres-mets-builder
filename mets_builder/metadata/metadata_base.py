@@ -137,6 +137,24 @@ class MetadataBase:
             created = datetime.now(tz=timezone.utc)
         self.created = created
 
+    @property
+    def is_administrative(self) -> bool:
+        """Tells if this metadata is administrative metadata.
+
+        :returns: True if this metadata is administrative metadata, otherwise
+            False.
+        """
+        return self.metadata_type != MetadataType.DESCRIPTIVE
+
+    @property
+    def is_descriptive(self) -> bool:
+        """Tells if this metadata is descriptive metadata.
+
+        :returns: True if this metadata is descriptive metadata, otherwise
+            False.
+        """
+        return self.metadata_type == MetadataType.DESCRIPTIVE
+
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
