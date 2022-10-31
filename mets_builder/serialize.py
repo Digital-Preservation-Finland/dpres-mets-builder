@@ -164,6 +164,30 @@ def _parse_metadata_element(metadata: MetadataBase):
     return metadata_element
 
 
+def _write_descriptive_metadata(xml, mets):
+    """Write descriptive metadata to the given XML file."""
+    descriptive_metadata = iter(
+        metadata for metadata in mets.metadata
+        if metadata.is_descriptive
+    )
+    for metadata in descriptive_metadata:
+        metadata_element = _parse_metadata_element(metadata)
+        xml.write(metadata_element)
+
+
+def _write_administrative_metadata(xml, mets):
+    """Write administrative metadata to the given XML file."""
+    administrative_metadata = iter(
+        metadata for metadata in mets.metadata
+        if metadata.is_administrative
+    )
+    amdsec = mets_elements.amdsec()
+    with xml.element(amdsec.tag):
+        for metadata in administrative_metadata:
+            metadata_element = _parse_metadata_element(metadata)
+            xml.write(metadata_element)
+
+
 def _parse_file_references_file(digital_object: DigitalObject):
     """Parse given digital object as file element in file references."""
     # Streams
@@ -230,24 +254,10 @@ def _write_mets(mets, output_file):
             xml.write(_parse_mets_header(mets))
 
             # Descriptive metadata
-            descriptive_metadata = iter(
-                metadata for metadata in mets.metadata
-                if metadata.is_descriptive
-            )
-            for metadata in descriptive_metadata:
-                metadata_element = _parse_metadata_element(metadata)
-                xml.write(metadata_element)
+            _write_descriptive_metadata(xml, mets)
 
             # Administrative metadata
-            administrative_metadata = iter(
-                metadata for metadata in mets.metadata
-                if metadata.is_administrative
-            )
-            amdsec = mets_elements.amdsec()
-            with xml.element(amdsec.tag):
-                for metadata in administrative_metadata:
-                    metadata_element = _parse_metadata_element(metadata)
-                    xml.write(metadata_element)
+            _write_administrative_metadata(xml, mets)
 
             # File references
             if mets.file_references:
