@@ -2,7 +2,9 @@
 import pytest
 
 from mets_builder import metadata
-from mets_builder.mets import METS, MetsProfile, AgentRole, AgentType
+from mets_builder.digital_object import DigitalObject
+from mets_builder.file_references import FileReferences
+from mets_builder.mets import METS, AgentRole, AgentType, MetsProfile
 
 
 def test_invalid_mets_profile():
@@ -218,6 +220,64 @@ def test_add_metadata():
 
     mets.add_metadata(data)
     assert mets.metadata == {data}
+
+
+def test_add_digital_object():
+    """Test adding digital object to METS object."""
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+    assert mets.digital_objects == set()
+
+    digital_object = DigitalObject(path_in_sip="path")
+
+    mets.add_digital_object(digital_object)
+    assert mets.digital_objects == {digital_object}
+
+
+def test_add_file_references():
+    """Test adding file references to METS object."""
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+
+    assert mets.file_references is None
+    file_references = FileReferences()
+    mets.add_file_references(file_references)
+    assert mets.file_references == file_references
+
+
+def test_generating_file_references():
+    """Test generating file references for METS object."""
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+
+    digital_objects = {
+        DigitalObject(path_in_sip="path/1"),
+        DigitalObject(path_in_sip="path/2"),
+        DigitalObject(path_in_sip="path/3")
+    }
+
+    for digital_object in digital_objects:
+        mets.add_digital_object(digital_object)
+
+    assert mets.file_references is None
+    mets.generate_file_references()
+    assert mets.file_references
+
+    assert len(mets.file_references.file_groups) == 1
+    group = mets.file_references.file_groups.pop()
+    assert group.digital_objects == digital_objects
 
 
 def test_serialization():

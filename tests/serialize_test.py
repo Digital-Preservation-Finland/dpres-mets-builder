@@ -6,6 +6,7 @@ import pytest
 from lxml import etree
 
 from mets_builder import metadata, serialize
+from mets_builder.digital_object import DigitalObject, DigitalObjectStream
 from mets_builder.mets import METS, MetsProfile
 from mets_builder.serialize import _NAMESPACES, _use_namespace
 
@@ -41,6 +42,11 @@ def mets_object():
         format_version="1.0",
         identifier="1"
     )
+    do_1 = DigitalObject(
+        path_in_sip="path/1",
+        metadata=[md_1]
+    )
+
     md_2 = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
         metadata_type="technical",
@@ -49,8 +55,17 @@ def mets_object():
         format_version="1.0",
         identifier="2"
     )
+    do_2 = DigitalObject(
+        path_in_sip="path/2",
+        metadata=[md_2]
+    )
+
     mets.add_metadata(md_1)
     mets.add_metadata(md_2)
+    mets.add_digital_object(do_1)
+    mets.add_digital_object(do_2)
+
+    mets.generate_file_references()
 
     return mets
 
@@ -67,9 +82,10 @@ def test_parse_mets(mets_object):
     serialized = serialize.to_xml_string(mets_object)
     element = etree.fromstring(serialized)
 
-    assert len(element) == 3
+    assert len(element) == 4
     assert element.find("mets:metsHdr", namespaces=_NAMESPACES) is not None
     assert element.find("mets:dmdSec", namespaces=_NAMESPACES) is not None
+    assert element.find("mets:fileSec", namespaces=_NAMESPACES) is not None
 
     # Assert administrative metadata exists and contains other metadata than
     # descriptive metadata
@@ -209,6 +225,72 @@ def test_parse_metadata_with_estimated_create_time():
     root_element = serialize._parse_metadata_element(data)
     assert root_element.get(_use_namespace("fi", "CREATED")) == "2011?"
     assert root_element.get("CREATED") is None
+
+
+def test_parse_file_references_file_element(mets_object):
+    """Test that a file in file references is parsed correctly."""
+    md_do = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="technical",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="metadata-digital_object-id"
+    )
+    md_stream = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="technical",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="metadata-stream-id"
+    )
+
+    stream = DigitalObjectStream(metadata=[md_stream])
+    do = DigitalObject(
+        path_in_sip="path",
+        metadata=[md_do],
+        streams=[stream],
+        identifier="digital_object-id"
+    )
+
+    file_element = serialize._parse_file_references_file(do)
+
+    assert file_element.tag == _use_namespace("mets", "file")
+    assert file_element.get("ID") == "digital_object-id"
+    assert file_element.get("ADMID") == "metadata-digital_object-id"
+    file_location = file_element.find("mets:FLocat", namespaces=_NAMESPACES)
+    assert file_location is not None
+    assert file_location.get("LOCTYPE") == "URL"
+    assert file_location.get(_use_namespace("xlink", "href")) == "file://path"
+    assert file_location.get(_use_namespace("xlink", "type")) == "simple"
+    stream = file_element.find("mets:stream", namespaces=_NAMESPACES)
+    assert stream is not None
+    assert stream.get("ADMID") == "metadata-stream-id"
+
+
+def test_written_file_references(mets_object):
+    """Test that file references are written correctly.
+
+    File elements themselves are tested more thoroughly on another test.
+    """
+    # Serialize the entire mets, then read it to lxml.etree._Element for
+    # inspection
+    serialized = serialize.to_xml_string(mets_object)
+    element = etree.fromstring(serialized)
+    filesec = element.find("mets:fileSec", namespaces=_NAMESPACES)
+
+    assert filesec is not None
+
+    # Contains one group
+    assert len(filesec) == 1
+    group = filesec.find("mets:fileGrp", namespaces=_NAMESPACES)
+    assert group is not None
+
+    # Group contains 2 files
+    # Files are tested in a separate test
+    assert len(group) == 2
+    assert len(group.findall("mets:file", namespaces=_NAMESPACES)) == 2
 
 
 def test_to_xml_string(mets_object):

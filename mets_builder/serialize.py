@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import mets as mets_elements
 from lxml import etree
 
+from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import MetadataBase, MetadataType
 
 # Prevent circular import caused by type hints with special
@@ -163,6 +164,48 @@ def _parse_metadata_element(metadata: MetadataBase):
     return metadata_element
 
 
+def _parse_file_references_file(digital_object: DigitalObject):
+    """Parse given digital object as file element in file references."""
+    # Streams
+    streams = []
+    for stream in digital_object.streams:
+        administrative_metadata_identifiers = [
+            metadata.identifier for metadata in stream.metadata
+            if metadata.metadata_type != MetadataType.DESCRIPTIVE
+        ]
+        streams.append(
+            mets_elements.stream(administrative_metadata_identifiers)
+        )
+
+    # File
+    administrative_metadata_identifiers = [
+        metadata.identifier for metadata in digital_object.metadata
+        if metadata.metadata_type != MetadataType.DESCRIPTIVE
+    ]
+    digital_object_element = mets_elements.file_elem(
+        file_id=digital_object.identifier,
+        admid_elements=administrative_metadata_identifiers,
+        loctype="URL",
+        xlink_href=f"file://{digital_object.path_in_sip}",
+        xlink_type="simple"
+    )
+    for stream in streams:
+        digital_object_element.append(stream)
+
+    return digital_object_element
+
+
+def _write_file_references(xml, file_references):
+    """Write file references to the given XML file."""
+    file_references_root = mets_elements.filesec()
+    with xml.element(file_references_root.tag, file_references_root.attrib):
+        for group in file_references.file_groups:
+            group_root = mets_elements.filegrp(use=group.use)
+            with xml.element(group_root.tag, group_root.attrib):
+                for digital_object in group.digital_objects:
+                    xml.write(_parse_file_references_file(digital_object))
+
+
 def _write_mets(mets, output_file):
     """Write METS object to file serialized as XML.
 
@@ -205,6 +248,10 @@ def _write_mets(mets, output_file):
                 for metadata in administrative_metadata:
                     metadata_element = _parse_metadata_element(metadata)
                     xml.write(metadata_element)
+
+            # File references
+            if mets.file_references:
+                _write_file_references(xml, mets.file_references)
 
     return output_file
 

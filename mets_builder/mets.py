@@ -6,6 +6,8 @@ from enum import Enum
 from typing import List, NamedTuple, Optional, Set, Union
 import uuid
 
+from mets_builder.digital_object import DigitalObject
+from mets_builder.file_references import FileReferences
 from mets_builder.metadata import MetadataBase
 from mets_builder.serialize import to_xml_string
 
@@ -217,6 +219,8 @@ class METS:
         self.specification = specification
 
         self.metadata: Set[MetadataBase] = set()
+        self.digital_objects: Set[DigitalObject] = set()
+        self.file_references: Optional[FileReferences] = None
 
     @property
     def package_id(self) -> str:
@@ -387,6 +391,37 @@ class METS:
         :returns: None.
         """
         self.metadata.add(metadata)
+
+    def add_digital_object(self, digital_object: DigitalObject) -> None:
+        """Add a digital object to this METS.
+
+        :param DigitalObject digital_object: The DigitalObject instance that is
+            added to this METS.
+        """
+        self.digital_objects.add(digital_object)
+
+    def add_file_references(self, file_references: FileReferences) -> None:
+        """Add file references to this METS.
+
+        This will replace any previously added file references.
+
+        :param FileReferences file_references: FileReferences instance that is
+            added to this METS.
+        """
+        self.file_references = file_references
+
+    def generate_file_references(self) -> None:
+        """Generate file references for this METS.
+
+        If no special structure for file references are needed, they can be
+        generated here automatically. The file references are generated out of
+        the digital objects that have been added to this METS instance.
+
+        This will replace any previously added file references.
+        """
+        self.file_references = FileReferences.generate_file_references(
+            self.digital_objects
+        )
 
     def to_xml(self) -> bytes:
         """Serialize this METS object into XML-formatted bytestring."""
