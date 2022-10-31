@@ -1,8 +1,10 @@
 """Tests for mets.py."""
+from pathlib import Path
+
 import pytest
 
 from mets_builder import metadata
-from mets_builder.digital_object import DigitalObject
+from mets_builder.digital_object import DigitalObject, DigitalObjectStream
 from mets_builder.file_references import FileReferences
 from mets_builder.mets import METS, AgentRole, AgentType, MetsProfile
 
@@ -203,23 +205,40 @@ def test_add_agent_with_other_role_and_type():
     assert mets.agents[1].name == "name"
 
 
-def test_add_metadata():
-    """Test adding metadata to METS object."""
+def test_get_metadata():
+    """Test getting metadata added to a METS object through digital objects."""
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo"
     )
-
-    data = metadata.MetadataBase(
-        metadata_type="technical",
-        metadata_format="PREMIS:OBJECT",
-        format_version="1.0"
+    md_stream = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="descriptive",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="1"
     )
+    md_digital_object = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="technical",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="2"
+    )
+    expected_metadata = {md_stream, md_digital_object}
 
-    mets.add_metadata(data)
-    assert mets.metadata == {data}
+    stream = DigitalObjectStream(metadata=[md_stream])
+    digital_object = DigitalObject(
+        path_in_sip="path",
+        streams=[stream],
+        metadata=[md_digital_object]
+    )
+    mets.add_digital_object(digital_object)
+    assert mets.metadata == expected_metadata
 
 
 def test_add_digital_object():

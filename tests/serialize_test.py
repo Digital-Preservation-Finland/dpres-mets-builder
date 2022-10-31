@@ -60,8 +60,6 @@ def mets_object():
         metadata=[md_2]
     )
 
-    mets.add_metadata(md_1)
-    mets.add_metadata(md_2)
     mets.add_digital_object(do_1)
     mets.add_digital_object(do_2)
 

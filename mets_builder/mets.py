@@ -218,7 +218,6 @@ class METS:
         self.catalog_version = catalog_version
         self.specification = specification
 
-        self.metadata: Set[MetadataBase] = set()
         self.digital_objects: Set[DigitalObject] = set()
         self.file_references: Optional[FileReferences] = None
 
@@ -272,6 +271,20 @@ class METS:
                 "printable US-ASCII characters"
             )
         self._content_id = value
+
+    @property
+    def metadata(self) -> Set[MetadataBase]:
+        """Get all metadata that have been added to this METS via digital
+        objects.
+        """
+        metadata: Set[MetadataBase] = set()
+        for digital_object in self.digital_objects:
+            metadata |= digital_object.metadata
+
+            for stream in digital_object.streams:
+                metadata |= stream.metadata
+
+        return metadata
 
     def add_agent(
         self,
@@ -381,16 +394,6 @@ class METS:
         )
         agent = METSAgent(name, agent_role, other_role, agent_type, other_type)
         self.agents.append(agent)
-
-    def add_metadata(self, metadata: MetadataBase) -> None:
-        """Add a metadata object to this METS.
-
-        :param MetadataBase metadata: The metadata object that is added to this
-            METS object.
-
-        :returns: None.
-        """
-        self.metadata.add(metadata)
 
     def add_digital_object(self, digital_object: DigitalObject) -> None:
         """Add a digital object to this METS.
