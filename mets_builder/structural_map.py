@@ -1,22 +1,10 @@
 """Module for classes related to structural map (METS structMap)."""
 
 from typing import Iterable, Optional
-import string
 
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import MetadataBase
-
-
-# TODO: In Python 3.8 this can be done more simply with
-# word.isascii() and word.isprintable()
-def _is_printable_us_ascii(word: str) -> bool:
-    """Checks whether a string contains only printable US-ASCII
-    characters.
-    """
-    for letter in word:
-        if letter not in string.printable:
-            return False
-    return True
+from mets_builder import validation
 
 
 class StructuralMapDiv:
@@ -232,7 +220,7 @@ class StructuralMap:
     @pid.setter
     def pid(self, value: Optional[str]) -> None:
         """Setter for pid."""
-        if value is not None and not _is_printable_us_ascii(value):
+        if value is not None and not validation.is_printable_us_ascii(value):
             raise ValueError(
                 f"pid '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -247,7 +235,7 @@ class StructuralMap:
     @pid_type.setter
     def pid_type(self, value: Optional[str]) -> None:
         """Setter for pid_type."""
-        if value is not None and not _is_printable_us_ascii(value):
+        if value is not None and not validation.is_printable_us_ascii(value):
             raise ValueError(
                 f"pid_type '{value}' contains characters that are not "
                 "printable US-ASCII characters"

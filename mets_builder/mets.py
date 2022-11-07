@@ -1,11 +1,11 @@
 """Module for METS class representing a METS document."""
-import string
 import uuid
 from collections import namedtuple
 from datetime import datetime, timezone
 from enum import Enum
 from typing import List, NamedTuple, Optional, Set, Union
 
+from mets_builder import validation
 from mets_builder.digital_object import DigitalObject
 from mets_builder.file_references import FileReferences
 from mets_builder.metadata import MetadataBase
@@ -14,18 +14,6 @@ from mets_builder.structural_map import StructuralMap
 
 METS_CATALOG = "1.7.4"
 METS_SPECIFICATION = "1.7.4"
-
-
-# TODO: In Python 3.8 this can be done more simply with
-# word.isascii() and word.isprintable()
-def _is_printable_us_ascii(word: str) -> bool:
-    """Checks whether a string contains only printable US-ASCII
-    characters.
-    """
-    for letter in word:
-        if letter not in string.printable:
-            return False
-    return True
 
 
 class MetsProfile(Enum):
@@ -234,7 +222,7 @@ class METS:
         if value in (None, ""):
             raise ValueError("package_id cannot be empty")
 
-        if not _is_printable_us_ascii(value):
+        if not validation.is_printable_us_ascii(value):
             raise ValueError(
                 f"package_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -252,7 +240,7 @@ class METS:
         if value is None:
             raise ValueError("contract_id can not be None")
 
-        if not _is_printable_us_ascii(value):
+        if not validation.is_printable_us_ascii(value):
             raise ValueError(
                 f"contract_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -267,7 +255,7 @@ class METS:
     @content_id.setter
     def content_id(self, value: str) -> None:
         """Setter for content_id."""
-        if value is not None and not _is_printable_us_ascii(value):
+        if value is not None and not validation.is_printable_us_ascii(value):
             raise ValueError(
                 f"content_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
