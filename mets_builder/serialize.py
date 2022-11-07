@@ -230,6 +230,64 @@ def _write_file_references(xml, file_references):
                     xml.write(_parse_file_references_file(digital_object))
 
 
+def _write_structural_map_div(xml, div):
+    """Write a structural map div and recursively its nested divs to the given
+    xml file.
+    """
+    administrative_metadata_identifiers = [
+        metadata.identifier for metadata in div.metadata
+        if metadata.is_administrative
+    ]
+    descriptive_metadata_identifiers = [
+        metadata.identifier for metadata in div.metadata
+        if metadata.is_descriptive
+    ]
+    file_pointer_elements = [
+        mets_elements.fptr(digital_object.identifier)
+        for digital_object in div.digital_objects
+    ]
+
+    # Cast order to string
+    order = div.order
+    if div.order is not None:
+        order = str(div.order)
+
+    div_element = mets_elements.div(
+        type_attr=div.div_type,
+        order=order,
+        label=div.label,
+        orderlabel=div.orderlabel,
+        dmdid=descriptive_metadata_identifiers,
+        admid=administrative_metadata_identifiers
+    )
+    with xml.element(div_element.tag, div_element.attrib):
+        for element in file_pointer_elements:
+            xml.write(element)
+        for nested_div in div.divs:
+            _write_structural_map_div(xml, nested_div)
+
+
+def _write_structural_map(xml, structural_map):
+    """Write structural map to the given XML file."""
+    structural_map_root = mets_elements.structmap(
+        type_attr=structural_map.structural_map_type,
+        label=structural_map.label
+    )
+
+    # Set Finnish national METS schema specific attributes to the root element
+    if structural_map.pid:
+        structural_map_root.set(
+            _use_namespace("fi", "PID"), structural_map.pid
+        )
+    if structural_map.pid_type:
+        structural_map_root.set(
+            _use_namespace("fi", "PIDTYPE"), structural_map.pid_type
+        )
+
+    with xml.element(structural_map_root.tag, structural_map_root.attrib):
+        _write_structural_map_div(xml, structural_map.root_div)
+
+
 def _write_mets(mets, output_file):
     """Write METS object to file serialized as XML.
 
@@ -262,6 +320,10 @@ def _write_mets(mets, output_file):
             # File references
             if mets.file_references:
                 _write_file_references(xml, mets.file_references)
+
+            # Structural maps
+            for structural_map in mets.structural_maps:
+                _write_structural_map(xml, structural_map)
 
     return output_file
 

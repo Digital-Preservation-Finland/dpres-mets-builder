@@ -9,6 +9,7 @@ from mets_builder import metadata, serialize
 from mets_builder.digital_object import DigitalObject, DigitalObjectStream
 from mets_builder.mets import METS, MetsProfile
 from mets_builder.serialize import _NAMESPACES, _use_namespace
+from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
 @pytest.fixture()
@@ -34,9 +35,10 @@ def mets_object():
         other_type="Bar"
     )
 
+    # digital objects and metadata
     md_1 = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
-        metadata_type="descriptive",
+        metadata_type="technical",
         metadata_format="other",
         other_format="PAS-special",
         format_version="1.0",
@@ -44,7 +46,8 @@ def mets_object():
     )
     do_1 = DigitalObject(
         path_in_sip="path/1",
-        metadata=[md_1]
+        metadata=[md_1],
+        identifier="digital_object_1"
     )
 
     md_2 = metadata.ImportedMetadata(
@@ -57,13 +60,76 @@ def mets_object():
     )
     do_2 = DigitalObject(
         path_in_sip="path/2",
-        metadata=[md_2]
+        metadata=[md_2],
+        identifier="digital_object_2"
     )
 
     mets.add_digital_object(do_1)
     mets.add_digital_object(do_2)
 
+    # File references
     mets.generate_file_references()
+
+    # Structural map
+    md_3 = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="descriptive",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0",
+        identifier="3"
+    )
+    # Create structural map with the following div structure:
+    # root_div (has metadata md_3)
+    # --sub1
+    # --sub2
+    # ----subsub1 (has digital object do_1)
+    # ----subsub2 (has digital object do_2)
+    subsub1 = StructuralMapDiv(
+        div_type="test_type",
+        order=1,
+        label="subsub1",
+        orderlabel="i",
+        digital_objects=[do_1]
+    )
+    subsub2 = StructuralMapDiv(
+        div_type="test_type",
+        order=2,
+        label="subsub2",
+        orderlabel="ii",
+        digital_objects=[do_2]
+    )
+    sub1 = StructuralMapDiv(
+        div_type="test_type",
+        label="sub1"
+    )
+    sub2 = StructuralMapDiv(
+        div_type="test_type",
+        label="sub2",
+        divs=[subsub1, subsub2]
+    )
+    root_div = StructuralMapDiv(
+        div_type="test_type",
+        divs=[sub1, sub2],
+        metadata=[md_3]
+    )
+    # Add the map twice to test that multiple structural maps are supported
+    structural_map_1 = StructuralMap(
+        root_div=root_div,
+        structural_map_type="test_structural_map",
+        label="logical",
+        pid="pid1",
+        pid_type="pidtype"
+    )
+    structural_map_2 = StructuralMap(
+        root_div=root_div,
+        structural_map_type="test_structural_map",
+        label="logical",
+        pid="pid1",
+        pid_type="pidtype"
+    )
+    mets.add_structural_map(structural_map_1)
+    mets.add_structural_map(structural_map_2)
 
     return mets
 
@@ -80,17 +146,18 @@ def test_parse_mets(mets_object):
     serialized = serialize.to_xml_string(mets_object)
     element = etree.fromstring(serialized)
 
-    assert len(element) == 4
+    assert len(element) == 6
     assert element.find("mets:metsHdr", namespaces=_NAMESPACES) is not None
     assert element.find("mets:dmdSec", namespaces=_NAMESPACES) is not None
     assert element.find("mets:fileSec", namespaces=_NAMESPACES) is not None
+    assert len(element.findall("mets:structMap", namespaces=_NAMESPACES)) == 2
 
     # Assert administrative metadata exists and contains other metadata than
     # descriptive metadata
     amd_sec = element.find("mets:amdSec", namespaces=_NAMESPACES)
     assert amd_sec is not None
-    assert len(amd_sec) == 1
-    assert amd_sec.find("mets:techMD", namespaces=_NAMESPACES) is not None
+    assert len(amd_sec) == 2
+    assert len(amd_sec.findall("mets:techMD", namespaces=_NAMESPACES)) == 2
 
 
 def test_parse_root_element(mets_object):
@@ -289,6 +356,74 @@ def test_written_file_references(mets_object):
     # Files are tested in a separate test
     assert len(group) == 2
     assert len(group.findall("mets:file", namespaces=_NAMESPACES)) == 2
+
+
+def test_written_structural_maps(mets_object):
+    """Test that structural maps are written correctly."""
+    # Serialize the entire mets, then read it to lxml.etree._Element for
+    # inspection
+    serialized = serialize.to_xml_string(mets_object)
+    element = etree.fromstring(serialized)
+    structmaps = element.findall("mets:structMap", namespaces=_NAMESPACES)
+
+    assert len(structmaps) == 2
+
+    # The structmaps of the test mets_object are identical, so we can pick
+    # either one for assertion
+    structmap = structmaps.pop()
+
+    # Root element
+    assert structmap.tag == _use_namespace("mets", "structMap")
+    assert structmap.get("TYPE") == "test_structural_map"
+    assert structmap.get("LABEL") == "logical"
+    assert structmap.get(_use_namespace("fi", "PID")) == "pid1"
+    assert structmap.get(_use_namespace("fi", "PIDTYPE")) == "pidtype"
+
+    # root div
+    assert len(structmap) == 1
+    root_div = structmap[0]
+    assert root_div.tag == _use_namespace("mets", "div")
+    assert root_div.get("TYPE") == "test_type"
+    assert root_div.get("DMDID") == "3"
+
+    # sub divs
+    assert len(root_div) == 2
+    sub1 = root_div.findall("mets:div[@LABEL='sub1']", namespaces=_NAMESPACES)
+    assert len(sub1) == 1
+    sub1 = sub1[0]
+    assert sub1.get("TYPE") == "test_type"
+    assert len(sub1) == 0
+
+    sub2 = root_div.findall("mets:div[@LABEL='sub2']", namespaces=_NAMESPACES)
+    assert len(sub2) == 1
+    sub2 = sub2[0]
+    assert sub2.get("TYPE") == "test_type"
+    assert len(sub2) == 2
+
+    # subsub divs
+    subsub1 = sub2.findall(
+        "mets:div[@LABEL='subsub1']", namespaces=_NAMESPACES
+    )
+    assert len(subsub1) == 1
+    subsub1 = subsub1[0]
+    assert subsub1.get("TYPE") == "test_type"
+    assert subsub1.get("ORDER") == "1"
+    assert subsub1.get("ORDERLABEL") == "i"
+    assert len(subsub1) == 1
+    fptr = subsub1.find("mets:fptr", namespaces=_NAMESPACES)
+    assert fptr.get("FILEID") == "digital_object_1"
+
+    subsub2 = sub2.findall(
+        "mets:div[@LABEL='subsub2']", namespaces=_NAMESPACES
+    )
+    assert len(subsub2) == 1
+    subsub2 = subsub2[0]
+    assert subsub2.get("TYPE") == "test_type"
+    assert subsub2.get("ORDER") == "2"
+    assert subsub2.get("ORDERLABEL") == "ii"
+    assert len(subsub2) == 1
+    fptr = subsub2.find("mets:fptr", namespaces=_NAMESPACES)
+    assert fptr.get("FILEID") == "digital_object_2"
 
 
 def test_to_xml_string(mets_object):

@@ -7,6 +7,7 @@ from mets_builder import metadata
 from mets_builder.digital_object import DigitalObject, DigitalObjectStream
 from mets_builder.file_references import FileReferences
 from mets_builder.mets import METS, AgentRole, AgentType, MetsProfile
+from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
 def test_invalid_mets_profile():
@@ -206,7 +207,9 @@ def test_add_agent_with_other_role_and_type():
 
 
 def test_get_metadata():
-    """Test getting metadata added to a METS object through digital objects."""
+    """Test getting metadata added to a METS object through digital objects and
+    multiple structural maps with nested divs.
+    """
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
@@ -218,18 +221,32 @@ def test_get_metadata():
         metadata_type="descriptive",
         metadata_format="other",
         other_format="PAS-special",
-        format_version="1.0",
-        identifier="1"
+        format_version="1.0"
     )
     md_digital_object = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
         metadata_type="technical",
         metadata_format="other",
         other_format="PAS-special",
-        format_version="1.0",
-        identifier="2"
+        format_version="1.0"
     )
-    expected_metadata = {md_stream, md_digital_object}
+    md_structural_map_1 = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="descriptive",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0"
+    )
+    md_structural_map_2 = metadata.ImportedMetadata(
+        data_path=Path("tests/data/imported_metadata.xml"),
+        metadata_type="descriptive",
+        metadata_format="other",
+        other_format="PAS-special",
+        format_version="1.0"
+    )
+    expected_metadata = {
+        md_stream, md_digital_object, md_structural_map_1, md_structural_map_2
+    }
 
     stream = DigitalObjectStream(metadata=[md_stream])
     digital_object = DigitalObject(
@@ -238,6 +255,28 @@ def test_get_metadata():
         metadata=[md_digital_object]
     )
     mets.add_digital_object(digital_object)
+
+    #  two structural maps, one with metadata in a nested div
+    root_div_1 = StructuralMapDiv(
+        div_type="test_type",
+        digital_objects=[digital_object],
+        metadata=[md_structural_map_1]
+    )
+    structural_map_1 = StructuralMap(root_div=root_div_1)
+    mets.add_structural_map(structural_map_1)
+
+    subdiv = StructuralMapDiv(
+        div_type="test_type",
+        digital_objects=[digital_object],
+        metadata=[md_structural_map_2]
+    )
+    root_div_2 = StructuralMapDiv(
+        div_type="test_type",
+        divs=[subdiv]
+    )
+    structural_map_2 = StructuralMap(root_div=root_div_2)
+    mets.add_structural_map(structural_map_2)
+
     assert mets.metadata == expected_metadata
 
 
@@ -297,6 +336,25 @@ def test_generating_file_references():
     assert len(mets.file_references.file_groups) == 1
     group = mets.file_references.file_groups.pop()
     assert group.digital_objects == digital_objects
+
+
+def test_adding_structural_map():
+    """Test adding a structural map to METS object."""
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+    root_div = StructuralMapDiv(div_type="test_type")
+    structural_map_1 = StructuralMap(root_div=root_div)
+    structural_map_2 = StructuralMap(root_div=root_div)
+
+    assert mets.structural_maps == set()
+    mets.add_structural_map(structural_map_1)
+    assert mets.structural_maps == {structural_map_1}
+    mets.add_structural_map(structural_map_2)
+    assert mets.structural_maps == {structural_map_1, structural_map_2}
 
 
 def test_serialization():

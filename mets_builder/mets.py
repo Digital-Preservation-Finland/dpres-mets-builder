@@ -1,15 +1,16 @@
 """Module for METS class representing a METS document."""
 import string
+import uuid
 from collections import namedtuple
 from datetime import datetime, timezone
 from enum import Enum
 from typing import List, NamedTuple, Optional, Set, Union
-import uuid
 
 from mets_builder.digital_object import DigitalObject
 from mets_builder.file_references import FileReferences
 from mets_builder.metadata import MetadataBase
 from mets_builder.serialize import to_xml_string
+from mets_builder.structural_map import StructuralMap
 
 METS_CATALOG = "1.7.4"
 METS_SPECIFICATION = "1.7.4"
@@ -220,6 +221,7 @@ class METS:
 
         self.digital_objects: Set[DigitalObject] = set()
         self.file_references: Optional[FileReferences] = None
+        self.structural_maps: Set[StructuralMap] = set()
 
     @property
     def package_id(self) -> str:
@@ -277,12 +279,18 @@ class METS:
         """Get all metadata that have been added to this METS via digital
         objects.
         """
+        # Metadata in digital objects
         metadata: Set[MetadataBase] = set()
         for digital_object in self.digital_objects:
             metadata |= digital_object.metadata
 
             for stream in digital_object.streams:
                 metadata |= stream.metadata
+
+        # Metadata in structural map divs
+        for structural_map in self.structural_maps:
+            for div in structural_map:
+                metadata |= div.metadata
 
         return metadata
 
@@ -425,6 +433,14 @@ class METS:
         self.file_references = FileReferences.generate_file_references(
             self.digital_objects
         )
+
+    def add_structural_map(self, structural_map: StructuralMap) -> None:
+        """Add a structural map to this METS.
+
+        :param StructuralMap structural_map: The StructuralMap instance that is
+            added to this METS.
+        """
+        self.structural_maps.add(structural_map)
 
     def to_xml(self) -> bytes:
         """Serialize this METS object into XML-formatted bytestring."""
