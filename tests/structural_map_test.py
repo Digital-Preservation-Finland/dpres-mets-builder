@@ -111,3 +111,47 @@ def test_add_digital_object_to_div():
     digital_object = DigitalObject(path_in_sip="path")
     div.add_digital_object(digital_object)
     assert div.digital_objects == {digital_object}
+
+
+def test_get_root_div():
+    """Test getting the root div of a div."""
+    subsubdiv = StructuralMapDiv("test_type")
+    subdiv = StructuralMapDiv("test_type", divs=[subsubdiv])
+    root_div = StructuralMapDiv("test_type", divs=[subdiv])
+
+    assert root_div.root_div == root_div
+    assert subdiv.root_div == root_div
+    assert subsubdiv.root_div == root_div
+
+
+def test_add_duplicate_div_to_div_tree():
+    """Test that adding a div that already exists in the div tree raises an
+    error.
+    """
+    subsubdiv = StructuralMapDiv("test_type")
+    subdiv = StructuralMapDiv("test_type", divs=[subsubdiv])
+    root_div = StructuralMapDiv("test_type", divs=[subdiv])
+
+    # Add a div to itself
+    with pytest.raises(ValueError):
+        root_div.add_div(root_div)
+
+    # Add a div that already exists lower in tree
+    with pytest.raises(ValueError):
+        root_div.add_div(subsubdiv)
+
+    # Add a div that already exists higher up in the tree
+    with pytest.raises(ValueError):
+        subsubdiv.add_div(root_div)
+
+    # Add a div that lower in its tree contains a div that already exists in
+    # the parent div tree
+    new_div = StructuralMapDiv("test_type", divs=[root_div])
+    with pytest.raises(ValueError):
+        subdiv.add_div(new_div)
+
+    # Add a div to its sibling
+    subsubdiv_sibling = StructuralMapDiv("test_type")
+    subdiv.add_div(subsubdiv_sibling)
+    with pytest.raises(ValueError):
+        subsubdiv.add_div(subsubdiv_sibling)

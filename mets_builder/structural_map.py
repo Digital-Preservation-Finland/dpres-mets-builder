@@ -1,6 +1,6 @@
 """Module for classes related to structural map (METS structMap)."""
 
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Set
 
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import MetadataBase
@@ -82,6 +82,8 @@ class StructuralMapDiv:
         :param Iterable[DigitalObject] digital_objects: Digital objects that
             belong to this hierarchical division.
         """
+        self.parent: Optional["StructuralMapDiv"] = None
+
         self.div_type = div_type
         self.order = order
         self.label = label
@@ -91,13 +93,24 @@ class StructuralMapDiv:
         if metadata:
             self.metadata = set(metadata)
 
-        self.divs = set()
+        self.divs: Set["StructuralMapDiv"] = set()
         if divs:
-            self.divs = set(divs)
+            for div in divs:
+                self.add_div(div)
 
         self.digital_objects = set()
         if digital_objects:
             self.digital_objects = set(digital_objects)
+
+    @property
+    def root_div(self) -> "StructuralMapDiv":
+        """Return the root div of this div. Returns self if the div has no
+        parents.
+        """
+        parent_div = self
+        while parent_div.parent is not None:
+            parent_div = parent_div.parent
+        return parent_div
 
     def add_metadata(self, metadata: MetadataBase) -> None:
         """Add metadata to this div.
@@ -114,7 +127,27 @@ class StructuralMapDiv:
         """Add a further division to this division.
 
         :param StructuralMapDiv div: The div that is added to this div.
+
+        :raises ValueError: If the given div already exists in the div tree, or
+            if the added div already has a parent div.
         """
+        # StructuralMapDiv is iterable (the iterator iterates through all its
+        # nested divs), so set(div) constructs a set of all divs in the
+        # iterable (i.e. all the divs in the div tree)
+        added_divs = set(div)
+        existing_divs = set(self.root_div)
+        common_divs = added_divs & existing_divs
+
+        if common_divs:
+            raise ValueError(
+                "Added div contains or is itself a div that already exists in "
+                "the div tree."
+            )
+
+        if div.parent:
+            raise ValueError("Added div is already has a parent div.")
+
+        div.parent = self
         self.divs.add(div)
 
     def add_digital_object(self, digital_object: DigitalObject) -> None:
