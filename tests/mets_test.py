@@ -376,8 +376,8 @@ def test_adding_structural_map():
     assert mets.structural_maps == {structural_map_1, structural_map_2}
 
 
-def test_serialization():
-    """Test serializing METS object.
+def test_mets_to_xml():
+    """Test serializing METS object to XML string.
 
     More thorough testing should be done in serialize module tests.
     """
