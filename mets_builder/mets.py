@@ -207,7 +207,6 @@ class METS:
         self.catalog_version = catalog_version
         self.specification = specification
 
-        self.digital_objects: Set[DigitalObject] = set()
         self.file_references: Optional[FileReferences] = None
         self.structural_maps: Set[StructuralMap] = set()
 
@@ -281,6 +280,17 @@ class METS:
                 metadata |= div.metadata
 
         return metadata
+
+    @property
+    def digital_objects(self) -> Set[DigitalObject]:
+        """Get all digital objects that have been added to this METS via a
+        structural map.
+        """
+        digital_objects: Set[DigitalObject] = set()
+        for structural_map in self.structural_maps:
+            for div in structural_map:
+                digital_objects |= div.digital_objects
+        return digital_objects
 
     def add_agent(
         self,
@@ -391,14 +401,6 @@ class METS:
         agent = METSAgent(name, agent_role, other_role, agent_type, other_type)
         self.agents.append(agent)
 
-    def add_digital_object(self, digital_object: DigitalObject) -> None:
-        """Add a digital object to this METS.
-
-        :param DigitalObject digital_object: The DigitalObject instance that is
-            added to this METS.
-        """
-        self.digital_objects.add(digital_object)
-
     def add_file_references(self, file_references: FileReferences) -> None:
         """Add file references to this METS.
 
@@ -414,7 +416,8 @@ class METS:
 
         If no special structure for file references are needed, they can be
         generated here automatically. The file references are generated out of
-        the digital objects that have been added to this METS instance.
+        the digital objects that have been added to this METS instance via
+        structural maps.
 
         This will replace any previously added file references.
         """

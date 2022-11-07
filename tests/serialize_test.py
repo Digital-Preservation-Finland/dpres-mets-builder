@@ -64,12 +64,6 @@ def mets_object():
         identifier="digital_object_2"
     )
 
-    mets.add_digital_object(do_1)
-    mets.add_digital_object(do_2)
-
-    # File references
-    mets.generate_file_references()
-
     # Structural map
     md_3 = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
@@ -130,6 +124,9 @@ def mets_object():
     )
     mets.add_structural_map(structural_map_1)
     mets.add_structural_map(structural_map_2)
+
+    # File references
+    mets.generate_file_references()
 
     return mets
 

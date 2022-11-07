@@ -254,7 +254,6 @@ def test_get_metadata():
         streams=[stream],
         metadata=[md_digital_object]
     )
-    mets.add_digital_object(digital_object)
 
     #  two structural maps, one with metadata in a nested div
     root_div_1 = StructuralMapDiv(
@@ -280,20 +279,39 @@ def test_get_metadata():
     assert mets.metadata == expected_metadata
 
 
-def test_add_digital_object():
-    """Test adding digital object to METS object."""
+def test_get_digital_objects():
+    """Test getting the digital objects that have been added to a METS object
+    via structural maps.
+    """
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
         creator_name="Mr. Foo"
     )
-    assert mets.digital_objects == set()
 
-    digital_object = DigitalObject(path_in_sip="path")
+    subdiv_digital_objects = {
+        DigitalObject(path_in_sip="path/1"),
+        DigitalObject(path_in_sip="path/2"),
+        DigitalObject(path_in_sip="path/3")
+    }
+    root_div_digital_objects = {
+        DigitalObject(path_in_sip="path/1"),
+        DigitalObject(path_in_sip="path/2"),
+        DigitalObject(path_in_sip="path/3")
+    }
+    all_digital_objects = subdiv_digital_objects | root_div_digital_objects
 
-    mets.add_digital_object(digital_object)
-    assert mets.digital_objects == {digital_object}
+    subdiv = StructuralMapDiv(
+        "test_type",  digital_objects=subdiv_digital_objects
+    )
+    root_div = StructuralMapDiv(
+        "test_type", digital_objects=root_div_digital_objects, divs=[subdiv]
+    )
+    structural_map = StructuralMap(root_div=root_div)
+    mets.add_structural_map(structural_map)
+
+    assert mets.digital_objects == all_digital_objects
 
 
 def test_add_file_references():
@@ -326,8 +344,9 @@ def test_generating_file_references():
         DigitalObject(path_in_sip="path/3")
     }
 
-    for digital_object in digital_objects:
-        mets.add_digital_object(digital_object)
+    root_div = StructuralMapDiv("test_type", digital_objects=digital_objects)
+    structural_map = StructuralMap(root_div=root_div)
+    mets.add_structural_map(structural_map)
 
     assert mets.file_references is None
     mets.generate_file_references()
