@@ -90,17 +90,19 @@ class StructuralMapDiv:
         self.orderlabel = orderlabel
 
         self.metadata = set()
+        self.digital_objects: Set[DigitalObject] = set()
+        self.divs: Set["StructuralMapDiv"] = set()
+
         if metadata:
             self.metadata = set(metadata)
 
-        self.divs: Set["StructuralMapDiv"] = set()
+        if digital_objects:
+            for digital_object in digital_objects:
+                self.add_digital_object(digital_object)
+
         if divs:
             for div in divs:
                 self.add_div(div)
-
-        self.digital_objects = set()
-        if digital_objects:
-            self.digital_objects = set(digital_objects)
 
     @property
     def root_div(self) -> "StructuralMapDiv":
@@ -111,6 +113,14 @@ class StructuralMapDiv:
         while parent_div.parent is not None:
             parent_div = parent_div.parent
         return parent_div
+
+    @property
+    def nested_digital_objects(self) -> Set[DigitalObject]:
+        """Get all digital objects in this div and its nested divs."""
+        digital_objects = set()
+        for div in self:
+            digital_objects |= div.digital_objects
+        return digital_objects
 
     def add_metadata(self, metadata: MetadataBase) -> None:
         """Add metadata to this div.
@@ -128,8 +138,9 @@ class StructuralMapDiv:
 
         :param StructuralMapDiv div: The div that is added to this div.
 
-        :raises ValueError: If the given div already exists in the div tree, or
-            if the added div already has a parent div.
+        :raises ValueError: If the given div already exists in the div tree, if
+            the added div already has a parent div, or if the added div
+            contains digital objects that already exists in the div tree.
         """
         # StructuralMapDiv is iterable (the iterator iterates through all its
         # nested divs), so set(div) constructs a set of all divs in the
@@ -147,6 +158,16 @@ class StructuralMapDiv:
         if div.parent:
             raise ValueError("Added div is already has a parent div.")
 
+        # Check for digital object conflicts
+        added_objects = div.nested_digital_objects
+        existing_objects = self.root_div.nested_digital_objects
+        common_objects = added_objects & existing_objects
+        if common_objects:
+            raise ValueError(
+                "Added div contains a digital object that already exists in "
+                "the div tree."
+            )
+
         div.parent = self
         self.divs.add(div)
 
@@ -155,7 +176,15 @@ class StructuralMapDiv:
 
         :param DigitalObject digital_object: The DigitalObject that is added
             to the div.
+
+        :raises ValueError: If the DigitalObject already exists in the div
+            tree.
         """
+        if digital_object in self.root_div.nested_digital_objects:
+            raise ValueError(
+                "Given digital object already exists in the div tree."
+            )
+
         self.digital_objects.add(digital_object)
 
 

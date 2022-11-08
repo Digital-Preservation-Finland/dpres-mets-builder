@@ -52,8 +52,8 @@ def test_iterate_structural_map_div():
 
     root_div = StructuralMapDiv(div_type="test_type", divs=[sub1, sub2])
 
-    all_divs = {root_div, sub1, sub2, subsub1, subsub2}
-    assert set(root_div) == all_divs
+    nested_divs = {sub1, sub2, subsub1, subsub2}
+    assert set(root_div) == nested_divs
 
 
 def test_iterate_structural_map():
@@ -155,3 +155,68 @@ def test_add_duplicate_div_to_div_tree():
     subdiv.add_div(subsubdiv_sibling)
     with pytest.raises(ValueError):
         subsubdiv.add_div(subsubdiv_sibling)
+
+
+def test_add_duplicate_object_to_div():
+    """Test that adding a digital object twice to a div raises an error."""
+    subsubdiv = StructuralMapDiv("test_type")
+    subdiv = StructuralMapDiv("test_type", divs=[subsubdiv])
+    root_div = StructuralMapDiv("test_type", divs=[subdiv])
+
+    digital_object = DigitalObject("path")
+    subdiv.add_digital_object(digital_object)
+
+    # Adding the object second time to the same div
+    with pytest.raises(ValueError):
+        subdiv.add_digital_object(digital_object)
+
+    # Adding the object to parent div
+    with pytest.raises(ValueError):
+        root_div.add_digital_object(digital_object)
+
+    # Adding the object to child div
+    with pytest.raises(ValueError):
+        subsubdiv.add_digital_object(digital_object)
+
+    # Adding the object to a sibling
+    subdiv_sibling = StructuralMapDiv("test_type")
+    root_div.add_div(subdiv_sibling)
+    with pytest.raises(ValueError):
+        subdiv_sibling.add_digital_object(digital_object)
+
+
+def test_add_div_with_duplicate_digital_object_to_div():
+    """Test that adding a div to a div that contains a digital object that
+    already exists in the div tree fails.
+    """
+    digital_object = DigitalObject("path")
+
+    subdiv_1 = StructuralMapDiv("test_type", digital_objects=[digital_object])
+    root_div_1 = StructuralMapDiv("test_type", divs=[subdiv_1])
+
+    subdiv_2 = StructuralMapDiv("test_type", digital_objects=[digital_object])
+    root_div_2 = StructuralMapDiv("test_type", divs=[subdiv_2])
+
+    with pytest.raises(ValueError) as error:
+        root_div_1.add_div(root_div_2)
+    assert str(error.value) == (
+        "Added div contains a digital object that already exists in the div "
+        "tree."
+    )
+
+
+def test_nested_digital_objects():
+    """Test that all nested digital objects are retrievable drom a div."""
+    do_1 = DigitalObject("path/1")
+    do_2 = DigitalObject("path/2")
+    do_3 = DigitalObject("path/3")
+
+    subsubdiv = StructuralMapDiv("test_type", digital_objects=[do_3])
+    subdiv = StructuralMapDiv(
+        "test_type", divs=[subsubdiv], digital_objects=[do_2]
+    )
+    root_div = StructuralMapDiv(
+        "test_type", divs=[subdiv], digital_objects=[do_1]
+    )
+
+    assert root_div.nested_digital_objects == {do_1, do_2, do_3}
