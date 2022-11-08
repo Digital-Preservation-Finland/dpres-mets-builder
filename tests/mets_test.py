@@ -218,7 +218,7 @@ def test_get_metadata():
     )
     md_stream = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
-        metadata_type="descriptive",
+        metadata_type="technical",
         metadata_format="other",
         other_format="PAS-special",
         format_version="1.0"

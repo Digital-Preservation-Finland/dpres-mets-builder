@@ -2,7 +2,7 @@
 
 import uuid
 from pathlib import Path
-from typing import Iterable, Optional, Union
+from typing import Iterable, Optional, Set, Union
 
 from mets_builder.metadata import MetadataBase
 
@@ -20,18 +20,31 @@ class DigitalObjectBase:
         """Constructor for DigitalObjectBase.
 
         :param Iterable[MetadataBase] metadata: Iterable of metadata objects
-            that describe this object.
+            that describe this object. Note that the metadata should be
+            administrative metadata, and any descriptive metadata of a digital
+            object should be added to a div in a structural map.
         """
-        if metadata is None:
-            metadata = set()
-        self.metadata = set(metadata)
+        self.metadata: Set[MetadataBase] = set()
+        if metadata is not None:
+            for data in metadata:
+                self.add_metadata(data)
 
     def add_metadata(self, metadata: MetadataBase) -> None:
-        """Add metadata to this object.
+        """Add administrative metadata to this object.
+
+        Any descriptive metadata should be added to a div in structural map
+        (StructuralMapDiv in a StructuralMap)
 
         :param MetadataBase metadata: The metadata object that is added to this
             object.
+
+        :raises ValueError: If the given metadata is descriptive metadata.
         """
+        if metadata.is_descriptive:
+            raise ValueError(
+                "Added metadata is descriptive metadata. Descriptive metadata "
+                "should be added to a div in a structural map."
+            )
         self.metadata.add(metadata)
 
 
@@ -53,7 +66,9 @@ class DigitalObjectStream(DigitalObjectBase):
         """Constructor for DigitalObjectStream.
 
         :param Iterable[MetadataBase] metadata: Iterable of metadata objects
-            that describe this stream.
+            that describe this stream. Note that the metadata should be
+            administrative metadata, and any descriptive metadata of a stream
+            should be added to a div in a structural map.
         """
         super().__init__(metadata=metadata)
 
@@ -63,9 +78,11 @@ class DigitalObject(DigitalObjectBase):
 
     DigitalObject represents a file that is included in the METS document and
     in the SIP that the METS document describes. A DigitalObject instance
-    should be created for each file in the METS document, and any metadata that
-    describes the file should be added to the corresponding DigitalObject
-    instance.
+    should be created for each file in the METS document, and any
+    administrative metadata that describes the file should be added to the
+    corresponding DigitalObject instance. However, any descriptive metadata
+    should be added to a div in a structural map (StructuralMapDiv in a
+    StructuralMap).
 
     Some files may include multiple streams, for example video files may
     include separate video and audio streams. A DigitalObject instance should
@@ -88,7 +105,9 @@ class DigitalObject(DigitalObjectBase):
             SIP, relative to the SIP root directory. Note that this can be
             different than the path in the local filesystem.
         :param Iterable[MetadataBase] metadata: Iterable of metadata objects
-            that describe this stream.
+            that describe this stream. Note that the metadata should be
+            administrative metadata, and any descriptive metadata of a digital
+            object should be added to a div in a structural map.
         :param Iterable[DigitalObjectStream] streams: Iterable of
             DigitalObjectStreams, representing the streams of this digital
             object.
