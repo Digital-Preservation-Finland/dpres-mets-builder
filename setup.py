@@ -1,9 +1,8 @@
-from setuptools import setup
-
+from setuptools import find_packages, setup
 
 setup(
     name="dpres-mets-builder",
-    packages=["mets_builder"],
+    packages=find_packages(),
     package_dir={
         "mets_builder": "mets_builder"
     },
