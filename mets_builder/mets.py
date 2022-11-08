@@ -17,7 +17,12 @@ METS_SPECIFICATION = "1.7.4"
 
 
 class MetsProfile(Enum):
-    """Enum for METS profiles."""
+    """Enum for METS profiles.
+
+    Value descriptions:
+    - CULTURAL_HERITAGE: Profile for cultural heritage resources.
+    - RESEARCH_DATA: Profile for research data resources.
+    """
 
     CULTURAL_HERITAGE = (
         "https://digitalpreservation.fi/mets-profiles/cultural-heritage")
@@ -29,7 +34,15 @@ class MetsProfile(Enum):
 
 
 class MetsRecordStatus(Enum):
-    """Enum for METS record statuses."""
+    """Enum for METS record statuses.
+
+    Value descriptions:
+    - SUBMISSION: The information package is a new SIP. If the package
+      identifier is the same as in some other information package ingested
+      earlier belonging to the same contract, the package will be rejected.
+    - UPDATE: The SIP is an updated version of a previous SIP.
+    - DISSEMINATION: The information package is a DIP.
+    """
 
     SUBMISSION = "submission"
     """The information package is a new SIP. If the package identifier is the
@@ -45,7 +58,26 @@ class MetsRecordStatus(Enum):
 
 
 class AgentRole(Enum):
-    """Enum for METS agent roles."""
+    """Enum for METS agent roles.
+
+    Value descriptions:
+    - CREATOR: The person(s) or institution(s) responsible for the METS
+      document.
+    - EDITOR: The person(s) or institution(s) that prepares the metadata for
+      encoding.
+    - ARCHIVIST: The person(s) or institution(s) responsible for the
+      document/collection.
+    - PRESERVATION: The person(s) or institution(s) responsible for
+      preservation functions.
+    - DISSEMINATOR: The person(s) or institution(s) responsible for
+      dissemination functions.
+    - CUSTODIAN: The person(s) or institution(s) charged with the oversight of
+      a document/collection.
+    - IPOWNER: Intellectual Property Owner: The person(s) or institution
+      holding copyright, trade or service marks or other intellectual property
+      rights for the object.
+    - OTHER: Use if none of the other options apply to the agent role.
+    """
 
     CREATOR = "CREATOR"
     """The person(s) or institution(s) responsible for the METS document."""
@@ -86,7 +118,15 @@ class AgentRole(Enum):
 
 
 class AgentType(Enum):
-    """Enum for METS agent types."""
+    """Enum for METS agent types.
+
+    Value descriptions:
+    - INDIVIDUAL: Use if an individual has served as the agent.
+    - ORGANIZATION: Use if an institution, corporate body, association,
+      non-profit enterprise, government, religious body, etc. has served as the
+      agent.
+    - OTHER: Use if none of the other options apply to the agent type.
+    """
 
     INDIVIDUAL = "INDIVIDUAL"
     """Use if an individual has served as the agent."""
@@ -132,16 +172,13 @@ class METS:
             printable US-ASCII characters.
         :param str creator_name: Name of the person or entity who created the
             information package.
-        :param AgentType, str creator_type: Specifies the type of creator. The
-            pre-defined values are:
+        :param AgentType, str creator_type: The type of creator, given as
+            AgentType enum or string. If given as string, the value is cast to
+            AgentTypeand results in error if it is not a valid agent type. The
+            allowed values can be found from AgentType documentation.
 
-            - INDIVIDUAL: Use if an individual has served as the creator.
-            - ORGANIZATION: Use if an institution, corporate body, association,
-              non-profit enterprise, government, religious body, etc. has
-              served as the creator.
-
-            Any other values should be given using the 'creator_other_type'
-            attribute.
+            If none of the AgentType values apply, any other values should be
+            given using the 'creator_other_type' attribute.
         :param str creator_other_type: Can be used to describe the creator
             type, if none of the pre-defined types in 'creator_type' attribute
             apply. If set, 'creator_other_type' overrides any value set to
@@ -311,38 +348,24 @@ class METS:
             set as "ORGANIZATION", the name should be set as the name of the
             organization.
         :param AgentRole, str agent_role: Specifies the function of the agent
-            with respect to the METS record. The pre-defined values are:
+            with respect to the METS record, given as AgentRole enum or string.
+            If given as string, the value is cast to AgentRole and results in
+            error if it is not a valid agent role. The allowed values can be
+            found from AgentRole documentation.
 
-            - CREATOR: The person(s) or institution(s) responsible for the METS
-              document.
-            - EDITOR: The person(s) or institution(s) that prepares the
-              metadata for encoding.
-            - ARCHIVIST: The person(s) or institution(s) responsible for the
-              document/collection.
-            - PRESERVATION: The person(s) or institution(s) responsible for
-              preservation functions.
-            - DISSEMINATOR: The person(s) or institution(s) responsible for
-              dissemination functions.
-            - CUSTODIAN: The person(s) or institution(s) charged with the
-              oversight of a document/collection.
-            - IPOWNER: Intellectual Property Owner: The person(s) or
-              institution holding copyright, trade or service marks or other
-              intellectual property rights for the object.
-
-            Any other values should be given using the 'other_role' attribute.
+            If none of the AgentRole values apply, other values should be given
+            using the 'other_role' attribute.
         :param str other_role: Can be used to describe the agent role, if none
             of the pre-defined roles in 'agent_role' attribute apply. If set,
             'other_role' overrides any value set to 'agent_role' with
             AgentRole.OTHER.
-        :param AgentType, str agent_type: Specifies the type of agent. The
-            pre-defined values are:
+        :param AgentType, str agent_type: Specifies the type of agent, given as
+            AgentType enum or string. If given as string, the value is cast to
+            AgentType and results in error if it is not a valid agent type. The
+            allowed values can be found from AgentType documentation.
 
-            - INDIVIDUAL: Use if an individual has served as the agent.
-            - ORGANIZATION: Use if an institution, corporate body, association,
-              non-profit enterprise, government, religious body, etc. has
-              served as the agent.
-
-            Any other values should be given using the 'other_type' attribute.
+            If none of the AgentType values apply, other values should be given
+            using the 'other_type' attribute.
         :param str other_type: Can be used to describe the agent type, if none
             of the pre-defined types in 'agent_type' attribute apply. If set,
             'other_type' overrides any value set to 'agent_type' with

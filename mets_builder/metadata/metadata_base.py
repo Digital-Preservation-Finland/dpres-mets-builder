@@ -9,14 +9,36 @@ from lxml import etree
 
 
 class MetadataType(Enum):
-    """Enum for metadata metadata_types."""
+    """Enum for metadata types."""
     TECHNICAL = "technical"
     DESCRIPTIVE = "descriptive"
     DIGITAL_PROVENANCE = "digital provenance"
 
 
 class MetadataFormat(Enum):
-    """Enum for metadata formats."""
+    """Enum for metadata formats.
+
+    Descriptive metadata formats:
+    - MARC
+    - MODS
+    - DC
+    - EAD
+    - EAC_CPF
+    - LIDO
+    - VRA
+    - DDI
+
+    Technical metadata formats:
+    - PREMIS_OBJECT
+    - NISOIMG
+
+    Digital provenance metadata formats:
+    - PREMIS_AGENT
+    - PREMIS_EVENT
+
+    Other:
+    - OTHER
+    """
 
     # descriptive metadata formats
     MARC = "MARC"
