@@ -24,10 +24,9 @@ class StructuralMapDiv:
         """Iterates through all nested divs in this div. The ordering is not
         quaranteed.
         """
-        yield self
         for div in self.divs:
-            for nested_div in div:
-                yield nested_div
+            yield div
+            yield from div
 
     def __init__(
         self,
@@ -118,6 +117,7 @@ class StructuralMapDiv:
     def nested_digital_objects(self) -> Set[DigitalObject]:
         """Get all digital objects in this div and its nested divs."""
         digital_objects = set()
+        digital_objects |= self.digital_objects
         for div in self:
             digital_objects |= div.digital_objects
         return digital_objects
@@ -144,9 +144,11 @@ class StructuralMapDiv:
         """
         # StructuralMapDiv is iterable (the iterator iterates through all its
         # nested divs), so set(div) constructs a set of all divs in the
-        # iterable (i.e. all the divs in the div tree)
-        added_divs = set(div)
-        existing_divs = set(self.root_div)
+        # iterable (i.e. all the nested divs under the div). The div that is
+        # iterated is not included in the iterator, so it has to be included
+        # separately here
+        added_divs = set(div) | {div}
+        existing_divs = set(self.root_div) | {self.root_div}
         common_divs = added_divs & existing_divs
 
         if common_divs:
@@ -222,8 +224,8 @@ class StructuralMap:
         """Iterate through all nested divs in this structural map. The ordering
         is not quaranteed.
         """
-        for div in self.root_div:
-            yield div
+        yield self.root_div
+        yield from self.root_div
 
     def __init__(
         self,
