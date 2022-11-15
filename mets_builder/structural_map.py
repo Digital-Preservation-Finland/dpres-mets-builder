@@ -92,15 +92,6 @@ class StructuralMapDiv:
         self.digital_objects: Set[DigitalObject] = set()
         self.divs: Set["StructuralMapDiv"] = set()
 
-        # Cache for all digital objects added to this div and nested divs,
-        # used to check for duplicate digital objects when adding divs or
-        # digital objects. Cache is used for performance reasons (iterating the
-        # whole div tree each time when a digital object is added gets slow
-        # after tens of thousands of objects)
-        self.nested_digital_objects: Set[DigitalObject] = set()
-        # Similar cache for nested divs
-        self.nested_divs: Set["StructuralMapDiv"] = set()
-
         if metadata:
             self.metadata = set(metadata)
 
@@ -121,6 +112,15 @@ class StructuralMapDiv:
         while parent_div.parent is not None:
             parent_div = parent_div.parent
         return parent_div
+
+    @property
+    def nested_digital_objects(self) -> Set[DigitalObject]:
+        """Get all digital objects in this div and its nested divs."""
+        digital_objects = set()
+        digital_objects |= self.digital_objects
+        for div in self:
+            digital_objects |= div.digital_objects
+        return digital_objects
 
     def add_metadata(self, metadata: MetadataBase) -> None:
         """Add metadata to this div.
@@ -147,9 +147,9 @@ class StructuralMapDiv:
         # iterable (i.e. all the nested divs under the div). The div that is
         # iterated is not included in the iterator, so it has to be included
         # separately here
-        added_divs = div.nested_divs | {div}
-        existing_divs = self.root_div.nested_divs | {self.root_div}
-        common_divs = not added_divs.isdisjoint(existing_divs)
+        added_divs = set(div) | {div}
+        existing_divs = set(self.root_div) | {self.root_div}
+        common_divs = added_divs & existing_divs
 
         if common_divs:
             raise ValueError(
@@ -172,8 +172,6 @@ class StructuralMapDiv:
 
         div.parent = self
         self.divs.add(div)
-        self._update_nested_digital_objects(added_objects)
-        self._update_nested_divs(added_divs)
 
     def add_digital_object(self, digital_object: DigitalObject) -> None:
         """Add a digital object to this div.
@@ -190,48 +188,6 @@ class StructuralMapDiv:
             )
 
         self.digital_objects.add(digital_object)
-        self._update_nested_digital_objects({digital_object})
-
-    def _update_nested_digital_objects(
-        self,
-        digital_objects: Set[DigitalObject]
-    ) -> None:
-        """Update nested digital objects cache.
-
-        Adds the given digital objects to the nested_digital_objects cache to
-        this div and all its parent divs.
-
-        The nested digital objects cache keeps track of all digital objects in
-        a div and its nested divs. The cache is used to check that a digital
-        object is not added twice to a div tree.
-
-        :param Set[DigitalObject] digital_objects: The digital objects that are
-            added.
-        """
-        div: Optional["StructuralMapDiv"] = self
-        while div:
-            div.nested_digital_objects |= digital_objects
-            div = div.parent
-
-    def _update_nested_divs(
-        self,
-        divs: Set["StructuralMapDiv"]
-    ) -> None:
-        """Update nested divs cache.
-
-        Adds the given divs to the nested_divs cache to this div and all its
-        parent divs.
-
-        The nested divs cache keeps track of all divs in a div and its nested
-        divs. The cache is used to check that a div is not added twice to a div
-        tree.
-
-        :param Set[StructuralMapDiv] divs: The divs that are added.
-        """
-        div: Optional["StructuralMapDiv"] = self
-        while div:
-            div.nested_divs |= divs
-            div = div.parent
 
 
 class StructuralMap:

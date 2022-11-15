@@ -206,13 +206,7 @@ def test_add_div_with_duplicate_digital_object_to_div():
 
 
 def test_nested_digital_objects():
-    """Test that all nested digital objects are retrievable drom a div.
-
-    Make sure that nested digital objects cache is updated both when one
-    digital object is added with a function, and when a div with digital
-    objects is added to the div tree.
-    """
-    # Original div tree
+    """Test that all nested digital objects are retrievable drom a div."""
     do_1 = DigitalObject("path/1")
     do_2 = DigitalObject("path/2")
     do_3 = DigitalObject("path/3")
@@ -226,22 +220,3 @@ def test_nested_digital_objects():
     )
 
     assert root_div.nested_digital_objects == {do_1, do_2, do_3}
-    assert subdiv.nested_digital_objects == {do_2, do_3}
-    assert subsubdiv.nested_digital_objects == {do_3}
-
-    # Div tree with digital objects added
-    do_4 = DigitalObject("path/4")
-    do_5 = DigitalObject("path/5")
-
-    subdiv_2 = StructuralMapDiv("test_type")
-    root_div_2 = StructuralMapDiv("test_type", divs=[subdiv_2])
-    root_div_2.add_digital_object(do_4)
-    subdiv_2.add_digital_object(do_5)
-
-    subdiv.add_div(root_div_2)
-
-    assert root_div.nested_digital_objects == {do_1, do_2, do_3, do_4, do_5}
-    assert subdiv.nested_digital_objects == {do_2, do_3, do_4, do_5}
-    assert subsubdiv.nested_digital_objects == {do_3}
-    assert root_div_2.nested_digital_objects == {do_4, do_5}
-    assert subdiv_2.nested_digital_objects == {do_5}
