@@ -44,9 +44,7 @@ class StructuralMapDiv:
             division that the division element represents. Possible values
             include: 'chapter', 'article', 'page', 'track', 'segment',
             'section' etc. METS places no constraints on the possible
-            values. The recommended controlled vocabulary according to the
-            Finnish national METS schema for the attribute can be found here:
-            https://digitalpreservation.fi/specifications/vocabularies
+            values.
         :param int order: A representation of the divison element's order among
             its siblings (e.g., its absolute, numeric sequence), given as
             integer value. For further of the distinction between 'order' and
@@ -278,9 +276,7 @@ class StructuralMap:
             structural map that represented a purely physical structure could
             be described with value 'physical'. However, the METS schema
             neither defines nor requires a common vocabulary for this
-            attribute. The recommended controlled vocabulary according to the
-            Finnish national METS schema for the attribute can be found here:
-            https://digitalpreservation.fi/specifications/vocabularies
+            attribute.
         :param str label: String that describes the structural map to viewers
             of the METS document. This would be useful primarily where more
             than one structural map is provided for a single object. A
