@@ -96,12 +96,10 @@ class StructuralMapDiv:
             self.metadata = set(metadata)
 
         if digital_objects:
-            for digital_object in digital_objects:
-                self.add_digital_object(digital_object)
+            self.add_digital_objects(digital_objects)
 
         if divs:
-            for div in divs:
-                self.add_div(div)
+            self.add_divs(divs)
 
     @property
     def root_div(self) -> "StructuralMapDiv":
@@ -133,61 +131,94 @@ class StructuralMapDiv:
         """
         self.metadata.add(metadata)
 
-    def add_div(self, div: "StructuralMapDiv") -> None:
-        """Add a further division to this division.
+    def add_divs(self, divs: Iterable["StructuralMapDiv"]) -> None:
+        """Add a further divisions to this division.
 
-        :param StructuralMapDiv div: The div that is added to this div.
+        Note that it is much more performant add multiple divs at once, rather
+        than adding divs one by one.
 
-        :raises ValueError: If the given div already exists in the div tree, if
-            the added div already has a parent div, or if the added div
-            contains digital objects that already exists in the div tree.
+        :param StructuralMapDiv divs: An iterable of StructuralMapDivs that are
+            added to this div.
+
+        :raises ValueError: If the given div already exists or contains a div
+            that exists in the div tree, if the added div already has a parent
+            div, or if any of the added divs contain digital objects that
+            already exists in the div tree.
         """
+        # Check that divs is not a sungle StructuralMapDiv, because as
+        # StructuralMapDiv is an iterable the following code would run but with
+        # unwanted results.
+        if isinstance(divs, StructuralMapDiv):
+            raise ValueError(
+                "Given 'divs' is a single StructuralMapDiv. Give an iterable "
+                "of StructuralMapDivs as the 'divs' attribute."
+            )
+
         # StructuralMapDiv is iterable (the iterator iterates through all its
         # nested divs), so set(div) constructs a set of all divs in the
         # iterable (i.e. all the nested divs under the div). The div that is
         # iterated is not included in the iterator, so it has to be included
         # separately here
-        added_divs = set(div) | {div}
+        added_divs = set()
+        for div in divs:
+            added_divs = set(div) | {div}
         existing_divs = set(self.root_div) | {self.root_div}
-        common_divs = added_divs & existing_divs
+        common_divs_exist = not added_divs.isdisjoint(existing_divs)
 
-        if common_divs:
+        if common_divs_exist:
             raise ValueError(
                 "Added div contains or is itself a div that already exists in "
                 "the div tree."
             )
 
-        if div.parent:
-            raise ValueError("Added div is already has a parent div.")
+        for div in divs:
+            if div.parent:
+                raise ValueError("An added div is already has a parent div.")
 
         # Check for digital object conflicts
-        added_objects = div.nested_digital_objects
+        added_objects = set()
+        for div in divs:
+            added_objects |= div.nested_digital_objects
         existing_objects = self.root_div.nested_digital_objects
-        common_objects = added_objects & existing_objects
-        if common_objects:
+        common_objects_exist = not added_objects.isdisjoint(existing_objects)
+        if common_objects_exist:
             raise ValueError(
-                "Added div contains a digital object that already exists in "
-                "the div tree."
+                "An added div contains a digital object that already exists "
+                "in the div tree."
             )
 
-        div.parent = self
-        self.divs.add(div)
+        # Set this div as the parent for all added divs
+        for div in divs:
+            div.parent = self
 
-    def add_digital_object(self, digital_object: DigitalObject) -> None:
-        """Add a digital object to this div.
+        # Add the divs to this div
+        self.divs |= set(divs)
 
-        :param DigitalObject digital_object: The DigitalObject that is added
-            to the div.
+    def add_digital_objects(
+        self,
+        digital_objects: Iterable[DigitalObject]
+    ) -> None:
+        """Add digital objects to this div.
 
-        :raises ValueError: If the DigitalObject already exists in the div
-            tree.
+        Note that it is much more performant add multiple digital objects at
+        once, rather than adding them one by one.
+
+        :param DigitalObject digital_objects: Iterable of DigitalObjects that
+            are added to this div.
+
+        :raises ValueError: If any of the given DigitalObjects already exist in
+            the div tree.
         """
-        if digital_object in self.root_div.nested_digital_objects:
+        added_objects = set(digital_objects)
+        existing_objects = self.root_div.nested_digital_objects
+        common_objects_exist = not added_objects.isdisjoint(existing_objects)
+        if common_objects_exist:
             raise ValueError(
-                "Given digital object already exists in the div tree."
+                "Some of the given digital objects already exist in the div "
+                "tree."
             )
 
-        self.digital_objects.add(digital_object)
+        self.digital_objects |= added_objects
 
 
 class StructuralMap:
