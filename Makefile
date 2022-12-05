@@ -8,3 +8,8 @@ install:
 
 	# Use Python setuptools
 	${PYTHON} ./setup.py install -O1 --prefix="${PREFIX}" --root="${DESTDIR}" --record=INSTALLED_FILES
+
+.PHONY: doc
+doc:
+	PYTHONPATH="../" make -C doc html
+

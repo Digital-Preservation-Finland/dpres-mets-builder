@@ -21,3 +21,6 @@ junit.xml
 
 # Vim
 *.swp
+
+# Ato-generated doc files
+doc/source/generated
