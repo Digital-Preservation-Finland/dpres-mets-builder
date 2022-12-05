@@ -11,55 +11,65 @@ from lxml import etree
 class MetadataType(Enum):
     """Enum for metadata types."""
     TECHNICAL = "technical"
+    """Technical metadata"""
+
     DESCRIPTIVE = "descriptive"
+    """Descriptive metadata"""
+
     DIGITAL_PROVENANCE = "digital provenance"
+    """Digital provenance metadata"""
 
 
 class MetadataFormat(Enum):
-    """Enum for metadata formats.
-
-    Descriptive metadata formats:
-    - MARC
-    - MODS
-    - DC
-    - EAD
-    - EAC_CPF
-    - LIDO
-    - VRA
-    - DDI
-
-    Technical metadata formats:
-    - PREMIS_OBJECT
-    - NISOIMG
-
-    Digital provenance metadata formats:
-    - PREMIS_AGENT
-    - PREMIS_EVENT
-
-    Other:
-    - OTHER
-    """
+    """Enum for metadata formats."""
 
     # descriptive metadata formats
     MARC = "MARC"
+    """MARC (Machine-Readable Cataloging), descriptive metadata format"""
+
     MODS = "MODS"
+    """MODS (Metadata Object Description Schema), descriptive metadata
+    format
+    """
+
     DC = "DC"
+    """DC (Dublin Core), descriptive metadata format"""
+
     EAD = "EAD"
+    """EAD (Encoded Archival Description), descriptive metadata format"""
+
     EAC_CPF = "EAC-CPF"
+    """EAD-CPF (Encoded Archival Context for Corporate Bodies, Persons, and
+    Families), descriptive metadata format"""
+
     LIDO = "LIDO"
+    """LIDO (Lightweight Information Describing Objects), descriptive metadata
+    format
+    """
+
     VRA = "VRA"
+    """VRA (Visual Resources Association), descriptive metadata format"""
+
     DDI = "DDI"
+    """DDI (Data Documentation Initiative), descriptive metadata format"""
 
     # technical metadata formats
     PREMIS_OBJECT = "PREMIS:OBJECT"
+    """PREMIS:OBJECT, technical metadata format"""
+
     NISOIMG = "NISOIMG"
+    """NISOIMG, technical metadata format"""
 
     # digital provenance metadata formats
     PREMIS_AGENT = "PREMIS:AGENT"
+    """PREMIS:AGENT, digital provenance metadata format"""
+
     PREMIS_EVENT = "PREMIS:EVENT"
+    """PREMIS:EVENT, digital provenance metadata format"""
 
     # other
     OTHER = "OTHER"
+    """Use if none of the other options apply to the metadata format."""
 
 
 class MetadataBase:

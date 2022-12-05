@@ -17,12 +17,7 @@ METS_SPECIFICATION = "1.7.4"
 
 
 class MetsProfile(Enum):
-    """Enum for METS profiles.
-
-    Value descriptions:
-    - CULTURAL_HERITAGE: Profile for cultural heritage resources.
-    - RESEARCH_DATA: Profile for research data resources.
-    """
+    """Enum for METS profiles."""
 
     CULTURAL_HERITAGE = (
         "https://digitalpreservation.fi/mets-profiles/cultural-heritage")
@@ -34,15 +29,7 @@ class MetsProfile(Enum):
 
 
 class MetsRecordStatus(Enum):
-    """Enum for METS record statuses.
-
-    Value descriptions:
-    - SUBMISSION: The information package is a new SIP. If the package
-      identifier is the same as in some other information package ingested
-      earlier belonging to the same contract, the package will be rejected.
-    - UPDATE: The SIP is an updated version of a previous SIP.
-    - DISSEMINATION: The information package is a DIP.
-    """
+    """Enum for METS record statuses."""
 
     SUBMISSION = "submission"
     """The information package is a new SIP. If the package identifier is the
@@ -58,26 +45,7 @@ class MetsRecordStatus(Enum):
 
 
 class AgentRole(Enum):
-    """Enum for METS agent roles.
-
-    Value descriptions:
-    - CREATOR: The person(s) or institution(s) responsible for the METS
-      document.
-    - EDITOR: The person(s) or institution(s) that prepares the metadata for
-      encoding.
-    - ARCHIVIST: The person(s) or institution(s) responsible for the
-      document/collection.
-    - PRESERVATION: The person(s) or institution(s) responsible for
-      preservation functions.
-    - DISSEMINATOR: The person(s) or institution(s) responsible for
-      dissemination functions.
-    - CUSTODIAN: The person(s) or institution(s) charged with the oversight of
-      a document/collection.
-    - IPOWNER: Intellectual Property Owner: The person(s) or institution
-      holding copyright, trade or service marks or other intellectual property
-      rights for the object.
-    - OTHER: Use if none of the other options apply to the agent role.
-    """
+    """Enum for METS agent roles."""
 
     CREATOR = "CREATOR"
     """The person(s) or institution(s) responsible for the METS document."""
@@ -118,15 +86,7 @@ class AgentRole(Enum):
 
 
 class AgentType(Enum):
-    """Enum for METS agent types.
-
-    Value descriptions:
-    - INDIVIDUAL: Use if an individual has served as the agent.
-    - ORGANIZATION: Use if an institution, corporate body, association,
-      non-profit enterprise, government, religious body, etc. has served as the
-      agent.
-    - OTHER: Use if none of the other options apply to the agent type.
-    """
+    """Enum for METS agent types."""
 
     INDIVIDUAL = "INDIVIDUAL"
     """Use if an individual has served as the agent."""
