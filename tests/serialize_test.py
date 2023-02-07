@@ -45,7 +45,7 @@ def mets_object():
         identifier="1"
     )
     do_1 = DigitalObject(
-        path_in_sip="path/1",
+        sip_filepath="path/1",
         metadata=[md_1],
         identifier="digital_object_1"
     )
@@ -59,7 +59,7 @@ def mets_object():
         identifier="2"
     )
     do_2 = DigitalObject(
-        path_in_sip="path/2",
+        sip_filepath="path/2",
         metadata=[md_2],
         identifier="digital_object_2"
     )
@@ -310,7 +310,7 @@ def test_parse_file_references_file_element(mets_object):
 
     stream = DigitalObjectStream(metadata=[md_stream])
     do = DigitalObject(
-        path_in_sip="path",
+        sip_filepath="path",
         metadata=[md_do],
         streams=[stream],
         identifier="digital_object-id"

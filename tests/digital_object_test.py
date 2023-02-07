@@ -52,7 +52,7 @@ def test_generated_identifier():
     """Test that if identifier is not given, an UUID identifier is generated
     for digital object.
     """
-    digital_object = DigitalObject(path_in_sip="path", identifier=None)
+    digital_object = DigitalObject(sip_filepath="path", identifier=None)
 
     # First character is underscore
     assert digital_object.identifier[0] == "_"
@@ -64,7 +64,7 @@ def test_generated_identifier():
 
 def test_add_stream_to_digital_object():
     """Test adding stream to a digital object."""
-    digital_object = DigitalObject(path_in_sip="path")
+    digital_object = DigitalObject(sip_filepath="path")
     assert digital_object.streams == set()
 
     stream = DigitalObjectStream()

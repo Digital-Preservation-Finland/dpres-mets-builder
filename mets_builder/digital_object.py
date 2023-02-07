@@ -94,14 +94,14 @@ class DigitalObject(DigitalObjectBase):
     """
     def __init__(
         self,
-        path_in_sip: Union[str, Path],
+        sip_filepath: Union[str, Path],
         metadata: Optional[Iterable[MetadataBase]] = None,
         streams: Optional[Iterable[DigitalObjectStream]] = None,
         identifier: Optional[str] = None
     ) -> None:
         """Constructor for DigitalObject.
 
-        :param str, Path path_in_sip: File path of this digital object in the
+        :param str, Path sip_filepath: File path of this digital object in the
             SIP, relative to the SIP root directory. Note that this can be
             different than the path in the local filesystem.
         :param Iterable[MetadataBase] metadata: Iterable of metadata objects
@@ -117,7 +117,7 @@ class DigitalObject(DigitalObjectBase):
         """
         super().__init__(metadata=metadata)
 
-        self.path_in_sip = str(path_in_sip)
+        self.sip_filepath = str(sip_filepath)
 
         if streams is None:
             streams = set()

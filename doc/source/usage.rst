@@ -46,7 +46,7 @@ For each digital object that should be included in the METS document, a ``Digita
     from mets_builder.metadata import ImportedMetadata, TechnicalImageMetadata
 
     picture = DigitalObject(
-        path_in_sip="pictures/cat.jpeg"
+        sip_filepath="pictures/cat.jpeg"
     )
 
     md = TechnicalImageMetadata(
@@ -88,7 +88,7 @@ If a digital object has streams, they can be added to the digital object using `
 .. code-block:: python
 
     movie = DigitalObject(
-        path_in_sip="movies/cat_video.mkv"
+        sip_filepath="movies/cat_video.mkv"
     )
     audio_stream = DigitalObjectStream(metadata=[audio_md])
     video_stream = DigitalObjectStream(metadata=[video_md])
