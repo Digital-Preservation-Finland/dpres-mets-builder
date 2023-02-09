@@ -394,3 +394,26 @@ def test_mets_to_xml():
     result.index(b"package_id")
     result.index(b"contract_id")
     result.index(b"Mr. Foo")
+
+
+def test_writing_mets(tmp_path):
+    """Test writing METS object to a file.
+
+    More thorough testing should be done in serialize module tests.
+    """
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        package_id="package_id",
+        contract_id="contract_id",
+        creator_name="Mr. Foo"
+    )
+
+    output_filepath = tmp_path / "mets.xml"
+    mets.write(output_filepath=output_filepath)
+
+    result = output_filepath.read_text()
+
+    # bytes.index raises ValueError if subsection is not found
+    result.index("package_id")
+    result.index("contract_id")
+    result.index("Mr. Foo")

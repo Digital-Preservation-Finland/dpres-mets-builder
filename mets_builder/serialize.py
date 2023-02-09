@@ -340,3 +340,8 @@ def to_xml_string(mets: "METS") -> bytes:
     output_file.close()
 
     return result
+
+
+def write_to_file(mets: "METS", output_filepath: str) -> None:
+    """Serialize METS object to XML and write to given file path."""
+    _write_mets(mets, output_filepath)

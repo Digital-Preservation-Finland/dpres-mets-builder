@@ -3,13 +3,13 @@ import uuid
 from collections import namedtuple
 from datetime import datetime, timezone
 from enum import Enum
+from pathlib import Path
 from typing import List, NamedTuple, Optional, Set, Union
 
-from mets_builder import validation
+from mets_builder import serialize, validation
 from mets_builder.digital_object import DigitalObject
 from mets_builder.file_references import FileReferences
 from mets_builder.metadata import MetadataBase
-from mets_builder.serialize import to_xml_string
 from mets_builder.structural_map import StructuralMap
 
 METS_CATALOG = "1.7.4"
@@ -418,4 +418,8 @@ class METS:
 
     def to_xml(self) -> bytes:
         """Serialize this METS object into XML-formatted bytestring."""
-        return to_xml_string(self)
+        return serialize.to_xml_string(self)
+
+    def write(self, output_filepath: Union[str, Path]) -> None:
+        """Serialize METS object to XML and write to given file path.."""
+        return serialize.write_to_file(self, str(output_filepath))
