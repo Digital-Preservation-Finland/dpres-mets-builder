@@ -70,3 +70,14 @@ def test_add_stream_to_digital_object():
     stream = DigitalObjectStream()
     digital_object.add_stream(stream)
     assert digital_object.streams == {stream}
+
+
+def test_sip_filepath_is_relative():
+    """Test that giving absolute file path as digital object's sip filepath
+    raises an error.
+    """
+    with pytest.raises(ValueError) as error:
+        DigitalObject(sip_filepath="/path")
+    assert str(error.value) == (
+        "Given SIP file path '/path' is not a relative path."
+    )

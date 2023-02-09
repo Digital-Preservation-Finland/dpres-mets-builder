@@ -117,6 +117,10 @@ class DigitalObject(DigitalObjectBase):
         """
         super().__init__(metadata=metadata)
 
+        if Path(sip_filepath).is_absolute():
+            raise ValueError(
+                f"Given SIP file path '{sip_filepath}' is not a relative path."
+            )
         self.sip_filepath = str(sip_filepath)
 
         if streams is None:
