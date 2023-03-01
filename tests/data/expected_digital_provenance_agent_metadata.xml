@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<premis:agent xmlns:premis="info:lc/xmlns/premis-v2">
+  <premis:agentIdentifier>
+    <premis:agentIdentifierType>agent-identifier-type</premis:agentIdentifierType>
+    <premis:agentIdentifierValue>agent-identifier-value</premis:agentIdentifierValue>
+  </premis:agentIdentifier>
+  <premis:agentName>agent-name</premis:agentName>
+  <premis:agentType>organization</premis:agentType>
+  <premis:agentNote>agent-note</premis:agentNote>
+</premis:agent>
