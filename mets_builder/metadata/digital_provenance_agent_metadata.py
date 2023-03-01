@@ -35,6 +35,7 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
         agent_identifier: str,
         agent_name: str,
         agent_type: Union[DigitalProvenanceAgentType, str],
+        agent_version: Optional[str] = None,
         agent_note: Optional[str] = None,
         **kwargs
     ) -> None:
@@ -52,12 +53,17 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
             value is cast to DigitalProvenanceAgentType and results in error if
             it is not a valid digital provenance agent type. The allowed values
             can be found from DigitalProvenanceAgentType documentation.
+        :param agent_version: The version of the agent. Does not have effect if
+            agent type is not 'software' or 'hardware'.
         :param agent_note: Additional information about the agent.
         """
         self.agent_identifier_type = agent_identifier_type
         self.agent_identifier = agent_identifier
         self.agent_name = agent_name
         self.agent_type = DigitalProvenanceAgentType(agent_type)
+        self.agent_version = self._resolve_agent_version(
+            agent_version, self.agent_type
+        )
         self.agent_note = agent_note
 
         super().__init__(
@@ -66,6 +72,32 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
             format_version=self.METADATA_FORMAT_VERSION,
             **kwargs
         )
+
+    def _resolve_agent_version(self, agent_version, agent_type):
+        """Resolve agent version.
+
+        The version should be None unless agent type is 'software' or
+        'hardware'.
+        """
+        if agent_type in [
+            DigitalProvenanceAgentType.SOFTWARE,
+            DigitalProvenanceAgentType.HARDWARE
+        ]:
+            return agent_version
+
+        return None
+
+    def _resolve_serialized_agent_name(self):
+        """Resolve how the name of the agent should be shown in the serialized
+        agent.
+
+        The name is the given agent name, unless the agent has a version
+        number, in which case the version number is appended to the name.
+        """
+        agent_name = self.agent_name
+        if self.agent_version is not None:
+            agent_name = f"{agent_name}-v{self.agent_version}"
+        return agent_name
 
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
@@ -78,9 +110,10 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
             prefix="agent",
             role=None
         )
+
         agent = premis.agent(
             agent_id=agent_identifier,
-            agent_name=self.agent_name,
+            agent_name=self._resolve_serialized_agent_name(),
             agent_type=self.agent_type.value,
             note=self.agent_note
         )
