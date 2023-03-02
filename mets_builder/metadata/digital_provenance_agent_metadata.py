@@ -1,4 +1,5 @@
 """Module for DigitalProvenanceAgentMetadata class."""
+import uuid
 from enum import Enum
 from typing import Optional, Union
 
@@ -31,12 +32,12 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
 
     def __init__(
         self,
-        agent_identifier_type: str,
-        agent_identifier: str,
         agent_name: str,
         agent_type: Union[DigitalProvenanceAgentType, str],
         agent_version: Optional[str] = None,
         agent_note: Optional[str] = None,
+        agent_identifier_type: Optional[str] = None,
+        agent_identifier: Optional[str] = None,
         **kwargs
     ) -> None:
         """Constructor for DigitalProvenanceAgentMetadata class.
@@ -45,8 +46,6 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
         can be given here as well. Look MetadataBase documentation for more
         information.
 
-        :param agent_identifier_type: Type of agent identifier.
-        :param agent_identifier: The agent identifier value.
         :param agent_name: Name of the agent.
         :param agent_type: The type of this agent, given as
             DigitalProvenanceAgentType enum or string. If given as string, the
@@ -56,15 +55,19 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
         :param agent_version: The version of the agent. Does not have effect if
             agent type is not 'software' or 'hardware'.
         :param agent_note: Additional information about the agent.
+        :param agent_identifier_type: Type of agent identifier.
+        :param agent_identifier: The agent identifier value. If not given by
+            the user, agent identifier is generated automatically.
         """
-        self.agent_identifier_type = agent_identifier_type
-        self.agent_identifier = agent_identifier
         self.agent_name = agent_name
         self.agent_type = DigitalProvenanceAgentType(agent_type)
         self.agent_version = self._resolve_agent_version(
             agent_version, self.agent_type
         )
         self.agent_note = agent_note
+        self._set_agent_identifier_and_type(
+            agent_identifier_type, agent_identifier
+        )
 
         super().__init__(
             metadata_type=self.METADATA_TYPE,
@@ -86,6 +89,25 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
             return agent_version
 
         return None
+
+    def _set_agent_identifier_and_type(self, identifier_type, identifier):
+        """Resolve agent identifier and identifier type.
+
+        If identifier is given, also identifier type must be declared by the
+        user. If identifier is not given by the user, agent identifier should
+        be generated.
+        """
+        if identifier and not identifier_type:
+            raise ValueError(
+                "Agent identifier type is not given, but agent identifier is."
+            )
+
+        if not identifier:
+            identifier_type = "local"
+            identifier = str(uuid.uuid4())
+
+        self.agent_identifier_type = identifier_type
+        self.agent_identifier = identifier
 
     def _resolve_serialized_agent_name(self):
         """Resolve how the name of the agent should be shown in the serialized

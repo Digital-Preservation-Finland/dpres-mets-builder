@@ -63,3 +63,47 @@ def test_serialized_agent_version(agent_type, expected_name):
     result = data.to_xml_element_tree()
     name_element = result.find("premis:agentName", namespaces=_NAMESPACES)
     assert name_element.text == expected_name
+
+
+def test_identifier_type_not_set():
+    """Test that an error is raised if agent identifier type is not given along
+    with an identifier.
+    """
+    with pytest.raises(ValueError) as error:
+        DigitalProvenanceAgentMetadata(
+            agent_identifier_type=None,
+            agent_identifier="agent-identifier-value",
+            agent_name="agent-name",
+            agent_type="organization"
+        )
+    assert str(error.value) == (
+        "Agent identifier type is not given, but agent identifier is."
+    )
+
+
+def test_generate_agent_identifier():
+    """Test that agent identifier is generated and type set to 'local', if
+    identifier is not given by the user.
+    """
+    agent = DigitalProvenanceAgentMetadata(
+        agent_identifier_type=None,
+        agent_identifier=None,
+        agent_name="agent-name",
+        agent_type="software",
+        agent_version="1.0"
+    )
+    assert agent.agent_identifier_type == "local"
+    assert agent.agent_identifier
+
+
+def test_user_given_identifier():
+    """Test that user gan give agent identifier and type."""
+    agent = DigitalProvenanceAgentMetadata(
+        agent_identifier_type="user-type",
+        agent_identifier="user-identifier",
+        agent_name="agent-name",
+        agent_type="software",
+        agent_version="1.0"
+    )
+    assert agent.agent_identifier_type == "user-type"
+    assert agent.agent_identifier == "user-identifier"
