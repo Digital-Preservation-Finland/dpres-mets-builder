@@ -81,3 +81,21 @@ def test_sip_filepath_is_relative():
     assert str(error.value) == (
         "Given SIP file path '/path' is not a relative path."
     )
+
+
+@pytest.mark.parametrize(
+    "sip_filepath",
+    [
+        (".."),
+        ("a/b/c/d/../../../../../b"),
+        ("../../etc/passwd")
+    ]
+)
+def test_sip_filepath_does_not_point_outside_sip(sip_filepath):
+    """Test that given SIP filepath does not point outside the SIP."""
+    with pytest.raises(ValueError) as error:
+        DigitalObject(sip_filepath=sip_filepath)
+    assert str(error.value) == (
+        f"Given SIP file path '{sip_filepath}' points outside the SIP root "
+        "directory."
+    )
