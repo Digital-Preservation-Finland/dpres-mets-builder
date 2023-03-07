@@ -117,20 +117,6 @@ class DigitalObject(DigitalObjectBase):
         """
         super().__init__(metadata=metadata)
 
-        sip_filepath = Path(sip_filepath)
-        if sip_filepath.is_absolute():
-            raise ValueError(
-                f"Given SIP file path '{sip_filepath}' is not a relative path."
-            )
-        # TODO: Replace with Path.is_relative_to in Python 3.9+
-        try:
-            # This will raise ValueError on paths that are not relative
-            sip_filepath.resolve().relative_to(Path(".").resolve())
-        except ValueError:
-            raise ValueError(
-                f"Given SIP file path '{sip_filepath}' points outside the "
-                "SIP root directory."
-            )
         self.sip_filepath = str(sip_filepath)
 
         if streams is None:
@@ -141,6 +127,33 @@ class DigitalObject(DigitalObjectBase):
             # Generate identifier if identifier is not given
             identifier = "_" + str(uuid.uuid4())
         self.identifier = identifier
+
+    @property
+    def sip_filepath(self) -> str:
+        """Getter for sip_filepath."""
+        return self._sip_filepath
+
+    @sip_filepath.setter
+    def sip_filepath(self, sip_filepath: Union[str, Path]) -> None:
+        """Setter for sip_filepath."""
+        sip_filepath = Path(sip_filepath)
+
+        if sip_filepath.is_absolute():
+            raise ValueError(
+                f"Given SIP file path '{sip_filepath}' is not a relative path."
+            )
+
+        # TODO: Replace with Path.is_relative_to in Python 3.9+
+        try:
+            # This will raise ValueError on paths that are not relative
+            sip_filepath.resolve().relative_to(Path(".").resolve())
+        except ValueError:
+            raise ValueError(
+                f"Given SIP file path '{sip_filepath}' points outside the "
+                "SIP root directory."
+            )
+
+        self._sip_filepath = str(sip_filepath)
 
     def add_stream(self, stream: DigitalObjectStream) -> None:
         """Add a stream to this digital object.
