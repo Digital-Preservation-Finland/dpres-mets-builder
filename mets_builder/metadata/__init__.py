@@ -7,8 +7,11 @@ from mets_builder.metadata.digital_provenance_agent_metadata import \
 from mets_builder.metadata.imported_metadata import ImportedMetadata
 from mets_builder.metadata.technical_image_metadata import \
     TechnicalImageMetadata
+from mets_builder.metadata.technical_object_metadata import \
+    TechnicalObjectMetadata
 
 __all__ = [
     "MetadataBase", "MetadataType", "MetadataFormat", "ImportedMetadata",
-    "TechnicalImageMetadata", "DigitalProvenanceAgentMetadata"
+    "TechnicalImageMetadata", "DigitalProvenanceAgentMetadata",
+    "TechnicalObjectMetadata"
 ]

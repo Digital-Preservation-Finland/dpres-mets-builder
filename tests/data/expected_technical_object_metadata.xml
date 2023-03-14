@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<premis:object xmlns:premis="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="premis:file">
+  <premis:objectIdentifier>
+    <premis:objectIdentifierType>object-identifier-type</premis:objectIdentifierType>
+    <premis:objectIdentifierValue>object-identifier-value</premis:objectIdentifierValue>
+  </premis:objectIdentifier>
+</premis:object>
