@@ -10,6 +10,8 @@ from mets_builder.metadata import TechnicalObjectMetadata
 def test_serialization():
     """Test serializing the technical object metadata."""
     data = TechnicalObjectMetadata(
+        checksum_algorithm="MD5",
+        checksum="3d7dcbd9ca4b5f37189cd2ec85cf0135",
         object_identifier_type="object-identifier-type",
         object_identifier="object-identifier-value"
     )
@@ -31,6 +33,8 @@ def test_identifier_type_not_set():
     """
     with pytest.raises(ValueError) as error:
         TechnicalObjectMetadata(
+            checksum_algorithm="MD5",
+            checksum="checksum-value",
             object_identifier_type=None,
             object_identifier="object-identifier-value"
         )
@@ -44,6 +48,8 @@ def test_generate_object_identifier():
     identifier is not given by the user.
     """
     object_metadata = TechnicalObjectMetadata(
+        checksum_algorithm="MD5",
+        checksum="checksum-value",
         agent_identifier_type=None,
         agent_identifier=None
     )
@@ -54,8 +60,45 @@ def test_generate_object_identifier():
 def test_user_given_identifier():
     """Test that user can give object identifier and type."""
     object_metadata = TechnicalObjectMetadata(
+        checksum_algorithm="MD5",
+        checksum="checksum-value",
         object_identifier_type="user-type",
         object_identifier="user-identifier"
     )
     assert object_metadata.object_identifier_type == "user-type"
     assert object_metadata.object_identifier == "user-identifier"
+
+
+def test_invalid_checksum_algorithm():
+    """Test that algorithms not allowed in DPRES specifications cannot be
+    set.
+    """
+    with pytest.raises(ValueError):
+        TechnicalObjectMetadata(
+            checksum_algorithm="invalid-checksum-algorithm",
+            checksum="checksum-value",
+            object_identifier_type="user-type",
+            object_identifier="user-identifier"
+        )
+
+
+@pytest.mark.parametrize(
+    "checksum_algorithm",
+    (
+        ("MD5"),
+        ("SHA-1"),
+        ("SHA-224"),
+        ("SHA-256"),
+        ("SHA-384"),
+        ("SHA-512")
+    )
+)
+def test_valid_checksum_algorithm(checksum_algorithm):
+    """Test that algorithms allowed in DPRES specifications can be set."""
+    metadata = TechnicalObjectMetadata(
+        checksum_algorithm=checksum_algorithm,
+        checksum="checksum-value",
+        object_identifier_type="user-type",
+        object_identifier="user-identifier"
+    )
+    assert metadata.checksum_algorithm

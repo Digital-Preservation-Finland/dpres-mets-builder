@@ -1,11 +1,12 @@
 """Module for TechnicalObjectMetadata class."""
 import uuid
-from typing import Optional
+from typing import Optional, Union
 
 import premis
 from lxml import etree
 
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import (ChecksumAlgorithm, MetadataBase,
+                                   MetadataFormat, MetadataType)
 
 
 class TechnicalObjectMetadata(MetadataBase):
@@ -21,6 +22,8 @@ class TechnicalObjectMetadata(MetadataBase):
 
     def __init__(
         self,
+        checksum_algorithm: Union[ChecksumAlgorithm, str],
+        checksum: str,
         object_identifier_type: Optional[str] = None,
         object_identifier: Optional[str] = None,
         **kwargs
@@ -31,6 +34,12 @@ class TechnicalObjectMetadata(MetadataBase):
         can be given here as well. Look MetadataBase documentation for more
         information.
 
+        :param checksum_algorithm: The specific algorithm used to construct the
+            checksum for the digital object. If given as string, the value is
+            cast to ChecksumAlgorithm and results in error if it is not a valid
+            checksum algorithm. The allowed values can be found from
+            ChecksumAlgorithm documentation.
+        :param checksum: The output of the message digest algorithm.
         :param object_identifier_type: Type of object identifier. Standardized
             identifier types should be used when possible (e.g., an ISBN for
             books).
@@ -38,6 +47,8 @@ class TechnicalObjectMetadata(MetadataBase):
             the user, object identifier is generated automatically. File
             identifiers should be globally unique.
         """
+        self.checksum_algorithm = checksum_algorithm
+        self.checksum = checksum
         self._set_object_identifier_and_type(
             object_identifier_type, object_identifier
         )
@@ -47,6 +58,17 @@ class TechnicalObjectMetadata(MetadataBase):
             format_version=self.METADATA_FORMAT_VERSION,
             **kwargs
         )
+
+    @property
+    def checksum_algorithm(self):
+        """Getter for checksum_algorithm."""
+        return self._checksum_algorithm
+
+    @checksum_algorithm.setter
+    def checksum_algorithm(self, checksum_algorithm):
+        """Setter for checksum_algorithm."""
+        checksum_algorithm = ChecksumAlgorithm(checksum_algorithm)
+        self._checksum_algorithm = checksum_algorithm
 
     def _set_object_identifier_and_type(self, identifier_type, identifier):
         """Resolve object identifier and identifier type.
@@ -77,7 +99,18 @@ class TechnicalObjectMetadata(MetadataBase):
             identifier_type=self.object_identifier_type,
             identifier_value=self.object_identifier
         )
-        premis_object = premis.object(
-            object_id=object_id
+
+        fixity = premis.fixity(
+            message_digest=self.checksum,
+            digest_algorithm=self.checksum_algorithm.value
         )
+        object_characteristics = premis.object_characteristics(
+            child_elements=[fixity]
+        )
+
+        premis_object = premis.object(
+            object_id=object_id,
+            child_elements=[object_characteristics]
+        )
+
         return premis_object

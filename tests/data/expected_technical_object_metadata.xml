@@ -4,4 +4,11 @@
     <premis:objectIdentifierType>object-identifier-type</premis:objectIdentifierType>
     <premis:objectIdentifierValue>object-identifier-value</premis:objectIdentifierValue>
   </premis:objectIdentifier>
+  <premis:objectCharacteristics>
+    <premis:compositionLevel>0</premis:compositionLevel>
+    <premis:fixity>
+      <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+      <premis:messageDigest>3d7dcbd9ca4b5f37189cd2ec85cf0135</premis:messageDigest>
+    </premis:fixity>
+  </premis:objectCharacteristics>
 </premis:object>
