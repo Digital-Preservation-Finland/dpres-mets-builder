@@ -10,6 +10,8 @@ from mets_builder.metadata import TechnicalObjectMetadata
 def test_serialization():
     """Test serializing the technical object metadata."""
     data = TechnicalObjectMetadata(
+        file_format="video/x-matroska",
+        file_format_version="4",
         checksum_algorithm="MD5",
         checksum="3d7dcbd9ca4b5f37189cd2ec85cf0135",
         object_identifier_type="object-identifier-type",
@@ -33,6 +35,8 @@ def test_identifier_type_not_set():
     """
     with pytest.raises(ValueError) as error:
         TechnicalObjectMetadata(
+            file_format="video/x-matroska",
+            file_format_version="4",
             checksum_algorithm="MD5",
             checksum="checksum-value",
             object_identifier_type=None,
@@ -48,6 +52,8 @@ def test_generate_object_identifier():
     identifier is not given by the user.
     """
     object_metadata = TechnicalObjectMetadata(
+        file_format="video/x-matroska",
+        file_format_version="4",
         checksum_algorithm="MD5",
         checksum="checksum-value",
         agent_identifier_type=None,
@@ -60,6 +66,8 @@ def test_generate_object_identifier():
 def test_user_given_identifier():
     """Test that user can give object identifier and type."""
     object_metadata = TechnicalObjectMetadata(
+        file_format="video/x-matroska",
+        file_format_version="4",
         checksum_algorithm="MD5",
         checksum="checksum-value",
         object_identifier_type="user-type",
@@ -75,6 +83,8 @@ def test_invalid_checksum_algorithm():
     """
     with pytest.raises(ValueError):
         TechnicalObjectMetadata(
+            file_format="video/x-matroska",
+            file_format_version="4",
             checksum_algorithm="invalid-checksum-algorithm",
             checksum="checksum-value",
             object_identifier_type="user-type",
@@ -96,6 +106,8 @@ def test_invalid_checksum_algorithm():
 def test_valid_checksum_algorithm(checksum_algorithm):
     """Test that algorithms allowed in DPRES specifications can be set."""
     metadata = TechnicalObjectMetadata(
+        file_format="video/x-matroska",
+        file_format_version="4",
         checksum_algorithm=checksum_algorithm,
         checksum="checksum-value",
         object_identifier_type="user-type",

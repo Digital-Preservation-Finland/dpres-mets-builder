@@ -10,5 +10,11 @@
       <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
       <premis:messageDigest>3d7dcbd9ca4b5f37189cd2ec85cf0135</premis:messageDigest>
     </premis:fixity>
+    <premis:format>
+      <premis:formatDesignation>
+        <premis:formatName>video/x-matroska</premis:formatName>
+        <premis:formatVersion>4</premis:formatVersion>
+      </premis:formatDesignation>
+    </premis:format>
   </premis:objectCharacteristics>
 </premis:object>

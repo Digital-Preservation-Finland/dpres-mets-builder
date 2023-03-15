@@ -22,6 +22,8 @@ class TechnicalObjectMetadata(MetadataBase):
 
     def __init__(
         self,
+        file_format: str,
+        file_format_version: str,
         checksum_algorithm: Union[ChecksumAlgorithm, str],
         checksum: str,
         object_identifier_type: Optional[str] = None,
@@ -34,6 +36,9 @@ class TechnicalObjectMetadata(MetadataBase):
         can be given here as well. Look MetadataBase documentation for more
         information.
 
+        :param file_format: Mimetype of the file, e.g. 'image/tiff'
+        :param file_format_version: Version number of the file format, e.g.
+            '1.2'.
         :param checksum_algorithm: The specific algorithm used to construct the
             checksum for the digital object. If given as string, the value is
             cast to ChecksumAlgorithm and results in error if it is not a valid
@@ -47,6 +52,8 @@ class TechnicalObjectMetadata(MetadataBase):
             the user, object identifier is generated automatically. File
             identifiers should be globally unique.
         """
+        self.file_format = file_format
+        self.file_format_version = file_format_version
         self.checksum_algorithm = checksum_algorithm
         self.checksum = checksum
         self._set_object_identifier_and_type(
@@ -104,8 +111,13 @@ class TechnicalObjectMetadata(MetadataBase):
             message_digest=self.checksum,
             digest_algorithm=self.checksum_algorithm.value
         )
+        format_designation = premis.format_designation(
+            format_name=self.file_format,
+            format_version=self.file_format_version
+        )
+        format_ = premis.format(child_elements=[format_designation])
         object_characteristics = premis.object_characteristics(
-            child_elements=[fixity]
+            child_elements=[fixity, format_]
         )
 
         premis_object = premis.object(
