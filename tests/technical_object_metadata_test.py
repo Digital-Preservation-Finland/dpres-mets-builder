@@ -20,7 +20,9 @@ def test_serialization():
         object_identifier="object-identifier-value",
         original_name="original-name",
         format_registry_name="format-registry-name",
-        format_registry_key="format-registry-key"
+        format_registry_key="format-registry-key",
+        creating_application="application-name",
+        creating_application_version="1.0"
     )
 
     result = xml_helpers.utils.serialize(

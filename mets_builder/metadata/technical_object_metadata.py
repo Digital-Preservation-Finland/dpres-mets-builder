@@ -33,6 +33,8 @@ class TechnicalObjectMetadata(MetadataBase):
         original_name: Optional[str] = None,
         format_registry_name: Optional[str] = None,
         format_registry_key: Optional[str] = None,
+        creating_application: Optional[str] = None,
+        creating_application_version: Optional[str] = None,
         **kwargs
     ) -> None:
         """Constructor for TechnicalObjectMetadata class.
@@ -69,6 +71,10 @@ class TechnicalObjectMetadata(MetadataBase):
             format.
         :param format_registry_key: The unique key used to reference an entry
             for this file format in a format registry.
+        :param creating_application: Software that was used to create this
+            file.
+        :param creating_application_version: Version of the software that was
+            used to create this file.
         """
         self.file_format = file_format
         self.file_format_version = file_format_version
@@ -83,6 +89,8 @@ class TechnicalObjectMetadata(MetadataBase):
         self._set_format_registry_name_and_key(
             format_registry_name, format_registry_key
         )
+        self.creating_application = creating_application
+        self.creating_application_version = creating_application_version
 
         super().__init__(
             metadata_type=self.METADATA_TYPE,
@@ -192,9 +200,22 @@ class TechnicalObjectMetadata(MetadataBase):
             format_child_elements.append(format_registry)
         format_ = premis.format(child_elements=format_child_elements)
 
-        application_created_date = premis.date_created(self.file_created_date)
+        application_child_elements = []
+        if self.creating_application:
+            application_child_elements.append(
+                premis.creating_application_name(self.creating_application)
+            )
+        if self.creating_application_version:
+            application_child_elements.append(
+                premis.creating_application_version(
+                    self.creating_application_version
+                )
+            )
+        application_child_elements.append(
+            premis.date_created(self.file_created_date)
+        )
         creating_application = premis.creating_application(
-            child_elements=[application_created_date]
+            child_elements=application_child_elements
         )
 
         object_characteristics = premis.object_characteristics(
