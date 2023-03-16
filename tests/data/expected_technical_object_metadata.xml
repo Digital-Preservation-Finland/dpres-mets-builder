@@ -15,6 +15,10 @@
         <premis:formatName>video/x-matroska</premis:formatName>
         <premis:formatVersion>4</premis:formatVersion>
       </premis:formatDesignation>
+      <premis:formatRegistry>
+        <premis:formatRegistryName>format-registry-name</premis:formatRegistryName>
+        <premis:formatRegistryKey>format-registry-key</premis:formatRegistryKey>
+      </premis:formatRegistry>
     </premis:format>
   </premis:objectCharacteristics>
   <premis:originalName>original-name</premis:originalName>

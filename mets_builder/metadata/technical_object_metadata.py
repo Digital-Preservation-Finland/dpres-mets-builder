@@ -30,6 +30,8 @@ class TechnicalObjectMetadata(MetadataBase):
         object_identifier: Optional[str] = None,
         charset: Union[Charset, str, None] = None,
         original_name: Optional[str] = None,
+        format_registry_name: Optional[str] = None,
+        format_registry_key: Optional[str] = None,
         **kwargs
     ) -> None:
         """Constructor for TechnicalObjectMetadata class.
@@ -58,6 +60,11 @@ class TechnicalObjectMetadata(MetadataBase):
             charset. The allowed values can be found from Charset
             documentation.
         :param original_name: Original name of the file.
+        :param format_registry_name: Name identifying a format registry, if a
+            format registry is used to give further information about the file
+            format.
+        :param format_registry_key: The unique key used to reference an entry
+            for this file format in a format registry.
         """
         self.file_format = file_format
         self.file_format_version = file_format_version
@@ -68,6 +75,9 @@ class TechnicalObjectMetadata(MetadataBase):
         )
         self.charset = charset
         self.original_name = original_name
+        self._set_format_registry_name_and_key(
+            format_registry_name, format_registry_key
+        )
 
         super().__init__(
             metadata_type=self.METADATA_TYPE,
@@ -119,6 +129,23 @@ class TechnicalObjectMetadata(MetadataBase):
         self.object_identifier_type = identifier_type
         self.object_identifier = identifier
 
+    def _set_format_registry_name_and_key(self, registry_name, registry_key):
+        """Resolve format registry name and key.
+
+        If one exists, the other one has to exist as well.
+        """
+        if registry_name and not registry_key:
+            raise ValueError(
+                "Format registry name is given, but not format registry key."
+            )
+        if not registry_name and registry_key:
+            raise ValueError(
+                "Format registry key is given, but not format registry name."
+            )
+
+        self.format_registry_name = registry_name
+        self.format_registry_key = registry_key
+
     def _resolve_serialized_format_name(self):
         """Resolve how the file format name should be shown in the serialized
         metadata.
@@ -145,11 +172,21 @@ class TechnicalObjectMetadata(MetadataBase):
             message_digest=self.checksum,
             digest_algorithm=self.checksum_algorithm.value
         )
+
+        format_child_elements = []
         format_designation = premis.format_designation(
             format_name=self._resolve_serialized_format_name(),
             format_version=self.file_format_version
         )
-        format_ = premis.format(child_elements=[format_designation])
+        format_child_elements.append(format_designation)
+        if self.format_registry_name and self.format_registry_key:
+            format_registry = premis.format_registry(
+                registry_name=self.format_registry_name,
+                registry_key=self.format_registry_key
+            )
+            format_child_elements.append(format_registry)
+        format_ = premis.format(child_elements=format_child_elements)
+
         object_characteristics = premis.object_characteristics(
             child_elements=[fixity, format_]
         )
