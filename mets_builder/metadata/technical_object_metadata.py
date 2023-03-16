@@ -26,6 +26,7 @@ class TechnicalObjectMetadata(MetadataBase):
         file_format_version: str,
         checksum_algorithm: Union[ChecksumAlgorithm, str],
         checksum: str,
+        file_created_date: str,
         object_identifier_type: Optional[str] = None,
         object_identifier: Optional[str] = None,
         charset: Union[Charset, str, None] = None,
@@ -43,6 +44,9 @@ class TechnicalObjectMetadata(MetadataBase):
         :param file_format: Mimetype of the file, e.g. 'image/tiff'
         :param file_format_version: Version number of the file format, e.g.
             '1.2'.
+        :param file_created_date: The actual or approximate date and time the
+            object was created. The time information must be expressed using
+            either the ISO-8601 format, or its extended version ISO_8601-2.
         :param checksum_algorithm: The specific algorithm used to construct the
             checksum for the digital object. If given as string, the value is
             cast to ChecksumAlgorithm and results in error if it is not a valid
@@ -68,6 +72,7 @@ class TechnicalObjectMetadata(MetadataBase):
         """
         self.file_format = file_format
         self.file_format_version = file_format_version
+        self.file_created_date = file_created_date
         self.checksum_algorithm = checksum_algorithm
         self.checksum = checksum
         self._set_object_identifier_and_type(
@@ -187,8 +192,13 @@ class TechnicalObjectMetadata(MetadataBase):
             format_child_elements.append(format_registry)
         format_ = premis.format(child_elements=format_child_elements)
 
+        application_created_date = premis.date_created(self.file_created_date)
+        creating_application = premis.creating_application(
+            child_elements=[application_created_date]
+        )
+
         object_characteristics = premis.object_characteristics(
-            child_elements=[fixity, format_]
+            child_elements=[fixity, format_, creating_application]
         )
 
         premis_object = premis.object(

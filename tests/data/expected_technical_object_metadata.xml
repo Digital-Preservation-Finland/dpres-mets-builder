@@ -20,6 +20,9 @@
         <premis:formatRegistryKey>format-registry-key</premis:formatRegistryKey>
       </premis:formatRegistry>
     </premis:format>
+    <premis:creatingApplication>
+      <premis:dateCreatedByApplication>2000-01-01T10:11:12</premis:dateCreatedByApplication>
+    </premis:creatingApplication>
   </premis:objectCharacteristics>
   <premis:originalName>original-name</premis:originalName>
 </premis:object>

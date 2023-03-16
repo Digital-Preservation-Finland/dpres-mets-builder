@@ -13,6 +13,7 @@ def test_serialization():
     data = TechnicalObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
+        file_created_date="2000-01-01T10:11:12",
         checksum_algorithm="MD5",
         checksum="3d7dcbd9ca4b5f37189cd2ec85cf0135",
         object_identifier_type="object-identifier-type",
@@ -41,6 +42,7 @@ def test_identifier_type_not_set():
         TechnicalObjectMetadata(
             file_format="video/x-matroska",
             file_format_version="4",
+            file_created_date="2000-01-01T10:11:12",
             checksum_algorithm="MD5",
             checksum="checksum-value",
             object_identifier_type=None,
@@ -58,6 +60,7 @@ def test_generate_object_identifier():
     object_metadata = TechnicalObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
+        file_created_date="2000-01-01T10:11:12",
         checksum_algorithm="MD5",
         checksum="checksum-value",
         agent_identifier_type=None,
@@ -72,6 +75,7 @@ def test_user_given_identifier():
     object_metadata = TechnicalObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
+        file_created_date="2000-01-01T10:11:12",
         checksum_algorithm="MD5",
         checksum="checksum-value",
         object_identifier_type="user-type",
@@ -89,6 +93,7 @@ def test_invalid_checksum_algorithm():
         TechnicalObjectMetadata(
             file_format="video/x-matroska",
             file_format_version="4",
+            file_created_date="2000-01-01T10:11:12",
             checksum_algorithm="invalid-checksum-algorithm",
             checksum="checksum-value",
             object_identifier_type="user-type",
@@ -112,6 +117,7 @@ def test_valid_checksum_algorithm(checksum_algorithm):
     metadata = TechnicalObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
+        file_created_date="2000-01-01T10:11:12",
         checksum_algorithm=checksum_algorithm,
         checksum="checksum-value",
         object_identifier_type="user-type",
@@ -136,6 +142,7 @@ def test_valid_encodings(charset):
     data = TechnicalObjectMetadata(
         file_format="text/plain",
         file_format_version="(:unap)",
+        file_created_date="2000-01-01T10:11:12",
         charset=charset,
         checksum_algorithm="MD5",
         checksum="checksum-value"
@@ -184,6 +191,7 @@ def test_incomplete_format_registry(registry_name, registry_key):
         TechnicalObjectMetadata(
             file_format="video/x-matroska",
             file_format_version="4",
+            file_created_date="2000-01-01T10:11:12",
             checksum_algorithm="invalid-checksum-algorithm",
             checksum="checksum-value",
             format_registry_name=registry_name,
