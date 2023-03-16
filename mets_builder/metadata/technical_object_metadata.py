@@ -5,7 +5,7 @@ from typing import Optional, Union
 import premis
 from lxml import etree
 
-from mets_builder.metadata import (ChecksumAlgorithm, MetadataBase,
+from mets_builder.metadata import (Charset, ChecksumAlgorithm, MetadataBase,
                                    MetadataFormat, MetadataType)
 
 
@@ -28,6 +28,7 @@ class TechnicalObjectMetadata(MetadataBase):
         checksum: str,
         object_identifier_type: Optional[str] = None,
         object_identifier: Optional[str] = None,
+        charset: Union[Charset, str, None] = None,
         **kwargs
     ) -> None:
         """Constructor for TechnicalObjectMetadata class.
@@ -51,6 +52,10 @@ class TechnicalObjectMetadata(MetadataBase):
         :param object_identifier: The object identifier value. If not given by
             the user, object identifier is generated automatically. File
             identifiers should be globally unique.
+        :param charset: Character encoding of the file. If given as string, the
+            value is cast to Charset and results in error if it is not a valid
+            charset. The allowed values can be found from Charset
+            documentation.
         """
         self.file_format = file_format
         self.file_format_version = file_format_version
@@ -59,6 +64,8 @@ class TechnicalObjectMetadata(MetadataBase):
         self._set_object_identifier_and_type(
             object_identifier_type, object_identifier
         )
+        self.charset = charset
+
         super().__init__(
             metadata_type=self.METADATA_TYPE,
             metadata_format=self.METADATA_FORMAT,
@@ -76,6 +83,18 @@ class TechnicalObjectMetadata(MetadataBase):
         """Setter for checksum_algorithm."""
         checksum_algorithm = ChecksumAlgorithm(checksum_algorithm)
         self._checksum_algorithm = checksum_algorithm
+
+    @property
+    def charset(self):
+        """Getter for charset."""
+        return self._charset
+
+    @charset.setter
+    def charset(self, charset):
+        """Setter for charset."""
+        if charset is not None:
+            charset = Charset(charset)
+        self._charset = charset
 
     def _set_object_identifier_and_type(self, identifier_type, identifier):
         """Resolve object identifier and identifier type.
@@ -97,6 +116,18 @@ class TechnicalObjectMetadata(MetadataBase):
         self.object_identifier_type = identifier_type
         self.object_identifier = identifier
 
+    def _resolve_serialized_format_name(self):
+        """Resolve how the file format name should be shown in the serialized
+        metadata.
+
+        If character encoding is given, it should be appended to the file
+        format name.
+        """
+        format_name = self.file_format
+        if self.charset:
+            format_name += f"; encoding={self.charset.value}"
+        return format_name
+
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
@@ -112,7 +143,7 @@ class TechnicalObjectMetadata(MetadataBase):
             digest_algorithm=self.checksum_algorithm.value
         )
         format_designation = premis.format_designation(
-            format_name=self.file_format,
+            format_name=self._resolve_serialized_format_name(),
             format_version=self.file_format_version
         )
         format_ = premis.format(child_elements=[format_designation])

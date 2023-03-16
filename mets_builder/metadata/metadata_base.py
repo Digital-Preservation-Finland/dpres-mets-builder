@@ -18,6 +18,14 @@ class ChecksumAlgorithm(Enum):
     SHA512 = "SHA-512"
 
 
+class Charset(Enum):
+    """Enum of allowed character encodings."""
+    ISO8859_15 = "ISO-8859-15"
+    UTF8 = "UTF-8"
+    UTF16 = "UTF-16"
+    UTF32 = "UTF-32"
+
+
 class MetadataType(Enum):
     """Enum for metadata types."""
     TECHNICAL = "technical"

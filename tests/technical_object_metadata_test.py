@@ -5,6 +5,7 @@ import pytest
 import xml_helpers.utils
 
 from mets_builder.metadata import TechnicalObjectMetadata
+from mets_builder.serialize import _NAMESPACES
 
 
 def test_serialization():
@@ -114,3 +115,52 @@ def test_valid_checksum_algorithm(checksum_algorithm):
         object_identifier="user-identifier"
     )
     assert metadata.checksum_algorithm
+
+
+@pytest.mark.parametrize(
+    "charset",
+    (
+        ("ISO-8859-15"),
+        ("UTF-8"),
+        ("UTF-16"),
+        ("UTF-32")
+    )
+)
+def test_valid_encodings(charset):
+    """Test that if encoding is given, it is appended to mimetype when
+    metadata is serialized.
+    """
+    data = TechnicalObjectMetadata(
+        file_format="text/plain",
+        file_format_version="(:unap)",
+        charset=charset,
+        checksum_algorithm="MD5",
+        checksum="checksum-value"
+    )
+
+    result = data.to_xml_element_tree()
+    name_element = result.find(
+        "premis:objectCharacteristics//premis:formatName",
+        namespaces=_NAMESPACES
+    )
+    assert name_element.text == "text/plain; encoding=" + charset
+
+
+@pytest.mark.parametrize(
+    "invalid_charset",
+    (
+        ("invalid-charset"),
+        ("")
+    )
+)
+def test_invalid_encoding(invalid_charset):
+    """Test that invalid encodings raise an error."""
+    with pytest.raises(ValueError):
+        TechnicalObjectMetadata(
+            file_format="text/plain",
+            file_format_version="(:unap)",
+            file_created_date="2000-01-01T10:11:12",
+            charset=invalid_charset,
+            checksum_algorithm="MD5",
+            checksum="checksum-value"
+        )
