@@ -16,7 +16,8 @@ def test_serialization():
         checksum_algorithm="MD5",
         checksum="3d7dcbd9ca4b5f37189cd2ec85cf0135",
         object_identifier_type="object-identifier-type",
-        object_identifier="object-identifier-value"
+        object_identifier="object-identifier-value",
+        original_name="original-name"
     )
 
     result = xml_helpers.utils.serialize(

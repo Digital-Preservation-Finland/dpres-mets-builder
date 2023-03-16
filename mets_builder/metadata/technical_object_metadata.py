@@ -29,6 +29,7 @@ class TechnicalObjectMetadata(MetadataBase):
         object_identifier_type: Optional[str] = None,
         object_identifier: Optional[str] = None,
         charset: Union[Charset, str, None] = None,
+        original_name: Optional[str] = None,
         **kwargs
     ) -> None:
         """Constructor for TechnicalObjectMetadata class.
@@ -56,6 +57,7 @@ class TechnicalObjectMetadata(MetadataBase):
             value is cast to Charset and results in error if it is not a valid
             charset. The allowed values can be found from Charset
             documentation.
+        :param original_name: Original name of the file.
         """
         self.file_format = file_format
         self.file_format_version = file_format_version
@@ -65,6 +67,7 @@ class TechnicalObjectMetadata(MetadataBase):
             object_identifier_type, object_identifier
         )
         self.charset = charset
+        self.original_name = original_name
 
         super().__init__(
             metadata_type=self.METADATA_TYPE,
@@ -153,6 +156,7 @@ class TechnicalObjectMetadata(MetadataBase):
 
         premis_object = premis.object(
             object_id=object_id,
+            original_name=self.original_name,
             child_elements=[object_characteristics]
         )
 

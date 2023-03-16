@@ -17,4 +17,5 @@
       </premis:formatDesignation>
     </premis:format>
   </premis:objectCharacteristics>
+  <premis:originalName>original-name</premis:originalName>
 </premis:object>
