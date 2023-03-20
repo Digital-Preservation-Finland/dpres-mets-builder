@@ -27,4 +27,40 @@
     </premis:creatingApplication>
   </premis:objectCharacteristics>
   <premis:originalName>original-name</premis:originalName>
+  <premis:relationship>
+    <premis:relationshipType>type-1</premis:relationshipType>
+    <premis:relationshipSubType>subtype-1</premis:relationshipSubType>
+    <premis:relatedObjectIdentification>
+      <premis:relatedObjectIdentifierType>test-type</premis:relatedObjectIdentifierType>
+      <premis:relatedObjectIdentifierValue>related-0</premis:relatedObjectIdentifierValue>
+    </premis:relatedObjectIdentification>
+    <premis:relatedObjectIdentification>
+      <premis:relatedObjectIdentifierType>test-type</premis:relatedObjectIdentifierType>
+      <premis:relatedObjectIdentifierValue>related-1</premis:relatedObjectIdentifierValue>
+    </premis:relatedObjectIdentification>
+    <premis:relatedObjectIdentification>
+      <premis:relatedObjectIdentifierType>test-type</premis:relatedObjectIdentifierType>
+      <premis:relatedObjectIdentifierValue>related-2</premis:relatedObjectIdentifierValue>
+    </premis:relatedObjectIdentification>
+  </premis:relationship>
+  <premis:relationship>
+    <premis:relationshipType>type-1</premis:relationshipType>
+    <premis:relationshipSubType>subtype-2</premis:relationshipSubType>
+    <premis:relatedObjectIdentification>
+      <premis:relatedObjectIdentifierType>test-type</premis:relatedObjectIdentifierType>
+      <premis:relatedObjectIdentifierValue>related-3</premis:relatedObjectIdentifierValue>
+    </premis:relatedObjectIdentification>
+    <premis:relatedObjectIdentification>
+      <premis:relatedObjectIdentifierType>test-type</premis:relatedObjectIdentifierType>
+      <premis:relatedObjectIdentifierValue>related-4</premis:relatedObjectIdentifierValue>
+    </premis:relatedObjectIdentification>
+  </premis:relationship>
+  <premis:relationship>
+    <premis:relationshipType>type-2</premis:relationshipType>
+    <premis:relationshipSubType>subtype-2</premis:relationshipSubType>
+    <premis:relatedObjectIdentification>
+      <premis:relatedObjectIdentifierType>test-type</premis:relatedObjectIdentifierType>
+      <premis:relatedObjectIdentifierValue>related-5</premis:relatedObjectIdentifierValue>
+    </premis:relatedObjectIdentification>
+  </premis:relationship>
 </premis:object>

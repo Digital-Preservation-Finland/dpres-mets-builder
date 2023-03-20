@@ -10,7 +10,7 @@ from mets_builder.serialize import _NAMESPACES
 
 def test_serialization():
     """Test serializing the technical object metadata."""
-    data = TechnicalObjectMetadata(
+    container = TechnicalObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
         file_created_date="2000-01-01T10:11:12",
@@ -25,8 +25,59 @@ def test_serialization():
         creating_application_version="1.0"
     )
 
+    # Related metadata
+    object_metadatas = []
+    for i in range(6):
+        object_metadatas.append(
+            TechnicalObjectMetadata(
+                file_format="file-format",
+                file_format_version="file-format-version",
+                file_created_date="2000-01-01T00:00:00",
+                checksum_algorithm="MD5",
+                checksum="checksum-value",
+                object_identifier_type="test-type",
+                object_identifier=f"related-{i}"
+            )
+        )
+
+    # Relationship group 1 - type-1, subtype-1
+    container.add_relationship(
+        technical_object_metadata=object_metadatas[0],
+        relationship_type="type-1",
+        relationship_subtype="subtype-1"
+    )
+    container.add_relationship(
+        technical_object_metadata=object_metadatas[1],
+        relationship_type="type-1",
+        relationship_subtype="subtype-1"
+    )
+    container.add_relationship(
+        technical_object_metadata=object_metadatas[2],
+        relationship_type="type-1",
+        relationship_subtype="subtype-1"
+    )
+
+    # Relationship group 2 - type-1, subtype-2
+    container.add_relationship(
+        technical_object_metadata=object_metadatas[3],
+        relationship_type="type-1",
+        relationship_subtype="subtype-2"
+    )
+    container.add_relationship(
+        technical_object_metadata=object_metadatas[4],
+        relationship_type="type-1",
+        relationship_subtype="subtype-2"
+    )
+
+    # Relationship group 3 - type-2, subtype-2
+    container.add_relationship(
+        technical_object_metadata=object_metadatas[5],
+        relationship_type="type-2",
+        relationship_subtype="subtype-2"
+    )
+
     result = xml_helpers.utils.serialize(
-        data.to_xml_element_tree()
+        container.to_xml_element_tree()
     ).decode("utf-8")
 
     expected_xml = Path(

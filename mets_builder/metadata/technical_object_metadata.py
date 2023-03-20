@@ -1,12 +1,35 @@
 """Module for TechnicalObjectMetadata class."""
 import uuid
-from typing import Optional, Union
+from collections import defaultdict
+from typing import List, Optional, Union
 
 import premis
 from lxml import etree
 
 from mets_builder.metadata import (Charset, ChecksumAlgorithm, MetadataBase,
                                    MetadataFormat, MetadataType)
+
+
+class _Relationship():
+    """Class for storing information about relationships between technical
+    object metadata.
+    """
+    def __init__(
+        self,
+        object_identifier_type: str,
+        object_identifier: str,
+        relationship_type: str,
+        relationship_subtype: str
+    ):
+        self.object_identifier_type = object_identifier_type
+        self.object_identifier = object_identifier
+        self.relationship_type = relationship_type
+        self.relationship_subtype = relationship_subtype
+
+    @property
+    def type_and_subtype(self) -> tuple:
+        """Get relationship type and subtype as tuple."""
+        return (self.relationship_type, self.relationship_subtype)
 
 
 class TechnicalObjectMetadata(MetadataBase):
@@ -92,6 +115,8 @@ class TechnicalObjectMetadata(MetadataBase):
         self.creating_application = creating_application
         self.creating_application_version = creating_application_version
 
+        self.relationships: List[_Relationship] = []
+
         super().__init__(
             metadata_type=self.METADATA_TYPE,
             metadata_format=self.METADATA_FORMAT,
@@ -121,6 +146,32 @@ class TechnicalObjectMetadata(MetadataBase):
         if charset is not None:
             charset = Charset(charset)
         self._charset = charset
+
+    def add_relationship(
+        self,
+        technical_object_metadata: "TechnicalObjectMetadata",
+        relationship_type: str,
+        relationship_subtype: str
+    ) -> None:
+        """Add a relationship to another technical object metadata.
+
+        :param technical_object_metadata: The technical object metadata object
+            that is linked to this technical object metadata.
+        :param relationship_type: A high-level categorization of the nature of
+            the relationship.
+        :param relationship_subtype: A specific characterization of the nature
+            of the relationship.
+        """
+        relationship = _Relationship(
+            object_identifier_type=(
+                technical_object_metadata.object_identifier_type
+            ),
+            object_identifier=technical_object_metadata.object_identifier,
+            relationship_type=relationship_type,
+            relationship_subtype=relationship_subtype
+        )
+
+        self.relationships.append(relationship)
 
     def _set_object_identifier_and_type(self, identifier_type, identifier):
         """Resolve object identifier and identifier type.
@@ -170,6 +221,40 @@ class TechnicalObjectMetadata(MetadataBase):
         if self.charset:
             format_name += f"; encoding={self.charset.value}"
         return format_name
+
+    def _serialize_relationships_to_xml_elements(self):
+        """Serialize the relationships of this metadata to other metadata into
+        XML elements.
+        """
+        premis_relationships = []
+
+        # Group relationships with the same type and subtype together
+        grouped_relationships = defaultdict(list)
+        for relationship in self.relationships:
+            group_key = relationship.type_and_subtype
+            grouped_relationships[group_key].append(relationship)
+
+        # Create a premis:relationship element for each relationship category
+        for relationships in grouped_relationships.values():
+            relationship_type = relationships[0].relationship_type
+            relationship_subtype = relationships[0].relationship_subtype
+            related_object_ids = [
+                premis.identifier(
+                    identifier_type=relationship.object_identifier_type,
+                    identifier_value=relationship.object_identifier
+                )
+                for relationship in relationships
+            ]
+
+            premis_relationships.append(
+                premis.relationship(
+                    relationship_type=relationship_type,
+                    relationship_subtype=relationship_subtype,
+                    related_objects=related_object_ids
+                )
+            )
+
+        return premis_relationships
 
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
@@ -221,11 +306,13 @@ class TechnicalObjectMetadata(MetadataBase):
         object_characteristics = premis.object_characteristics(
             child_elements=[fixity, format_, creating_application]
         )
+        relationships = self._serialize_relationships_to_xml_elements()
+        premis_object_child_elements = [object_characteristics] + relationships
 
         premis_object = premis.object(
             object_id=object_id,
             original_name=self.original_name,
-            child_elements=[object_characteristics]
+            child_elements=premis_object_child_elements
         )
 
         return premis_object
