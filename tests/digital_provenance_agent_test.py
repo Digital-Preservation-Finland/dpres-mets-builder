@@ -1,4 +1,4 @@
-"""Tests for digital provenange agent metadata."""
+"""Tests for digital provenance agent metadata."""
 from pathlib import Path
 
 import pytest
@@ -9,7 +9,7 @@ from mets_builder.serialize import _NAMESPACES
 
 
 def test_invalid_agent_type():
-    """Test that aproviding invalid agent type raises an error."""
+    """Test that providing invalid agent type raises an error."""
     with pytest.raises(ValueError):
         DigitalProvenanceAgentMetadata(
             agent_identifier_type="agent-identifier-type",
