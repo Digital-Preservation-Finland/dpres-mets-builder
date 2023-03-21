@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<premis:event xmlns:premis="info:lc/xmlns/premis-v2">
+  <premis:eventIdentifier>
+    <premis:eventIdentifierType>event-identifier-type</premis:eventIdentifierType>
+    <premis:eventIdentifierValue>event-identifier-value</premis:eventIdentifierValue>
+  </premis:eventIdentifier>
+  <premis:eventType>event-type</premis:eventType>
+  <premis:eventDateTime>2000-01-01T10:11:12</premis:eventDateTime>
+  <premis:eventDetail>event-detail</premis:eventDetail>
+  <premis:eventOutcomeInformation>
+    <premis:eventOutcome>event-outcome</premis:eventOutcome>
+    <premis:eventOutcomeDetail>
+      <premis:eventOutcomeDetailNote>event-outcome-detail</premis:eventOutcomeDetailNote>
+    </premis:eventOutcomeDetail>
+  </premis:eventOutcomeInformation>
+</premis:event>
