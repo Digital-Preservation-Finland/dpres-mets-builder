@@ -1,11 +1,25 @@
 """Module for DigitalProvenanceEventMetadata class."""
 import uuid
-from typing import Optional
+from typing import Optional, List
 
 import premis
 from lxml import etree
 
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
+                                   MetadataBase, MetadataFormat, MetadataType)
+
+
+class _LinkedAgent:
+    """Class holding information of a agent linked to an event."""
+
+    def __init__(
+        self,
+        agent: DigitalProvenanceAgentMetadata,
+        agent_role: str
+    ):
+        """Constructor for _LinkedAgent."""
+        self.agent = agent
+        self.agent_role = agent_role
 
 
 class DigitalProvenanceEventMetadata(MetadataBase):
@@ -56,12 +70,27 @@ class DigitalProvenanceEventMetadata(MetadataBase):
             event_identifier_type, event_identifier
         )
 
+        self.linked_agents: List[_LinkedAgent] = []
+
         super().__init__(
             metadata_type=self.METADATA_TYPE,
             metadata_format=self.METADATA_FORMAT,
             format_version=self.METADATA_FORMAT_VERSION,
             **kwargs
         )
+
+    def link_agent(
+        self,
+        agent: DigitalProvenanceAgentMetadata,
+        agent_role: str
+    ) -> None:
+        """Link a digital provenance agent to this event.
+
+        :param agent: The agent that is associated with this event.
+        :param agent_role: The role of the agent in relation to this event.
+        """
+        linked_agent = _LinkedAgent(agent=agent, agent_role=agent_role)
+        self.linked_agents.append(linked_agent)
 
     def _set_event_identifier_and_type(self, identifier_type, identifier):
         """Resolve event identifier and identifier type.
@@ -82,6 +111,19 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         self.event_identifier_type = identifier_type
         self.event_identifier = identifier
 
+    def _serialize_linked_agents_to_xml_elements(self):
+        """Serialize linked agents to XML elements."""
+        linked_agent_ids = [
+            premis.identifier(
+                identifier_type=linked_agent.agent.agent_identifier_type,
+                identifier_value=linked_agent.agent.agent_identifier,
+                prefix='linkingAgent',
+                role=linked_agent.agent_role
+            )
+            for linked_agent in self.linked_agents
+        ]
+        return linked_agent_ids
+
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
@@ -98,12 +140,16 @@ class DigitalProvenanceEventMetadata(MetadataBase):
             detail_note=self.event_outcome_detail
         )
 
+        linked_agents = self._serialize_linked_agents_to_xml_elements()
+
+        event_child_elements = [outcome] + linked_agents
+
         event = premis.event(
             event_id=event_id,
             event_type=self.event_type,
             event_date_time=self.event_datetime,
             event_detail=self.event_detail,
-            child_elements=[outcome]
+            child_elements=event_child_elements
         )
 
         return event

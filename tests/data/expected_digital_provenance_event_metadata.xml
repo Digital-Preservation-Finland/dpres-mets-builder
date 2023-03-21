@@ -13,4 +13,14 @@
       <premis:eventOutcomeDetailNote>event-outcome-detail</premis:eventOutcomeDetailNote>
     </premis:eventOutcomeDetail>
   </premis:eventOutcomeInformation>
+  <premis:linkingAgentIdentifier>
+    <premis:linkingAgentIdentifierType>test-type</premis:linkingAgentIdentifierType>
+    <premis:linkingAgentIdentifierValue>agent-1</premis:linkingAgentIdentifierValue>
+    <premis:linkingAgentRole>agent-role-1</premis:linkingAgentRole>
+  </premis:linkingAgentIdentifier>
+  <premis:linkingAgentIdentifier>
+    <premis:linkingAgentIdentifierType>test-type</premis:linkingAgentIdentifierType>
+    <premis:linkingAgentIdentifierValue>agent-2</premis:linkingAgentIdentifierValue>
+    <premis:linkingAgentRole>agent-role-2</premis:linkingAgentRole>
+  </premis:linkingAgentIdentifier>
 </premis:event>
