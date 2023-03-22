@@ -23,4 +23,14 @@
     <premis:linkingAgentIdentifierValue>agent-2</premis:linkingAgentIdentifierValue>
     <premis:linkingAgentRole>agent-role-2</premis:linkingAgentRole>
   </premis:linkingAgentIdentifier>
+  <premis:linkingObjectIdentifier>
+    <premis:linkingObjectIdentifierType>test-type</premis:linkingObjectIdentifierType>
+    <premis:linkingObjectIdentifierValue>object-1</premis:linkingObjectIdentifierValue>
+    <premis:linkingObjectRole>object-role-1</premis:linkingObjectRole>
+  </premis:linkingObjectIdentifier>
+  <premis:linkingObjectIdentifier>
+    <premis:linkingObjectIdentifierType>test-type</premis:linkingObjectIdentifierType>
+    <premis:linkingObjectIdentifierValue>object-2</premis:linkingObjectIdentifierValue>
+    <premis:linkingObjectRole>object-role-2</premis:linkingObjectRole>
+  </premis:linkingObjectIdentifier>
 </premis:event>

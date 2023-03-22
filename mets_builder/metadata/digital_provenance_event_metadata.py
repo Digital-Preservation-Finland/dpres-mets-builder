@@ -7,7 +7,8 @@ import premis
 from lxml import etree
 
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
-                                   MetadataBase, MetadataFormat, MetadataType)
+                                   MetadataBase, MetadataFormat, MetadataType,
+                                   TechnicalObjectMetadata)
 
 
 class EventOutcome(Enum):
@@ -58,6 +59,19 @@ class _LinkedAgent:
         """Constructor for _LinkedAgent."""
         self.agent = agent
         self.agent_role = agent_role
+
+
+class _LinkedObject:
+    """Class holding information of an object linked to an event."""
+
+    def __init__(
+        self,
+        object_metadata: TechnicalObjectMetadata,
+        object_role: str
+    ):
+        """Constructor for _LinkedObject."""
+        self.object_metadata = object_metadata
+        self.object_role = object_role
 
 
 class DigitalProvenanceEventMetadata(MetadataBase):
@@ -112,6 +126,7 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         )
 
         self.linked_agents: List[_LinkedAgent] = []
+        self.linked_objects: List[_LinkedObject] = []
 
         super().__init__(
             metadata_type=self.METADATA_TYPE,
@@ -143,6 +158,23 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         """
         linked_agent = _LinkedAgent(agent=agent, agent_role=agent_role)
         self.linked_agents.append(linked_agent)
+
+    def link_object_metadata(
+        self,
+        object_metadata: TechnicalObjectMetadata,
+        object_role: str
+    ) -> None:
+        """Link a technical object metadata to this event.
+
+        :param object_metadata: The object metadata that is associated with
+            this event.
+        :param object_role: The role of the object in relation to this event.
+        """
+        linked_object = _LinkedObject(
+            object_metadata=object_metadata,
+            object_role=object_role
+        )
+        self.linked_objects.append(linked_object)
 
     def _set_event_identifier_and_type(self, identifier_type, identifier):
         """Resolve event identifier and identifier type.
@@ -176,6 +208,23 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         ]
         return linked_agent_ids
 
+    def _serialize_linked_objects_to_xml_elements(self):
+        """Serialize linked objects to XML elements."""
+        linked_object_ids = [
+            premis.identifier(
+                identifier_type=(
+                    linked_object.object_metadata.object_identifier_type
+                ),
+                identifier_value=(
+                    linked_object.object_metadata.object_identifier
+                ),
+                prefix='linkingObject',
+                role=linked_object.object_role
+            )
+            for linked_object in self.linked_objects
+        ]
+        return linked_object_ids
+
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
@@ -193,8 +242,9 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         )
 
         linked_agents = self._serialize_linked_agents_to_xml_elements()
+        linked_objects = self._serialize_linked_objects_to_xml_elements()
 
-        event_child_elements = [outcome] + linked_agents
+        event_child_elements = [outcome] + linked_agents + linked_objects
 
         event = premis.event(
             event_id=event_id,

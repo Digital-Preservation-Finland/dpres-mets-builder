@@ -5,7 +5,8 @@ import pytest
 import xml_helpers.utils
 
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
-                                   DigitalProvenanceEventMetadata)
+                                   DigitalProvenanceEventMetadata,
+                                   TechnicalObjectMetadata)
 
 
 def test_serialization():
@@ -34,6 +35,27 @@ def test_serialization():
     )
     event.link_agent(agent_1, agent_role="agent-role-1")
     event.link_agent(agent_2, agent_role="agent-role-2")
+
+    object_1 = TechnicalObjectMetadata(
+        file_format="file-format",
+        file_format_version="file-format-version",
+        checksum_algorithm="MD5",
+        checksum="checksum",
+        file_created_date="2000-01-01T00:00:00",
+        object_identifier_type="test-type",
+        object_identifier="object-1"
+    )
+    object_2 = TechnicalObjectMetadata(
+        file_format="file-format",
+        file_format_version="file-format-version",
+        checksum_algorithm="MD5",
+        checksum="checksum",
+        file_created_date="2000-01-01T00:00:00",
+        object_identifier_type="test-type",
+        object_identifier="object-2"
+    )
+    event.link_object_metadata(object_1, object_role="object-role-1")
+    event.link_object_metadata(object_2, object_role="object-role-2")
 
     result = xml_helpers.utils.serialize(
         event.to_xml_element_tree()
