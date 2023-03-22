@@ -1,12 +1,50 @@
 """Module for DigitalProvenanceEventMetadata class."""
 import uuid
-from typing import Optional, List
+from enum import Enum
+from typing import List, Optional, Union
 
 import premis
 from lxml import etree
 
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    MetadataBase, MetadataFormat, MetadataType)
+
+
+class EventOutcome(Enum):
+    """Enum for valid event outcomes."""
+
+    SUCCESS = "success"
+    """Succesful outcome."""
+
+    FAILURE = "failure"
+    """Unsuccesful outcome."""
+
+    UNACCESSIBLE = "(:unac)"
+    """Temporarily inaccessible."""
+
+    UNALLOWED = "(:unal)"
+    """Unallowed, suppressed intentionally."""
+
+    UNAPPLICABLE = "(:unap)"
+    """Not applicable, makes no sense."""
+
+    UNAVAILABLE = "(:unav)"
+    """Value unavailable, possibly unknown."""
+
+    UNKNOWN = "(:unkn)"
+    """Known to be unknown (e.g., Anonymous, Inconnue)."""
+
+    NONE = "(:none)"
+    """Never had a value, never will."""
+
+    NULL = "(:null)"
+    """Explicitly and meaningfully empty."""
+
+    TO_BE_ANNOUNCED = "(:tba)"
+    """To be assigned or announced later."""
+
+    ET_ALIA = "(:etal)"
+    """Too numerous to list (et alia)."""
 
 
 class _LinkedAgent:
@@ -37,7 +75,7 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         event_type: str,
         event_datetime: str,
         event_detail: str,
-        event_outcome: str,
+        event_outcome: Union[EventOutcome, str],
         event_outcome_detail: str,
         event_identifier_type: Optional[str] = None,
         event_identifier: Optional[str] = None,
@@ -54,7 +92,10 @@ class DigitalProvenanceEventMetadata(MetadataBase):
             range, at or during which the event occurred.
         :param event_detail: Additional information about the event.
         :param event_outcome: A categorization of the overall result of the
-            event in terms of success, partial success, or failure.
+            event in terms of success, partial success, or failure. If given as
+            string, the value is cast to EventOutcome and results in error if
+            it is not a valid event outcome. The allowed values can be found
+            from EventOutcome documentation.
         :param event_outcome_detail: A detailed description of the result or
             product of the event.
         :param event_identifier_type: Type of event identifier.
@@ -78,6 +119,17 @@ class DigitalProvenanceEventMetadata(MetadataBase):
             format_version=self.METADATA_FORMAT_VERSION,
             **kwargs
         )
+
+    @property
+    def event_outcome(self):
+        """Getter for event_outcome."""
+        return self._event_outcome
+
+    @event_outcome.setter
+    def event_outcome(self, event_outcome):
+        """Setter for event_outcome."""
+        event_outcome = EventOutcome(event_outcome)
+        self._event_outcome = event_outcome
 
     def link_agent(
         self,
@@ -136,7 +188,7 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         )
 
         outcome = premis.outcome(
-            outcome=self.event_outcome,
+            outcome=self.event_outcome.value,
             detail_note=self.event_outcome_detail
         )
 

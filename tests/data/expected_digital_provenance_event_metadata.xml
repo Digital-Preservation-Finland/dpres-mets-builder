@@ -8,7 +8,7 @@
   <premis:eventDateTime>2000-01-01T10:11:12</premis:eventDateTime>
   <premis:eventDetail>event-detail</premis:eventDetail>
   <premis:eventOutcomeInformation>
-    <premis:eventOutcome>event-outcome</premis:eventOutcome>
+    <premis:eventOutcome>success</premis:eventOutcome>
     <premis:eventOutcomeDetail>
       <premis:eventOutcomeDetailNote>event-outcome-detail</premis:eventOutcomeDetailNote>
     </premis:eventOutcomeDetail>

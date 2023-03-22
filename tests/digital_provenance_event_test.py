@@ -14,7 +14,7 @@ def test_serialization():
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
         event_detail="event-detail",
-        event_outcome="event-outcome",
+        event_outcome="success",
         event_outcome_detail="event-outcome-detail",
         event_identifier_type="event-identifier-type",
         event_identifier="event-identifier-value"
@@ -55,7 +55,7 @@ def test_identifier_type_not_set():
             event_type="event-type",
             event_datetime="2000-01-01T10:11:12",
             event_detail="event-detail",
-            event_outcome="event-outcome",
+            event_outcome="success",
             event_outcome_detail="event-outcome-detail",
             event_identifier_type=None,
             event_identifier="event-identifier-value"
@@ -73,7 +73,7 @@ def test_generate_agent_identifier():
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
         event_detail="event-detail",
-        event_outcome="event-outcome",
+        event_outcome="success",
         event_outcome_detail="event-outcome-detail",
         event_identifier_type=None,
         event_identifier=None
@@ -88,10 +88,59 @@ def test_user_given_identifier():
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
         event_detail="event-detail",
-        event_outcome="event-outcome",
+        event_outcome="success",
         event_outcome_detail="event-outcome-detail",
         event_identifier_type="user-type",
         event_identifier="user-identifier"
     )
     assert event.event_identifier_type == "user-type"
     assert event.event_identifier == "user-identifier"
+
+
+@pytest.mark.parametrize(
+    "event_outcome",
+    (
+        "success",
+        "failure",
+        "(:unac)",
+        "(:unal)",
+        "(:unap)",
+        "(:unav)",
+        "(:unkn)",
+        "(:none)",
+        "(:null)",
+        "(:tba)",
+        "(:etal)"
+    )
+)
+def test_valid_event_outcomes(event_outcome):
+    """Test that valid event outcomes can be set."""
+    event = DigitalProvenanceEventMetadata(
+        event_type="event-type",
+        event_datetime="2000-01-01T10:11:12",
+        event_detail="event-detail",
+        event_outcome=event_outcome,
+        event_outcome_detail="event-outcome-detail"
+    )
+    assert event.event_outcome.value == event_outcome
+
+
+@pytest.mark.parametrize(
+    "invalid_event_outcome",
+    (
+        (""),
+        (None),
+        ("invalid-event-outcome")
+    )
+)
+def test_invalid_event_outcomes(invalid_event_outcome):
+    """Test that invalid event outcomes raise an error."""
+    event = DigitalProvenanceEventMetadata(
+        event_type="event-type",
+        event_datetime="2000-01-01T10:11:12",
+        event_detail="event-detail",
+        event_outcome="success",
+        event_outcome_detail="event-outcome-detail"
+    )
+    with pytest.raises(ValueError):
+        event.event_outcome = invalid_event_outcome
