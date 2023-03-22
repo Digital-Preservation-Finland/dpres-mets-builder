@@ -138,20 +138,29 @@ def test_user_given_identifier():
     assert object_metadata.object_identifier == "user-identifier"
 
 
-def test_invalid_checksum_algorithm():
+@pytest.mark.parametrize(
+    "invalid_checksum_algorithm",
+    (
+        ("invalid-checksum-algorithm"),
+        (""),
+        (None)
+    )
+)
+def test_invalid_checksum_algorithm(invalid_checksum_algorithm):
     """Test that algorithms not allowed in DPRES specifications cannot be
     set.
     """
+    metadata = TechnicalObjectMetadata(
+        file_format="video/x-matroska",
+        file_format_version="4",
+        file_created_date="2000-01-01T10:11:12",
+        checksum_algorithm="MD5",
+        checksum="checksum-value",
+        object_identifier_type="user-type",
+        object_identifier="user-identifier"
+    )
     with pytest.raises(ValueError):
-        TechnicalObjectMetadata(
-            file_format="video/x-matroska",
-            file_format_version="4",
-            file_created_date="2000-01-01T10:11:12",
-            checksum_algorithm="invalid-checksum-algorithm",
-            checksum="checksum-value",
-            object_identifier_type="user-type",
-            object_identifier="user-identifier"
-        )
+        metadata.checksum_algorithm = invalid_checksum_algorithm
 
 
 @pytest.mark.parametrize(
@@ -218,35 +227,61 @@ def test_valid_encodings(charset):
 )
 def test_invalid_encoding(invalid_charset):
     """Test that invalid encodings raise an error."""
+    metadata = TechnicalObjectMetadata(
+        file_format="text/plain",
+        file_format_version="(:unap)",
+        file_created_date="2000-01-01T10:11:12",
+        charset="UTF-8",
+        checksum_algorithm="MD5",
+        checksum="checksum-value"
+    )
     with pytest.raises(ValueError):
-        TechnicalObjectMetadata(
-            file_format="text/plain",
-            file_format_version="(:unap)",
-            file_created_date="2000-01-01T10:11:12",
-            charset=invalid_charset,
-            checksum_algorithm="MD5",
-            checksum="checksum-value"
-        )
+        metadata.charset = invalid_charset
 
 
 @pytest.mark.parametrize(
-    ("registry_name", "registry_key"),
+    ("registry_name"),
     (
-        ("registry-name", None),
-        ("registry-name", ""),
-        (None, "registry-key"),
-        ("", "registry-key"),
+        (None),
+        ("")
     )
 )
-def test_incomplete_format_registry(registry_name, registry_key):
-    """Test that incomplete format registry information raises an error."""
-    with pytest.raises(ValueError):
+def test_missing_format_registry_name(registry_name):
+    """Test that missing format registry name raises an error."""
+    with pytest.raises(ValueError) as error:
         TechnicalObjectMetadata(
             file_format="video/x-matroska",
             file_format_version="4",
             file_created_date="2000-01-01T10:11:12",
-            checksum_algorithm="invalid-checksum-algorithm",
+            checksum_algorithm="MD5",
             checksum="checksum-value",
             format_registry_name=registry_name,
+            format_registry_key="registry-key"
+        )
+    assert str(error.value) == (
+        "Format registry key is given, but not format registry name."
+    )
+
+
+@pytest.mark.parametrize(
+    ("registry_key"),
+    (
+        (None),
+        ("")
+    )
+)
+def test_missing_format_registry_key(registry_key):
+    """Test that missing format registry key raises an error."""
+    with pytest.raises(ValueError) as error:
+        TechnicalObjectMetadata(
+            file_format="video/x-matroska",
+            file_format_version="4",
+            file_created_date="2000-01-01T10:11:12",
+            checksum_algorithm="MD5",
+            checksum="checksum-value",
+            format_registry_name="registry_name",
             format_registry_key=registry_key
         )
+    assert str(error.value) == (
+        "Format registry name is given, but not format registry key."
+    )
