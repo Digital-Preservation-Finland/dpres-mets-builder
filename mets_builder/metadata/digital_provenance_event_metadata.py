@@ -53,11 +53,11 @@ class _LinkedAgent:
 
     def __init__(
         self,
-        agent: DigitalProvenanceAgentMetadata,
+        agent_metadata: DigitalProvenanceAgentMetadata,
         agent_role: str
     ):
         """Constructor for _LinkedAgent."""
-        self.agent = agent
+        self.agent_metadata = agent_metadata
         self.agent_role = agent_role
 
 
@@ -146,17 +146,20 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         event_outcome = EventOutcome(event_outcome)
         self._event_outcome = event_outcome
 
-    def link_agent(
+    def link_agent_metadata(
         self,
-        agent: DigitalProvenanceAgentMetadata,
+        agent_metadata: DigitalProvenanceAgentMetadata,
         agent_role: str
     ) -> None:
-        """Link a digital provenance agent to this event.
+        """Link a digital provenance agent metadata to this event.
 
-        :param agent: The agent that is associated with this event.
+        :param agent_metadata: The agent that is associated with this event.
         :param agent_role: The role of the agent in relation to this event.
         """
-        linked_agent = _LinkedAgent(agent=agent, agent_role=agent_role)
+        linked_agent = _LinkedAgent(
+            agent_metadata=agent_metadata,
+            agent_role=agent_role
+        )
         self.linked_agents.append(linked_agent)
 
     def link_object_metadata(
@@ -199,8 +202,12 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         """Serialize linked agents to XML elements."""
         linked_agent_ids = [
             premis.identifier(
-                identifier_type=linked_agent.agent.agent_identifier_type,
-                identifier_value=linked_agent.agent.agent_identifier,
+                identifier_type=(
+                    linked_agent.agent_metadata.agent_identifier_type
+                ),
+                identifier_value=(
+                    linked_agent.agent_metadata.agent_identifier
+                ),
                 prefix='linkingAgent',
                 role=linked_agent.agent_role
             )

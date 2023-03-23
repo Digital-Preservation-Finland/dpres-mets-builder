@@ -33,8 +33,8 @@ def test_serialization():
         agent_identifier_type="test-type",
         agent_identifier="agent-2"
     )
-    event.link_agent(agent_1, agent_role="agent-role-1")
-    event.link_agent(agent_2, agent_role="agent-role-2")
+    event.link_agent_metadata(agent_1, agent_role="agent-role-1")
+    event.link_agent_metadata(agent_2, agent_role="agent-role-2")
 
     object_1 = TechnicalObjectMetadata(
         file_format="file-format",
