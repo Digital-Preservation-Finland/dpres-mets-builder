@@ -1,6 +1,6 @@
 """Module for ImportedMetadata class."""
-
 from pathlib import Path
+from typing import Union
 
 import xml_helpers.utils
 from lxml import etree
@@ -13,16 +13,16 @@ class ImportedMetadata(MetadataBase):
 
     def __init__(
             self,
-            data_path: Path,
+            data_path: Union[str, Path],
             **kwargs
     ) -> None:
         """Constructor for ImportedMetadata class.
 
-        :param pathlib.Path data_path: Path to the metadata file.
+        :param data_path: Path to the metadata file.
         """
         super().__init__(**kwargs)
 
-        data_path = data_path.resolve()
+        data_path = Path(data_path).resolve()
         if not data_path.is_file():
             raise ValueError(f"Given path '{str(data_path)}' is not a file.")
         self.data_path = data_path
