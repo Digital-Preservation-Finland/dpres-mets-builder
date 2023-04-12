@@ -1,11 +1,12 @@
 """Module for ImportedMetadata class."""
+from datetime import datetime
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import xml_helpers.utils
 from lxml import etree
 
-from mets_builder.metadata import MetadataBase
+from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
 
 
 class ImportedMetadata(MetadataBase):
@@ -14,13 +15,51 @@ class ImportedMetadata(MetadataBase):
     def __init__(
             self,
             data_path: Union[str, Path],
+            metadata_type: Union[MetadataType, str],
+            metadata_format: Union[MetadataFormat, str, None],
+            format_version: str,
+            other_format: Optional[str] = None,
+            created: Union[datetime, str, None] = None,
             **kwargs
     ) -> None:
         """Constructor for ImportedMetadata class.
 
         :param data_path: Path to the metadata file.
+        :param metadata_type: The type of metadata, given as MetadataType enum
+            or string. If given as string, the value is cast to MetadataType
+            and results in error if it is not a valid metadata type. The
+            allowed values can be found from MetadataType enum documentation.
+        :param metadata_format: The format of the metadata, given as
+            MetadataFormat enum or a string. If given as string, it is cast to
+            MetadataFormat and results in error if it is not a valid metadata
+            format. The allowed values can be found in MetadataFormat enum
+            documentation.
+        :param format_version: The version number of the used metadata format,
+            given as string.
+        :param other_format: Can be used to define the metadata format, if
+            none of the allowed values in 'metadata_format' apply. If set,
+            'other_format' overrides any value given in 'metadata_format' with
+            MetadataFormat.OTHER.
+        :param created: The time the metadata record was created.
+
+            If given as a datetime object, it is interpreted as the precise
+            time of creation.
+
+            If given as a string, it is interpreted as an approximate time the
+            metadata record was created, and has to be given in the extended
+            ISO 8601 format [ISO_8601-1, ISO_8601-2].
+
+            If set to None, the time this object is created is used as the
+            default value.
         """
-        super().__init__(**kwargs)
+        super().__init__(
+            metadata_type=metadata_type,
+            metadata_format=metadata_format,
+            format_version=format_version,
+            other_format=other_format,
+            created=created,
+            **kwargs
+        )
 
         data_path = Path(data_path).resolve()
         if not data_path.is_file():
