@@ -24,7 +24,7 @@ class ImportedMetadata(MetadataBase):
 
         data_path = Path(data_path).resolve()
         if not data_path.is_file():
-            raise ValueError(f"Given path '{str(data_path)}' is not a file.")
+            raise ValueError(f"Given path '{data_path}' is not a file.")
         self.data_path = data_path
 
     def to_xml_element_tree(self) -> etree._Element:
