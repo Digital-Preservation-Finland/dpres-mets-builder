@@ -108,7 +108,7 @@ class METS:
         mets_profile: Union[MetsProfile, str],
         contract_id: str,
         creator_name: str,
-        creator_type: Union[AgentType, str, None] = AgentType.ORGANIZATION,
+        creator_type: Union[AgentType, str],
         creator_other_type: str = None,
         package_id: Optional[str] = None,
         content_id: Optional[str] = None,
@@ -134,7 +134,7 @@ class METS:
             information package.
         :param AgentType, str creator_type: The type of creator, given as
             AgentType enum or string. If given as string, the value is cast to
-            AgentTypeand results in error if it is not a valid agent type. The
+            AgentType and results in error if it is not a valid agent type. The
             allowed values can be found from AgentType documentation.
 
             If none of the AgentType values apply, any other values should be

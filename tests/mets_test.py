@@ -19,7 +19,8 @@ def test_invalid_mets_profile():
             mets_profile="invalid",
             package_id="package_id",
             contract_id="contract_id",
-            creator_name="Mr. Foo"
+            creator_name="Mr. Foo",
+            creator_type=AgentType.INDIVIDUAL
         )
     assert str(error.value) == (
         "'invalid' is not a valid MetsProfile"
@@ -43,7 +44,8 @@ def test_invalid_package_id(invalid_value, error_message):
             mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id=invalid_value,
             contract_id="contract_id",
-            creator_name="Mr. Foo"
+            creator_name="Mr. Foo",
+            creator_type=AgentType.INDIVIDUAL
         )
     assert str(error.value) == error_message
 
@@ -65,7 +67,8 @@ def test_invalid_contract_id(invalid_value, error_message):
             mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
             contract_id=invalid_value,
-            creator_name="Mr. Foo"
+            creator_name="Mr. Foo",
+            creator_type=AgentType.INDIVIDUAL
         )
     assert str(error.value) == error_message
 
@@ -80,6 +83,7 @@ def test_invalid_content_id():
             package_id="package_id",
             contract_id="contract_id",
             creator_name="Mr. Foo",
+            creator_type=AgentType.INDIVIDUAL,
             content_id="ä"
         )
     assert str(error.value) == (
@@ -98,6 +102,7 @@ def test_invalid_record_status():
             package_id="package_id",
             contract_id="contract_id",
             creator_name="Mr. Foo",
+            creator_type=AgentType.INDIVIDUAL,
             record_status="invalid"
         )
     assert str(error.value) == "'invalid' is not a valid MetsRecordStatus"
@@ -113,6 +118,7 @@ def test_no_specification_or_catalog_version():
             package_id="package_id",
             contract_id="contract_id",
             creator_name="Mr. Foo",
+            creator_type=AgentType.INDIVIDUAL,
             catalog_version=None,
             specification=None
         )
@@ -127,7 +133,8 @@ def test_add_agent():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
     mets.add_agent(name="name", agent_role="EDITOR", agent_type="INDIVIDUAL")
 
@@ -167,7 +174,8 @@ def test_add_agent_invalid_arguments(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
 
     with pytest.raises(ValueError):
@@ -188,7 +196,8 @@ def test_add_agent_with_other_role_and_type():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
     mets.add_agent(
         name="name",
@@ -214,7 +223,8 @@ def test_get_metadata():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
     md_stream = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
@@ -287,7 +297,8 @@ def test_get_digital_objects():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
 
     subdiv_digital_objects = {
@@ -320,7 +331,8 @@ def test_add_file_references():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
 
     assert mets.file_references is None
@@ -335,7 +347,8 @@ def test_generating_file_references():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
 
     digital_objects = {
@@ -363,7 +376,8 @@ def test_adding_structural_map():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
     root_div = StructuralMapDiv(div_type="test_type")
     structural_map_1 = StructuralMap(root_div=root_div)
@@ -385,7 +399,8 @@ def test_mets_to_xml():
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
 
     result = mets.to_xml()
@@ -405,7 +420,8 @@ def test_writing_mets(tmp_path):
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
         contract_id="contract_id",
-        creator_name="Mr. Foo"
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
     )
 
     output_filepath = tmp_path / "mets.xml"
