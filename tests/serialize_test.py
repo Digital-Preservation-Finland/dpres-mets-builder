@@ -324,7 +324,7 @@ def test_parse_file_references_file_element(mets_object):
     file_location = file_element.find("mets:FLocat", namespaces=_NAMESPACES)
     assert file_location is not None
     assert file_location.get("LOCTYPE") == "URL"
-    assert file_location.get(_use_namespace("xlink", "href")) == "file://path"
+    assert file_location.get(_use_namespace("xlink", "href")) == "file:///path"
     assert file_location.get(_use_namespace("xlink", "type")) == "simple"
     stream = file_element.find("mets:stream", namespaces=_NAMESPACES)
     assert stream is not None

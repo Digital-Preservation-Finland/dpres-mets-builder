@@ -210,7 +210,7 @@ def _parse_file_references_file(digital_object: DigitalObject):
         file_id=digital_object.identifier,
         admid_elements=administrative_metadata_identifiers,
         loctype="URL",
-        xlink_href=f"file://{digital_object.sip_filepath}",
+        xlink_href=f"file:///{digital_object.sip_filepath}",
         xlink_type="simple"
     )
     for stream in streams:
