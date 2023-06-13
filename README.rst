@@ -1,15 +1,24 @@
+**NOTE: The project is not ready for production use. It is published prematurely to give an opportunity to get acquainted with the project in advance and to get feedback.**
+
+To give feedback, please open a GitHub issue or pull request.
+
 METS builder
 ============
 A library for easy composing of METS files that conform to the Finnish national METS schema.
 
 Installation
 ------------
+Installation and usage requires Python 3.6 or newer. The software is tested with Python 3.6 on Centos 7.x release.
+
 Create virtual environment and install requirements::
 
     python3 -m venv venv
     source venv/bin/activate
     pip install --upgrade pip setuptools
-    pip install -r requirements_dev.txt
+    pip install -r requirements_github.txt
+    pip install .
+
+To deactivate the virtual environment, run ``deactivate``. To reactivate it, run the ``source`` command above.
 
 Usage
 -----
