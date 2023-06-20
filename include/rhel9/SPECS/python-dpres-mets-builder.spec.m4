@@ -34,6 +34,7 @@ Requires:       %{py3_dist xml-helpers}
 Requires:       %{py3_dist mets}
 Requires:       %{py3_dist nisomix}
 Requires:       %{py3_dist premis}
+Requires:       %{py3_dist audiomd}
 %description -n python3-dpres-mets-builder %_description
 
 

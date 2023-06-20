@@ -26,6 +26,7 @@ Requires:       python3-xml-helpers
 Requires:       python3-mets
 Requires:       python3-nisomix
 Requires:       python3-premis
+Requires:       python3-audiomd
 
 %description
 A library for easy composing of METS files.
