@@ -10,12 +10,14 @@ from mets_builder.metadata.digital_provenance_agent_metadata import \
 from mets_builder.metadata.digital_provenance_event_metadata import \
     DigitalProvenanceEventMetadata, EventOutcome
 from mets_builder.metadata.imported_metadata import ImportedMetadata
+from mets_builder.metadata.technical_audio_metadata import \
+    TechnicalAudioMetadata
 from mets_builder.metadata.technical_image_metadata import \
     TechnicalImageMetadata
 
 __all__ = [
     "Charset", "ChecksumAlgorithm", "MetadataBase", "MetadataType",
-    "MetadataFormat", "ImportedMetadata", "TechnicalImageMetadata",
-    "DigitalProvenanceAgentMetadata", "DigitalProvenanceEventMetadata",
-    "TechnicalObjectMetadata", "EventOutcome"
+    "MetadataFormat", "ImportedMetadata", "TechnicalAudioMetadata",
+    "TechnicalImageMetadata", "DigitalProvenanceAgentMetadata",
+    "DigitalProvenanceEventMetadata", "TechnicalObjectMetadata", "EventOutcome"
 ]

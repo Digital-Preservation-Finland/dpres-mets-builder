@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<amd:AUDIOMD xmlns:amd="http://www.loc.gov/audioMD/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/audioMD/ https://www.loc.gov/standards/amdvmd/audioMD.xsd" ANALOGDIGITALFLAG="FileDigital">
+  <amd:fileData>
+    <amd:audioDataEncoding>FLAC</amd:audioDataEncoding>
+    <amd:bitsPerSample>8</amd:bitsPerSample>
+    <amd:compression>
+      <amd:codecCreatorApp>Lavf56.40.101</amd:codecCreatorApp>
+      <amd:codecCreatorAppVersion>56.40.101</amd:codecCreatorAppVersion>
+      <amd:codecName>PCM</amd:codecName>
+      <amd:codecQuality>lossless</amd:codecQuality>
+    </amd:compression>
+    <amd:dataRate>705.6</amd:dataRate>
+    <amd:dataRateMode>Fixed</amd:dataRateMode>
+    <amd:samplingFrequency>44.1</amd:samplingFrequency>
+  </amd:fileData>
+  <amd:audioInfo>
+    <amd:duration>PT0.86S</amd:duration>
+    <amd:numChannels>2</amd:numChannels>
+  </amd:audioInfo>
+</amd:AUDIOMD>
