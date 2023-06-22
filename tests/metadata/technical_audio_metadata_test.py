@@ -1,6 +1,7 @@
 """Tests for technical audio metadata."""
 from pathlib import Path
 
+import pytest
 import xml_helpers
 
 from mets_builder.metadata import TechnicalAudioMetadata
@@ -31,3 +32,41 @@ def test_serialization():
     ).read_text()
 
     assert result == expected_xml
+
+
+def test_invalid_data_rate_mode():
+    """Test that invalid data rate modes are not allowed"""
+    with pytest.raises(ValueError) as error:
+        TechnicalAudioMetadata(
+            audio_data_encoding="foo",
+            bits_per_sample="foo",
+            codec_creator_app="foo",
+            codec_creator_app_version="foo",
+            codec_name="foo",
+            codec_quality="lossless",
+            data_rate="foo",
+            data_rate_mode="invalid",
+            sampling_frequency="foo",
+            duration="foo",
+            num_channels="foo"
+        )
+    assert str(error.value) == "'invalid' is not a valid DataRateMode"
+
+
+def test_invalid_codec_quality():
+    """Test that invalid codec quality values are not allowed"""
+    with pytest.raises(ValueError) as error:
+        TechnicalAudioMetadata(
+            audio_data_encoding="foo",
+            bits_per_sample="foo",
+            codec_creator_app="foo",
+            codec_creator_app_version="foo",
+            codec_name="foo",
+            codec_quality="invalid",
+            data_rate="foo",
+            data_rate_mode="Fixed",
+            sampling_frequency="foo",
+            duration="foo",
+            num_channels="foo"
+        )
+    assert str(error.value) == "'invalid' is not a valid CodecQuality"

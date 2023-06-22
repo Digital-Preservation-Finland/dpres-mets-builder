@@ -1,8 +1,23 @@
 """"Module for TechnicalAudioMetadata class."""
+from enum import Enum
+from typing import Union
+
 import audiomd
 from lxml import etree
 
 from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+
+
+class CodecQuality(Enum):
+    """Enum for allowed codec quality values."""
+    LOSSLESS = "lossless"
+    LOSSY = "lossy"
+
+
+class DataRateMode(Enum):
+    """Enum for allowed data rate modes."""
+    FIXED = "Fixed"
+    VARIABLE = "Variable"
 
 
 class TechnicalAudioMetadata(MetadataBase):
@@ -20,9 +35,9 @@ class TechnicalAudioMetadata(MetadataBase):
         codec_creator_app: str,
         codec_creator_app_version: str,
         codec_name: str,
-        codec_quality: str,
+        codec_quality: Union[CodecQuality, str],
         data_rate: str,
-        data_rate_mode: str,
+        data_rate_mode: Union[DataRateMode, str],
         sampling_frequency: str,
         duration: str,
         num_channels: str,
@@ -44,11 +59,16 @@ class TechnicalAudioMetadata(MetadataBase):
         :param codec_name: Name and version (or subtype) of the compression
             algorithm used, e.g. Frauenhofer 1.0
         :param codec_quality: Impact of the compression on quality e.g.
-            'lossless' or 'lossy'.
+            'lossless' or 'lossy'. If given as string, the value is
+            cast to CodecQuality and results in error if it is not a valid
+            codec quality value. The allowed values can be found from
+            CodecQuality documentation.
         :param data_rate: Data rate of the audio in an MP3 or other compressed
             file, expressed in kbps, e.g., '64', '128', '256', etc.
         :param data_rate_mode: Indicator whether the data rate is fixed or
-            variable.
+            variable. If given as string, the value is cast to DataRateMode and
+            results in error if it is not a valid data rate mode. The allowed
+            values can be found from DataRateMode documentation.
         :param sampling_frequency: Rate at which the audio was sampled,
             expressed in kHz, e.g., '22', '44.1', '48', '96', etc.
         :param duration: Elapsed time of the entire file, expressed using ISO
@@ -76,6 +96,28 @@ class TechnicalAudioMetadata(MetadataBase):
             **kwargs
         )
 
+    @property
+    def data_rate_mode(self):
+        """Getter for data_rate_mode."""
+        return self._data_rate_mode
+
+    @data_rate_mode.setter
+    def data_rate_mode(self, data_rate_mode):
+        """Setter for data_rate_mode."""
+        data_rate_mode = DataRateMode(data_rate_mode)
+        self._data_rate_mode = data_rate_mode
+
+    @property
+    def codec_quality(self):
+        """Getter for codec_quality."""
+        return self._codec_quality
+
+    @codec_quality.setter
+    def codec_quality(self, codec_quality):
+        """Setter for codec_quality."""
+        codec_quality = CodecQuality(codec_quality)
+        self._codec_quality = codec_quality
+
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
@@ -85,7 +127,7 @@ class TechnicalAudioMetadata(MetadataBase):
             app=self.codec_creator_app,
             app_version=self.codec_creator_app_version,
             name=self.codec_name,
-            quality=self.codec_quality
+            quality=self.codec_quality.value
         )
 
         file_data_params = {
@@ -93,7 +135,7 @@ class TechnicalAudioMetadata(MetadataBase):
             "bitsPerSample": self.bits_per_sample,
             "compression": compression,
             "dataRate": self.data_rate,
-            "dataRateMode": self.data_rate_mode,
+            "dataRateMode": self.data_rate_mode.value,
             "samplingFrequency": self.sampling_frequency
         }
         file_data = audiomd.amd_file_data(file_data_params)
