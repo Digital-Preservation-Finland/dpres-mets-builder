@@ -5,6 +5,7 @@ from typing import Union
 import audiomd
 from lxml import etree
 
+from mets_builder.defaults import UNAV
 from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
 
 
@@ -30,17 +31,17 @@ class TechnicalAudioMetadata(MetadataBase):
 
     def __init__(
         self,
-        audio_data_encoding: str,
-        bits_per_sample: str,
-        codec_creator_app: str,
-        codec_creator_app_version: str,
-        codec_name: str,
         codec_quality: Union[CodecQuality, str],
-        data_rate: str,
         data_rate_mode: Union[DataRateMode, str],
-        sampling_frequency: str,
-        duration: str,
-        num_channels: str,
+        audio_data_encoding: str = UNAV,
+        bits_per_sample: str = "0",
+        codec_creator_app: str = UNAV,
+        codec_creator_app_version: str = UNAV,
+        codec_name: str = UNAV,
+        data_rate: str = "0",
+        sampling_frequency: str = "0",
+        duration: str = UNAV,
+        num_channels: str = UNAV,
         **kwargs
     ):
         """Constructor for TechnicalAudioMetadata class.
@@ -49,43 +50,54 @@ class TechnicalAudioMetadata(MetadataBase):
         can be given here as well. Look MetadataBase documentation for more
         information.
 
-        :param audio_data_encoding: Structure for audio data.
-        :param bits_per_sample: Number of bits per audio sample as a string,
-            e.g. '16', '20', '24', etc.
-        :param codec_creator_app: Name of the creator of the compression
-            application.
-        :param codec_creator_app_version: Version of the compression
-            application
-        :param codec_name: Name and version (or subtype) of the compression
-            algorithm used, e.g. Frauenhofer 1.0
         :param codec_quality: Impact of the compression on quality e.g.
             'lossless' or 'lossy'. If given as string, the value is
             cast to CodecQuality and results in error if it is not a valid
             codec quality value. The allowed values can be found from
             CodecQuality documentation.
-        :param data_rate: Data rate of the audio in an MP3 or other compressed
-            file, expressed in kbps, e.g., '64', '128', '256', etc. Should be
-            an integer value represented as a string. Float values are rounded
-            to integers automatically.
         :param data_rate_mode: Indicator whether the data rate is fixed or
             variable. If given as string, the value is cast to DataRateMode and
             results in error if it is not a valid data rate mode. The allowed
             values can be found from DataRateMode documentation.
+        :param audio_data_encoding: Structure for audio data. If the value is
+            unavailable, '(:unav)' can be used as the value.
+        :param bits_per_sample: Number of bits per audio sample as a string,
+            e.g. '16', '20', '24', etc. If the value is unavailable, '0' can be
+            used as the value.
+        :param codec_creator_app: Name of the creator of the compression
+            application. If the value is unavailable, '(:unav)' can be used as
+            the value. If the audio is not compressed, '(:unap)' can be used.
+        :param codec_creator_app_version: Version of the compression
+            application. If the value is unavailable, '(:unav)' can be used as
+            the value. If the audio is not compressed or the used software
+            doesn't have versioning, '(:unap)' can be used.
+        :param codec_name: Name and version (or subtype) of the compression
+            algorithm used, e.g. Frauenhofer 1.0. If the value is unavailable,
+            '(:unav)' can be used as the value. If the audio is not compressed,
+            '(:unap)' can be used.
+        :param data_rate: Data rate of the audio in an MP3 or other compressed
+            file, expressed in kbps, e.g., '64', '128', '256', etc. Should be
+            an integer value represented as a string. Float values are rounded
+            to integers automatically. If the value is unavailable, '0' can be
+            used as the value.
         :param sampling_frequency: Rate at which the audio was sampled,
-            expressed in kHz, e.g., '22', '44.1', '48', '96', etc.
+            expressed in kHz, e.g., '22', '44.1', '48', '96', etc. If the value
+            is unavailable, '0' can be used as the value.
         :param duration: Elapsed time of the entire file, expressed using ISO
-            8601 syntax.
+            8601 syntax. If the value is unavailable, '(:unav)' can be used as
+            the value.
         :param num_channels: Number of audio channels as a string, e.g., '1',
-            '2', '4', '5'.
+            '2', '4', '5'. If the value is unavailable, '(:unav)' can be used
+            as the value.
         """
+        self.codec_quality = codec_quality
+        self.data_rate_mode = data_rate_mode
         self.audio_data_encoding = audio_data_encoding
         self.bits_per_sample = bits_per_sample
         self.codec_creator_app = codec_creator_app
         self.codec_creator_app_version = codec_creator_app_version
         self.codec_name = codec_name
-        self.codec_quality = codec_quality
         self.data_rate = data_rate
-        self.data_rate_mode = data_rate_mode
         self.sampling_frequency = sampling_frequency
         self.duration = duration
         self.num_channels = num_channels
