@@ -64,7 +64,9 @@ class TechnicalAudioMetadata(MetadataBase):
             codec quality value. The allowed values can be found from
             CodecQuality documentation.
         :param data_rate: Data rate of the audio in an MP3 or other compressed
-            file, expressed in kbps, e.g., '64', '128', '256', etc.
+            file, expressed in kbps, e.g., '64', '128', '256', etc. Should be
+            an integer value represented as a string. Float values are rounded
+            to integers automatically.
         :param data_rate_mode: Indicator whether the data rate is fixed or
             variable. If given as string, the value is cast to DataRateMode and
             results in error if it is not a valid data rate mode. The allowed
@@ -117,6 +119,22 @@ class TechnicalAudioMetadata(MetadataBase):
         """Setter for codec_quality."""
         codec_quality = CodecQuality(codec_quality)
         self._codec_quality = codec_quality
+
+    @property
+    def data_rate(self):
+        """Getter for data_rate."""
+        return self._data_rate
+
+    @data_rate.setter
+    def data_rate(self, data_rate):
+        """Setter for data_rate.
+
+        :param data_rate: The new data_rate. The value should be an integer
+            represented with a string. If given as a float, the given value is
+            rounded to an integer.
+        """
+        rounded_data_rate = round(float(data_rate))
+        self._data_rate = str(rounded_data_rate)
 
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.

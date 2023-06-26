@@ -16,7 +16,7 @@ def test_serialization():
         codec_creator_app_version="56.40.101",
         codec_name="PCM",
         codec_quality="lossless",
-        data_rate="705.6",
+        data_rate="706",
         data_rate_mode="Fixed",
         sampling_frequency="44.1",
         duration="PT0.86S",
@@ -44,7 +44,7 @@ def test_invalid_data_rate_mode():
             codec_creator_app_version="foo",
             codec_name="foo",
             codec_quality="lossless",
-            data_rate="foo",
+            data_rate="1",
             data_rate_mode="invalid",
             sampling_frequency="foo",
             duration="foo",
@@ -63,10 +63,28 @@ def test_invalid_codec_quality():
             codec_creator_app_version="foo",
             codec_name="foo",
             codec_quality="invalid",
-            data_rate="foo",
+            data_rate="1",
             data_rate_mode="Fixed",
             sampling_frequency="foo",
             duration="foo",
             num_channels="foo"
         )
     assert str(error.value) == "'invalid' is not a valid CodecQuality"
+
+
+def test_data_rate_is_rounded():
+    """Test that if given data rate is not an integer, it is rounded."""
+    data = TechnicalAudioMetadata(
+        audio_data_encoding="foo",
+        bits_per_sample="foo",
+        codec_creator_app="foo",
+        codec_creator_app_version="foo",
+        codec_name="foo",
+        codec_quality="lossless",
+        data_rate="1.1",
+        data_rate_mode="Fixed",
+        sampling_frequency="foo",
+        duration="foo",
+        num_channels="foo"
+    )
+    assert data.data_rate == "1"

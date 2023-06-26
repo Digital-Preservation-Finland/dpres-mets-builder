@@ -9,7 +9,7 @@
       <amd:codecName>PCM</amd:codecName>
       <amd:codecQuality>lossless</amd:codecQuality>
     </amd:compression>
-    <amd:dataRate>705.6</amd:dataRate>
+    <amd:dataRate>706</amd:dataRate>
     <amd:dataRateMode>Fixed</amd:dataRateMode>
     <amd:samplingFrequency>44.1</amd:samplingFrequency>
   </amd:fileData>
