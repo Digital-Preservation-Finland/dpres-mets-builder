@@ -34,57 +34,37 @@ def test_serialization():
     assert result == expected_xml
 
 
-def test_invalid_data_rate_mode():
-    """Test that invalid data rate modes are not allowed"""
-    with pytest.raises(ValueError) as error:
-        TechnicalAudioMetadata(
-            audio_data_encoding="foo",
-            bits_per_sample="foo",
-            codec_creator_app="foo",
-            codec_creator_app_version="foo",
-            codec_name="foo",
-            codec_quality="lossless",
-            data_rate="1",
-            data_rate_mode="invalid",
-            sampling_frequency="foo",
-            duration="foo",
-            num_channels="foo"
+@pytest.mark.parametrize(
+    ("invalid_init_params", "error_message"),
+    (
+        (
+            {"data_rate_mode": "invalid"},
+            "'invalid' is not a valid DataRateMode"
+        ),
+        (
+            {"codec_quality": "invalid"},
+            "'invalid' is not a valid CodecQuality"
         )
-    assert str(error.value) == "'invalid' is not a valid DataRateMode"
+    )
+)
+def test_invalid_init_parameters(invalid_init_params, error_message):
+    """Test initializing TechnicalAudioMetadata with invalid parameters."""
+    init_params = {
+        "data_rate_mode": "Fixed",
+        "codec_quality": "lossless"
+    }
+    init_params.update(invalid_init_params)
 
-
-def test_invalid_codec_quality():
-    """Test that invalid codec quality values are not allowed"""
     with pytest.raises(ValueError) as error:
-        TechnicalAudioMetadata(
-            audio_data_encoding="foo",
-            bits_per_sample="foo",
-            codec_creator_app="foo",
-            codec_creator_app_version="foo",
-            codec_name="foo",
-            codec_quality="invalid",
-            data_rate="1",
-            data_rate_mode="Fixed",
-            sampling_frequency="foo",
-            duration="foo",
-            num_channels="foo"
-        )
-    assert str(error.value) == "'invalid' is not a valid CodecQuality"
+        TechnicalAudioMetadata(**init_params)
+    assert str(error.value) == error_message
 
 
 def test_data_rate_is_rounded():
     """Test that if given data rate is not an integer, it is rounded."""
     data = TechnicalAudioMetadata(
-        audio_data_encoding="foo",
-        bits_per_sample="foo",
-        codec_creator_app="foo",
-        codec_creator_app_version="foo",
-        codec_name="foo",
         codec_quality="lossless",
-        data_rate="1.1",
         data_rate_mode="Fixed",
-        sampling_frequency="foo",
-        duration="foo",
-        num_channels="foo"
+        data_rate="1.1"
     )
     assert data.data_rate == "1"
