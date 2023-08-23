@@ -115,9 +115,7 @@ def test_generate_object_identifier():
         file_format_version="4",
         file_created_date="2000-01-01T10:11:12",
         checksum_algorithm="MD5",
-        checksum="checksum-value",
-        agent_identifier_type=None,
-        agent_identifier=None
+        checksum="checksum-value"
     )
     assert object_metadata.object_identifier_type == "UUID"
     assert object_metadata.object_identifier
