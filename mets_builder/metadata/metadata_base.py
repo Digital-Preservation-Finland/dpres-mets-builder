@@ -107,27 +107,25 @@ class MetadataBase:
     ) -> None:
         """Constructor for MetadataBase class.
 
-        :param MetadataType, str metadata_type: The type of metadata, given as
-            MetadataType enum or string. If given as string, the value is cast
-            to MetadataType and results in error if it is not a valid metadata
-            type. The allowed values can be found from MetadataType enum
+        :param metadata_type: The type of metadata, given as MetadataType enum
+            or string. If given as string, the value is cast to MetadataType
+            and results in error if it is not a valid metadata type. The
+            allowed values can be found from MetadataType enum documentation.
+        :param metadata_format: The format of the metadata, given as
+            MetadataFormat enum or a string. If given as string, it is cast to
+            MetadataFormat and results in error if it is not a valid metadata
+            format. The allowed values can be found in MetadataFormat enum
             documentation.
-        :param MetadataFormat, str metadata_format: The format of the metadata,
-            given as MetadataFormat enum or a string. If given as string, it is
-            cast to MetadataFormat and results in error if it is not a valid
-            metadata format. The allowed values can be found in MetadataFormat
-            enum documentation.
-        :param str format_version: The version number of the used metadata
-            format, given as string.
-        :param str other_format: Can be used to define the metadata format, if
-            none of the allowed values in 'metadata_format' apply. If set,
+        :param format_version: The version number of the used metadata format,
+            given as string.
+        :param other_format: Can be used to define the metadata format, if none
+            of the allowed values in 'metadata_format' apply. If set,
             'other_format' overrides any value given in 'metadata_format' with
             MetadataFormat.OTHER.
-        :param str identifier: Identifier for the metadata element. The
-            identifier must be unique in the METS document. If None, the
-            identifier is generated automatically.
-        :param datetime.datetime, str created: The time the metadata record was
-            created.
+        :param identifier: Identifier for the metadata element. The identifier
+            must be unique in the METS document. If None, the identifier is
+            generated automatically.
+        :param created: The time the metadata record was created.
 
             If given as a datetime object, it is interpreted as the precise
             time of creation.

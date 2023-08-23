@@ -36,16 +36,16 @@ class TechnicalImageMetadata(MetadataBase):
         can be given here as well. Look MetadataBase documentation for more
         information.
 
-        :param str compression: Compression scheme, e.g. 'jpeg' or 'zip'
-        :param str colorspace: Color space of the image, e.g. 'rgb'
-        :param str width: Width of the image as pixels.
-        :param str height: Height of the image as pixels.
-        :param str bps_value: Bits per sample.
-        :param str bps_unit: Unit of the bps_value, e.g. 'integer'
-        :param str samples_per_pixel: Samples per pixel.
-        :param str mimetype: File mimetype, e.g. 'image/tiff'.
-        :param str byte_order: Byte order of the file, e.g. 'little endian'
-        :param str icc_profile_name: ICC profile name.
+        :param compression: Compression scheme, e.g. 'jpeg' or 'zip'
+        :param colorspace: Color space of the image, e.g. 'rgb'
+        :param width: Width of the image as pixels.
+        :param height: Height of the image as pixels.
+        :param bps_value: Bits per sample.
+        :param bps_unit: Unit of the bps_value, e.g. 'integer'
+        :param samples_per_pixel: Samples per pixel.
+        :param mimetype: File mimetype, e.g. 'image/tiff'.
+        :param byte_order: Byte order of the file, e.g. 'little endian'
+        :param icc_profile_name: ICC profile name.
         """
         self.compression = compression
         self.colorspace = colorspace

@@ -20,11 +20,11 @@ class FileGroup:
     ) -> None:
         """Constructor for FileGroup.
 
-        :param str use: Describe the purpose of the files in this file group.
-            The recommended vocabulary can be found here:
+        :param use: Describe the purpose of the files in this file group.  The
+            recommended vocabulary can be found here:
             https://digitalpreservation.fi/specifications/vocabularies
-        :param Iterable[DigitalObject] digital_objects: The DigitalObjects that
-            are added to the file group.
+        :param digital_objects: The DigitalObjects that are added to the file
+            group.
         """
         self.use = use
 
@@ -38,8 +38,8 @@ class FileGroup:
     ) -> None:
         """Add a digital object to this file group.
 
-        :param DigitalObject digital_object: The DigitalObject that is added
-            to the file group.
+        :param digital_object: The DigitalObject that is added to the file
+            group.
         """
         self.digital_objects.add(digital_object)
 
@@ -70,8 +70,7 @@ class FileReferences:
     ) -> None:
         """Constructor for FileReferences.
 
-        :param Iterable[FileGroup] file_groups: The file groups of these file
-            references.
+        :param file_groups: The file groups of these file references.
         """
         if file_groups is None:
             file_groups = set()
@@ -80,8 +79,8 @@ class FileReferences:
     def add_file_group(self, file_group: FileGroup) -> None:
         """Add a file group to these file references.
 
-        :param FileGroup file_group: The FileGroup instance that is added to
-            this FileReferences instance.
+        :param file_group: The FileGroup instance that is added to this
+            FileReferences instance.
         """
         self.file_groups.add(file_group)
 
@@ -95,8 +94,8 @@ class FileReferences:
         Returns a FileReferences instance where given digital objects have been
         grouped into a single file group.
 
-        :param Iterable[DigitalObject] digital_objects: The DigitalObject
-            instances that are included in the file references.
+        :param digital_objects: The DigitalObject instances that are included
+            in the file references.
         """
         if not digital_objects:
             raise ValueError(

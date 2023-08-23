@@ -40,7 +40,7 @@ def _use_namespace(namespace, attribute):
 def _parse_mets_root_element(mets):
     """Parse root element for given METS object.
 
-    :param METS mets: METS object
+    :param mets: METS object
 
     :returns: METS root element (mets:mets) as lxml.etree._Element
     """
@@ -78,7 +78,7 @@ def _parse_mets_root_element(mets):
 def _parse_mets_header(mets):
     """Parse metsHdr for given METS object.
 
-    :param METS mets: METS object
+    :param mets: METS object
 
     :returns: METS header (mets:metsHdr) as lxml.etree._Element
     """
@@ -113,7 +113,7 @@ def _parse_mets_header(mets):
 def _parse_metadata_element(metadata: MetadataBase):
     """Parse given metadata object.
 
-    :param MetadataBase metadata: The metadata object that should be parsed.
+    :param metadata: The metadata object that should be parsed.
 
     :returns: The metadata wrapped in the correct base element (dmdSec, techMD
         etc.) as lxml.etree._Element
@@ -291,11 +291,11 @@ def _write_structural_map(xml, structural_map):
 def _write_mets(mets, output_file):
     """Write METS object to file serialized as XML.
 
-    :param METS mets: METS object to serialize
-    :param BytesIO, str output_file: File to write the serialized METS to. It
-        can be given as a BytesIO file object or as path to the output file. If
-        BytesIO is given, the caller should take care of closing the file
-        themselves.
+    :param mets: METS object to serialize
+    :param output_file: File to write the serialized METS to. It can be given
+        as a BytesIO file object or as string containing the path to the output
+        file. If BytesIO is given, the caller should take care of closing the
+        file themselves.
 
     :returns: The given output_file.
     """
@@ -331,7 +331,7 @@ def _write_mets(mets, output_file):
 def to_xml_string(mets: "METS") -> bytes:
     """Serialize METS object to XML string.
 
-    :param METS mets: METS object
+    :param mets: METS object
 
     :returns: Given METS object as XML-formatted byte string.
     """

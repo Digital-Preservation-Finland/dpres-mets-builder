@@ -19,10 +19,10 @@ class DigitalObjectBase:
     ) -> None:
         """Constructor for DigitalObjectBase.
 
-        :param Iterable[MetadataBase] metadata: Iterable of metadata objects
-            that describe this object. Note that the metadata should be
-            administrative metadata, and any descriptive metadata of a digital
-            object should be added to a div in a structural map.
+        :param metadata: Iterable of metadata objects that describe this
+            object. Note that the metadata should be administrative metadata,
+            and any descriptive metadata of a digital object should be added to
+            a div in a structural map.
         """
         self.metadata: Set[MetadataBase] = set()
         if metadata is not None:
@@ -35,8 +35,7 @@ class DigitalObjectBase:
         Any descriptive metadata should be added to a div in structural map
         (StructuralMapDiv in a StructuralMap)
 
-        :param MetadataBase metadata: The metadata object that is added to this
-            object.
+        :param metadata: The metadata object that is added to this object.
 
         :raises ValueError: If the given metadata is descriptive metadata.
         """
@@ -65,10 +64,10 @@ class DigitalObjectStream(DigitalObjectBase):
     ) -> None:
         """Constructor for DigitalObjectStream.
 
-        :param Iterable[MetadataBase] metadata: Iterable of metadata objects
-            that describe this stream. Note that the metadata should be
-            administrative metadata, and any descriptive metadata of a stream
-            should be added to a div in a structural map.
+        :param metadata: Iterable of metadata objects that describe this
+            stream. Note that the metadata should be administrative metadata,
+            and any descriptive metadata of a stream should be added to a div
+            in a structural map.
         """
         super().__init__(metadata=metadata)
 
@@ -101,19 +100,18 @@ class DigitalObject(DigitalObjectBase):
     ) -> None:
         """Constructor for DigitalObject.
 
-        :param str, Path sip_filepath: File path of this digital object in the
-            SIP, relative to the SIP root directory. Note that this can be
-            different than the path in the local filesystem.
-        :param Iterable[MetadataBase] metadata: Iterable of metadata objects
-            that describe this stream. Note that the metadata should be
-            administrative metadata, and any descriptive metadata of a digital
-            object should be added to a div in a structural map.
-        :param Iterable[DigitalObjectStream] streams: Iterable of
-            DigitalObjectStreams, representing the streams of this digital
-            object.
-        :param str identifier: Identifier for the digital object. The
-            identifier must be unique in the METS document. If None, the
-            identifier is generated automatically.
+        :param sip_filepath: File path of this digital object in the SIP,
+            relative to the SIP root directory. Note that this can be different
+            than the path in the local filesystem.
+        :param metadata: Iterable of metadata objects that describe this
+            stream. Note that the metadata should be administrative metadata,
+            and any descriptive metadata of a digital object should be added to
+            a div in a structural map.
+        :param streams: Iterable of DigitalObjectStreams, representing the
+            streams of this digital object.
+        :param identifier: Identifier for the digital object. The identifier
+            must be unique in the METS document. If None, the identifier is
+            generated automatically.
         """
         super().__init__(metadata=metadata)
 
@@ -158,7 +156,6 @@ class DigitalObject(DigitalObjectBase):
     def add_stream(self, stream: DigitalObjectStream) -> None:
         """Add a stream to this digital object.
 
-        :param DigitalObjectStream stream: The stream object that is added to
-            this digital object.
+        :param stream: The stream object that is added to this digital object.
         """
         self.streams.add(stream)

@@ -7,6 +7,8 @@ import string
 def is_printable_us_ascii(word: str) -> bool:
     """Checks whether a string contains only printable US-ASCII
     characters.
+
+    :param word: The string to examine.
     """
     for letter in word:
         if letter not in string.printable:

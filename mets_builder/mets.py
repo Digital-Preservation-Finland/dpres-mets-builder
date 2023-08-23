@@ -122,53 +122,52 @@ class METS:
     ) -> None:
         """Constructor for METS class.
 
-        :param MetsProfile, str mets_profile: The METS profile for this
-            METS document, given as MetsProfile enum or string. If given as
-            string, the value is cast to MetsProfile and results in error if it
-            is not a valid mets profile. The allowed values can be found from
-            MetsProfile documentation.
-        :param str contract_id: Contract identifier of a DPS contract to which
-            the package content belongs. Attribute value should be expressed in
+        :param mets_profile: The METS profile for this METS document, given as
+            MetsProfile enum or string. If given as string, the value is cast
+            to MetsProfile and results in error if it is not a valid mets
+            profile. The allowed values can be found from MetsProfile
+            documentation.
+        :param contract_id: Contract identifier of a DPS contract to which the
+            package content belongs. Attribute value should be expressed in
             printable US-ASCII characters.
-        :param str creator_name: Name of the person or entity who created the
+        :param creator_name: Name of the person or entity who created the
             information package.
-        :param AgentType, str creator_type: The type of creator, given as
-            AgentType enum or string. If given as string, the value is cast to
-            AgentType and results in error if it is not a valid agent type. The
-            allowed values can be found from AgentType documentation.
+        :param creator_type: The type of creator, given as AgentType enum or
+            string. If given as string, the value is cast to AgentType and
+            results in error if it is not a valid agent type. The allowed
+            values can be found from AgentType documentation.
 
             If none of the AgentType values apply, any other values should be
             given using the 'creator_other_type' attribute.
-        :param str creator_other_type: Can be used to describe the creator
-            type, if none of the pre-defined types in 'creator_type' attribute
-            apply. If set, 'creator_other_type' overrides any value set to
-            'creator_type' with AgentType.OTHER.
-        :param str package_id: Organization’s unique identifier for the
-            information package (objid). Attribute value should be expressed in
-            printable US-ASCII characters. If set to None, an UUID is generated
-            as the default value.
-        :param str content_id: Identifier for the content in the package.
+        :param creator_other_type: Can be used to describe the creator type, if
+            none of the pre-defined types in 'creator_type' attribute apply. If
+            set, 'creator_other_type' overrides any value set to 'creator_type'
+            with AgentType.OTHER.
+        :param package_id: Organization’s unique identifier for the information
+            package (objid). Attribute value should be expressed in printable
+            US-ASCII characters. If set to None, an UUID is generated as the
+            default value.
+        :param content_id: Identifier for the content in the package.
             Attribute value should be expressed in printable US-ASCII
             characters.
-        :param str label: Short description of the information package.
-        :param datetime.datetime create_date: The package creation time with a
-            resolution of one second. If not set, the moment when this METS
-            object is created is used as default value.
-        :param datetime.datetime last_mod_date: If the package has been
-            modified since the initial creation, the modification time must be
-            expressed with last_mod_date using the same resolution as
-            create_date.
-        :param MetsRecordStatus, str record_status: The record status of the
-            information package, given as MetsRecordStatus enum or string. If
-            given as string, the value is cast to MetsRecordStatus and results
-            in error if it is not a valid record status. The allowed values can
-            be found from MetsRecordStatus documentation.
-        :param str catalog_version: Version number of the schema catalog used
-            when data package is created. If there is no "catalog_version"
-            present, it has to be replaced by "specification" attribute.
-        :param str specification: Version number of packaging specification
-            used in creation of data package. Mandatory only when the use of
-            the "catalog_version" attribute is not possible.
+        :param label: Short description of the information package.
+        :param create_date: The package creation time with a resolution of one
+            second. If not set, the moment when this METS object is created is
+            used as default value.
+        :param last_mod_date: If the package has been modified since the
+            initial creation, the modification time must be expressed with
+            last_mod_date using the same resolution as create_date.
+        :param record_status: The record status of the information package,
+            given as MetsRecordStatus enum or string. If given as string, the
+            value is cast to MetsRecordStatus and results in error if it is not
+            a valid record status. The allowed values can be found from
+            MetsRecordStatus documentation.
+        :param catalog_version: Version number of the schema catalog used when
+            data package is created. If there is no "catalog_version" present,
+            it has to be replaced by "specification" attribute.
+        :param specification: Version number of packaging specification used in
+            creation of data package. Mandatory only when the use of the
+            "catalog_version" attribute is not possible.
 
         :raises ValueError: if the given attributes are invalid
 
@@ -304,30 +303,30 @@ class METS:
         making of the information package. These agents will become agent
         elements in the metsHdr element in the final METS document.
 
-        :param str name: The name of the agent. For example, if agent type is
-            set as "ORGANIZATION", the name should be set as the name of the
+        :param name: The name of the agent. For example, if agent type is set
+            as "ORGANIZATION", the name should be set as the name of the
             organization.
-        :param AgentRole, str agent_role: Specifies the function of the agent
-            with respect to the METS record, given as AgentRole enum or string.
-            If given as string, the value is cast to AgentRole and results in
-            error if it is not a valid agent role. The allowed values can be
-            found from AgentRole documentation.
+        :param agent_role: Specifies the function of the agent with respect to
+            the METS record, given as AgentRole enum or string.  If given as
+            string, the value is cast to AgentRole and results in error if it
+            is not a valid agent role. The allowed values can be found from
+            AgentRole documentation.
 
             If none of the AgentRole values apply, other values should be given
             using the 'other_role' attribute.
-        :param str other_role: Can be used to describe the agent role, if none
-            of the pre-defined roles in 'agent_role' attribute apply. If set,
+        :param other_role: Can be used to describe the agent role, if none of
+            the pre-defined roles in 'agent_role' attribute apply. If set,
             'other_role' overrides any value set to 'agent_role' with
             AgentRole.OTHER.
-        :param AgentType, str agent_type: Specifies the type of agent, given as
-            AgentType enum or string. If given as string, the value is cast to
-            AgentType and results in error if it is not a valid agent type. The
-            allowed values can be found from AgentType documentation.
+        :param agent_type: Specifies the type of agent, given as AgentType enum
+            or string. If given as string, the value is cast to AgentType and
+            results in error if it is not a valid agent type. The allowed
+            values can be found from AgentType documentation.
 
             If none of the AgentType values apply, other values should be given
             using the 'other_type' attribute.
-        :param str other_type: Can be used to describe the agent type, if none
-            of the pre-defined types in 'agent_type' attribute apply. If set,
+        :param other_type: Can be used to describe the agent type, if none of
+            the pre-defined types in 'agent_type' attribute apply. If set,
             'other_type' overrides any value set to 'agent_type' with
             AgentType.OTHER.
 
@@ -389,8 +388,8 @@ class METS:
 
         This will replace any previously added file references.
 
-        :param FileReferences file_references: FileReferences instance that is
-            added to this METS.
+        :param file_references: FileReferences instance that is added to this
+            METS.
         """
         self.file_references = file_references
 
@@ -411,8 +410,8 @@ class METS:
     def add_structural_map(self, structural_map: StructuralMap) -> None:
         """Add a structural map to this METS.
 
-        :param StructuralMap structural_map: The StructuralMap instance that is
-            added to this METS.
+        :param structural_map: The StructuralMap instance that is added to this
+            METS.
         """
         self.structural_maps.add(structural_map)
 

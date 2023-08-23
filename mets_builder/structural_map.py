@@ -40,44 +40,42 @@ class StructuralMapDiv:
     ) -> None:
         """Constructor for StructuralMapDiv.
 
-        :param str div_type: A string that specifies the type of structural
+        :param div_type: A string that specifies the type of structural
             division that the division element represents. Possible values
             include: 'chapter', 'article', 'page', 'track', 'segment',
-            'section' etc. METS places no constraints on the possible
-            values.
-        :param int order: A representation of the divison element's order among
-            its siblings (e.g., its absolute, numeric sequence), given as
-            integer value. For further of the distinction between 'order' and
+            'section' etc. METS places no constraints on the possible values.
+        :param order: A representation of the divison element's order among its
+            siblings (e.g., its absolute, numeric sequence), given as integer
+            value. For further of the distinction between 'order' and
             'orderlabel' see the description of the 'orderlabel' attribute.
-        :param str label: A string that is used, for example, to identify a div
-            to an end user viewing the document. Thus a hierarchical
-            arrangement of the div label values could provide a table of
-            contents to the digital content represented by a METS document and
-            facilitate the users' navigation of the digital object. Note that a
-            div label should be specific to its level in the structural map. In
-            the case of a book with chapters, the book div label should have
-            the book title and the chapter div labels should have the
-            individual chapter titles, rather than having the chapter div
-            labels combine both book title and chapter title. For further of
-            the distinction between 'label' and 'orderlabel' see the
-            description of the 'orderlabel' attribute.
-        :param str orderlabel: A string representation of the element's order
-            among its siblings (e.g., 'xii'), or of any non-integer native
-            numbering system. It is presumed that this value will still be
-            machine actionable (e.g., it would support 'go to page ___'
-            function), and it should not be used as a replacement/substitute
-            for the 'label' attribute. To understand the differences between
-            'order', 'orderlabel' and 'label', imagine a text with 10 roman
-            numbered pages followed by 10 arabic numbered pages. Page iii would
-            have an 'order' of 3, an 'orderlabel' of 'iii' and a label of 'Page
-            iii', while page 3 would have an 'order' of 13, an 'orderlabel' of
-            '3' and a 'label' of 'Page 3'.
-        :param Iterable[MetadataBase] metadata: Metadata that applies to all
-            digital objects under this div.
-        :param Iterable[StructuralMapDiv] divs: Divisions that this division
-            should be divided further.
-        :param Iterable[DigitalObject] digital_objects: Digital objects that
-            belong to this hierarchical division.
+        :param label: A string that is used, for example, to identify a div to
+            an end user viewing the document. Thus a hierarchical arrangement
+            of the div label values could provide a table of contents to the
+            digital content represented by a METS document and facilitate the
+            users' navigation of the digital object. Note that a div label
+            should be specific to its level in the structural map. In the case
+            of a book with chapters, the book div label should have the book
+            title and the chapter div labels should have the individual chapter
+            titles, rather than having the chapter div labels combine both book
+            title and chapter title. For further of the distinction between
+            'label' and 'orderlabel' see the description of the 'orderlabel'
+            attribute.
+        :param orderlabel: A string representation of the element's order among
+            its siblings (e.g., 'xii'), or of any non-integer native numbering
+            system. It is presumed that this value will still be machine
+            actionable (e.g., it would support 'go to page ___' function), and
+            it should not be used as a replacement/substitute for the 'label'
+            attribute. To understand the differences between 'order',
+            'orderlabel' and 'label', imagine a text with 10 roman numbered
+            pages followed by 10 arabic numbered pages. Page iii would have an
+            'order' of 3, an 'orderlabel' of 'iii' and a label of 'Page iii',
+            while page 3 would have an 'order' of 13, an 'orderlabel' of '3'
+            and a 'label' of 'Page 3'.
+        :param metadata: Metadata that applies to all digital objects under
+            this div.
+        :param divs: Divisions that this division should be divided further.
+        :param digital_objects: Digital objects that belong to this
+            hierarchical division.
         """
         self.parent: Optional["StructuralMapDiv"] = None
 
@@ -124,8 +122,7 @@ class StructuralMapDiv:
         The metadata should apply to all digital objects under this div (as
         well as digital objects under the divs nested in this div)
 
-        :param MetadataBase metadata: The metadata object that is added to this
-            div.
+        :param metadata: The metadata object that is added to this div.
         """
         self.metadata.add(metadata)
 
@@ -135,8 +132,8 @@ class StructuralMapDiv:
         Note that it is much more performant add multiple divs at once, rather
         than adding divs one by one.
 
-        :param StructuralMapDiv divs: An iterable of StructuralMapDivs that are
-            added to this div.
+        :param divs: An iterable of StructuralMapDivs that are added to this
+            div.
 
         :raises ValueError: If the given div already exists or contains a div
             that exists in the div tree, if the added div already has a parent
@@ -201,8 +198,8 @@ class StructuralMapDiv:
         Note that it is much more performant add multiple digital objects at
         once, rather than adding them one by one.
 
-        :param DigitalObject digital_objects: Iterable of DigitalObjects that
-            are added to this div.
+        :param digital_objects: Iterable of DigitalObjects that are added to
+            this div.
 
         :raises ValueError: If any of the given DigitalObjects already exist in
             the div tree.
@@ -266,10 +263,10 @@ class StructuralMap:
     ) -> None:
         """Constructor for StructuralMap.
 
-        :param StrucuralMapDiv root_div: StructuralMapDiv that is the root div
-            of this structural map. The structural map has to have one and only
-            one root div, but the root div can contain multiple nested divs.
-        :param str structural_map_type: String that identifies the type of
+        :param root_div: StructuralMapDiv that is the root div of this
+            structural map. The structural map has to have one and only one
+            root div, but the root div can contain multiple nested divs.
+        :param structural_map_type: String that identifies the type of
             structure represented by the structural map. For example, a
             structural map that represents a purely logical or intellectual
             structure could be described with value 'logical' whereas a
@@ -277,17 +274,17 @@ class StructuralMap:
             be described with value 'physical'. However, the METS schema
             neither defines nor requires a common vocabulary for this
             attribute.
-        :param str label: String that describes the structural map to viewers
-            of the METS document. This would be useful primarily where more
-            than one structural map is provided for a single object. A
-            descriptive label value, in that case, could clarify to users the
-            purpose of each of the available structural maps.
-        :param str pid: Unique identifier of metadata, given as a string.
+        :param label: String that describes the structural map to viewers of
+            the METS document. This would be useful primarily where more than
+            one structural map is provided for a single object. A descriptive
+            label value, in that case, could clarify to users the purpose of
+            each of the available structural maps.
+        :param pid: Unique identifier of metadata, given as a string.
             Attribute value should be expressed in printable US-ASCII
             characters.
-        :param str pid_type: Identifier system used in the 'pid' attribute,
-            given as a string.  Attribute is mandatory if the pid attribute is
-            used. Attribute value should be expressed in printable US-ASCII
+        :param pid_type: Identifier system used in the 'pid' attribute, given
+            as a string.  Attribute is mandatory if the pid attribute is used.
+            Attribute value should be expressed in printable US-ASCII
             characters.
         """
         self.structural_map_type = structural_map_type
