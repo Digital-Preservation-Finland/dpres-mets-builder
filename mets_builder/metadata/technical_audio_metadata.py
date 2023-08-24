@@ -5,7 +5,6 @@ from typing import Union
 import audiomd
 from lxml import etree
 
-from mets_builder.defaults import UNAV
 from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
 
 
@@ -33,15 +32,15 @@ class TechnicalAudioMetadata(MetadataBase):
         self,
         codec_quality: Union[CodecQuality, str],
         data_rate_mode: Union[DataRateMode, str],
-        audio_data_encoding: str = UNAV,
-        bits_per_sample: str = "0",
-        codec_creator_app: str = UNAV,
-        codec_creator_app_version: str = UNAV,
-        codec_name: str = UNAV,
-        data_rate: str = "0",
-        sampling_frequency: str = "0",
-        duration: str = UNAV,
-        num_channels: str = UNAV,
+        audio_data_encoding: str,
+        bits_per_sample: str,
+        codec_creator_app: str,
+        codec_creator_app_version: str,
+        codec_name: str,
+        data_rate: str,
+        sampling_frequency: str,
+        duration: str,
+        num_channels: str,
         **kwargs
     ):
         """Constructor for TechnicalAudioMetadata class.

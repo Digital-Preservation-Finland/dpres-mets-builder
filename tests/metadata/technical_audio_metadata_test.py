@@ -50,8 +50,17 @@ def test_serialization():
 def test_invalid_init_parameters(invalid_init_params, error_message):
     """Test initializing TechnicalAudioMetadata with invalid parameters."""
     init_params = {
+        "audio_data_encoding": "FLAC",
+        "bits_per_sample": "8",
+        "codec_creator_app": "Lavf56.40.101",
+        "codec_creator_app_version": "56.40.101",
+        "codec_name": "PCM",
+        "codec_quality": "lossless",
+        "data_rate": "706",
         "data_rate_mode": "Fixed",
-        "codec_quality": "lossless"
+        "sampling_frequency": "44.1",
+        "duration": "PT0.86S",
+        "num_channels": "2"
     }
     init_params.update(invalid_init_params)
 
@@ -63,8 +72,16 @@ def test_invalid_init_parameters(invalid_init_params, error_message):
 def test_data_rate_is_rounded():
     """Test that if given data rate is not an integer, it is rounded."""
     data = TechnicalAudioMetadata(
+        audio_data_encoding="FLAC",
+        bits_per_sample="8",
+        codec_creator_app="Lavf56.40.101",
+        codec_creator_app_version="56.40.101",
+        codec_name="PCM",
         codec_quality="lossless",
+        data_rate="1.1",
         data_rate_mode="Fixed",
-        data_rate="1.1"
+        sampling_frequency="44.1",
+        duration="PT0.86S",
+        num_channels="2"
     )
     assert data.data_rate == "1"
