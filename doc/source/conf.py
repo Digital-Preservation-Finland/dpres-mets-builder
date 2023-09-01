@@ -14,7 +14,8 @@ author = 'CSC - IT Center for Science'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc'
+    'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints'
 ]
 
 templates_path = ['_templates']

@@ -5,6 +5,7 @@ pytest-cov
 mypy
 
 sphinx
+sphinx-autodoc-typehints
 
 git+https://gitlab.ci.csc.fi/dpres/mets.git@develop#egg=mets
 git+https://gitlab.ci.csc.fi/dpres/nisomix.git@develop#egg=nisomix
