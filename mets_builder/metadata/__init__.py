@@ -14,10 +14,21 @@ from mets_builder.metadata.technical_audio_metadata import \
     TechnicalAudioMetadata
 from mets_builder.metadata.technical_image_metadata import \
     TechnicalImageMetadata
+from mets_builder.metadata.technical_video_metadata import \
+    TechnicalVideoMetadata
 
 __all__ = [
-    "Charset", "ChecksumAlgorithm", "MetadataBase", "MetadataType",
-    "MetadataFormat", "ImportedMetadata", "TechnicalAudioMetadata",
-    "TechnicalImageMetadata", "DigitalProvenanceAgentMetadata",
-    "DigitalProvenanceEventMetadata", "TechnicalObjectMetadata", "EventOutcome"
+    "Charset",
+    "ChecksumAlgorithm",
+    "MetadataBase",
+    "MetadataType",
+    "MetadataFormat",
+    "ImportedMetadata",
+    "TechnicalAudioMetadata",
+    "TechnicalImageMetadata",
+    "TechnicalVideoMetadata",
+    "DigitalProvenanceAgentMetadata",
+    "DigitalProvenanceEventMetadata",
+    "TechnicalObjectMetadata",
+    "EventOutcome"
 ]
