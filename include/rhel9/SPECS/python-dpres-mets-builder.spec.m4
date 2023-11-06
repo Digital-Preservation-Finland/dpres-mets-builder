@@ -36,6 +36,7 @@ Requires:       %{py3_dist nisomix}
 Requires:       %{py3_dist premis}
 Requires:       %{py3_dist audiomd}
 Requires:       %{py3_dist videomd}
+Requires:       %{py3_dist addml}
 %description -n python3-dpres-mets-builder %_description
 
 
