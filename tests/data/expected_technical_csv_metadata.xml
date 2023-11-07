@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<addml:addml xmlns:addml="http://www.arkivverket.no/standarder/addml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.arkivverket.no/standarder/addml http://schema.arkivverket.no/ADDML/latest/addml.xsd">
+  <addml:dataset>
+    <addml:flatFiles>
+      <addml:flatFile name="example-1.csv" definitionReference="ref001"/>
+      <addml:flatFile name="example-2.csv" definitionReference="ref001"/>
+      <addml:flatFileDefinitions>
+        <addml:flatFileDefinition name="ref001" typeReference="rec001">
+          <addml:recordDefinitions>
+            <addml:recordDefinition name="record">
+              <addml:fieldDefinitions>
+                <addml:fieldDefinition name="name" typeReference="String"/>
+                <addml:fieldDefinition name="email" typeReference="String"/>
+              </addml:fieldDefinitions>
+            </addml:recordDefinition>
+          </addml:recordDefinitions>
+        </addml:flatFileDefinition>
+      </addml:flatFileDefinitions>
+      <addml:structureTypes>
+        <addml:flatFileTypes>
+          <addml:flatFileType name="rec001">
+            <addml:charset>UTF-8</addml:charset>
+            <addml:delimFileFormat>
+              <addml:recordSeparator>CR+LF</addml:recordSeparator>
+              <addml:fieldSeparatingChar>,</addml:fieldSeparatingChar>
+              <addml:quotingChar>'</addml:quotingChar>
+            </addml:delimFileFormat>
+          </addml:flatFileType>
+        </addml:flatFileTypes>
+        <addml:fieldTypes>
+          <addml:fieldType name="String">
+            <addml:dataType>string</addml:dataType>
+          </addml:fieldType>
+        </addml:fieldTypes>
+      </addml:structureTypes>
+    </addml:flatFiles>
+  </addml:dataset>
+</addml:addml>

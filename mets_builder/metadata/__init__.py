@@ -12,6 +12,8 @@ from mets_builder.metadata.digital_provenance_event_metadata import \
 from mets_builder.metadata.imported_metadata import ImportedMetadata
 from mets_builder.metadata.technical_audio_metadata import \
     TechnicalAudioMetadata
+from mets_builder.metadata.technical_csv_metadata import \
+    TechnicalCSVMetadata
 from mets_builder.metadata.technical_image_metadata import \
     TechnicalImageMetadata
 from mets_builder.metadata.technical_video_metadata import \
@@ -25,6 +27,7 @@ __all__ = [
     "MetadataFormat",
     "ImportedMetadata",
     "TechnicalAudioMetadata",
+    "TechnicalCSVMetadata",
     "TechnicalImageMetadata",
     "TechnicalVideoMetadata",
     "DigitalProvenanceAgentMetadata",
