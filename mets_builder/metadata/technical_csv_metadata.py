@@ -73,6 +73,17 @@ class TechnicalCSVMetadata(MetadataBase):
             filenames = [filenames]
         self._filenames = filenames
 
+    def add_files(self, filenames: List[str]) -> None:
+        """Add files that this metadata describes.
+
+        :param filenames: The names of the files that this metadata describes.
+        """
+        # Ensure that filenames is a list, even if a single string is given
+        if isinstance(filenames, str):
+            filenames = [filenames]
+
+        self._filenames += filenames
+
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 

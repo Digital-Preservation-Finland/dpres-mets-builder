@@ -1,6 +1,7 @@
 """Tests for technical csv metadata."""
 from pathlib import Path
 
+import pytest
 import xml_helpers
 
 from mets_builder.metadata import TechnicalCSVMetadata
@@ -47,3 +48,30 @@ def test_giving_filename_as_string():
     )
     assert len(flat_files) == 1
     assert flat_files[0].get("name") == "example.csv"
+
+
+@pytest.mark.parametrize(
+    ("files", "result"),
+    (
+        (
+            "example-2.csv",
+            ["example-1.csv", "example-2.csv"]
+        ),
+        (
+            ["example-2.csv", "example-3.csv"],
+            ["example-1.csv", "example-2.csv", "example-3.csv"]
+        )
+    )
+)
+def test_add_files(files, result):
+    """Test that files can be added to the metadata after initialization."""
+    data = TechnicalCSVMetadata(
+        filenames="example-1.csv",
+        header=["name", "email"],
+        charset="UTF-8",
+        delimiter=",",
+        record_separator="CR+LF",
+        quoting_character="'"
+    )
+    data.add_files(files)
+    assert data.filenames == result
