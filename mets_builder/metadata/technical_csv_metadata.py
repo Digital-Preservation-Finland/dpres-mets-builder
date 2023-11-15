@@ -1,5 +1,5 @@
 """"Module for TechnicalCSVMetadata class."""
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 import addml
 from lxml import etree
@@ -16,7 +16,7 @@ class TechnicalCSVMetadata(MetadataBase):
 
     def __init__(
         self,
-        filenames: List[str],
+        filenames: Iterable[str],
         header: Iterable[str],
         charset: str,
         delimiter: str,
@@ -60,21 +60,21 @@ class TechnicalCSVMetadata(MetadataBase):
         )
 
     @property
-    def filenames(self) -> List[str]:
+    def filenames(self) -> Iterable[str]:
         """Getter for filenames."""
         return self._filenames
 
     @filenames.setter
-    def filenames(self, filenames: List[str]):
+    def filenames(self, filenames: Iterable[str]):
         """Setter for filenames."""
         if isinstance(filenames, str):
             raise TypeError(
                 "Given 'filenames' is a single string. Give an iterable of "
                 "strings as the 'filenames' attribute value."
             )
-        self._filenames = filenames
+        self._filenames = list(filenames)
 
-    def add_files(self, filenames: List[str]) -> None:
+    def add_files(self, filenames: Iterable[str]) -> None:
         """Add files that this metadata describes.
 
         :param filenames: The names of the files that this metadata describes.
@@ -85,7 +85,7 @@ class TechnicalCSVMetadata(MetadataBase):
                 "strings as the 'filenames' argument."
             )
 
-        self._filenames += filenames
+        self._filenames += list(filenames)
 
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
