@@ -144,9 +144,9 @@ class StructuralMapDiv:
         # StructuralMapDiv is an iterable the following code would run but with
         # unwanted results.
         if isinstance(divs, StructuralMapDiv):
-            raise ValueError(
+            raise TypeError(
                 "Given 'divs' is a single StructuralMapDiv. Give an iterable "
-                "of StructuralMapDivs as the 'divs' attribute."
+                "of StructuralMapDivs as the 'divs' argument."
             )
 
         # StructuralMapDiv is iterable (the iterator iterates through all its

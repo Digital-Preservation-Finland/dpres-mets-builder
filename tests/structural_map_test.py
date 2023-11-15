@@ -256,12 +256,12 @@ def test_add_single_div_as_multiple_divs():
     root_div = StructuralMapDiv("test_type")
     added_div = StructuralMapDiv("test_type")
 
-    with pytest.raises(ValueError) as error:
+    with pytest.raises(TypeError) as error:
         root_div.add_divs(added_div)
 
     assert str(error.value) == (
         "Given 'divs' is a single StructuralMapDiv. Give an iterable of "
-        "StructuralMapDivs as the 'divs' attribute."
+        "StructuralMapDivs as the 'divs' argument."
     )
 
 
