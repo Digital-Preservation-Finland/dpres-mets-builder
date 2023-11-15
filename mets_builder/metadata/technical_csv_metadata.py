@@ -30,9 +30,8 @@ class TechnicalCSVMetadata(MetadataBase):
         can be given here as well. Look MetadataBase documentation for more
         information.
 
-        :param filenames: List of names of the files that the metadata
-            describes. If the metadata describes only one file, the name can be
-            given as string.
+        :param filenames: Iterable of names of the files that the metadata
+            describes.
         :param header: Header column names of the CSV file given as an iterable
             of strings.
         :param charset: Character set used in the CSV files, e.g. "UTF-8"
@@ -68,9 +67,11 @@ class TechnicalCSVMetadata(MetadataBase):
     @filenames.setter
     def filenames(self, filenames: List[str]):
         """Setter for filenames."""
-        # Ensure that filenames is a list, even if a single string is given
         if isinstance(filenames, str):
-            filenames = [filenames]
+            raise TypeError(
+                "Given 'filenames' is a single string. Give an iterable of "
+                "strings as the 'filenames' attribute value."
+            )
         self._filenames = filenames
 
     def add_files(self, filenames: List[str]) -> None:
@@ -78,9 +79,11 @@ class TechnicalCSVMetadata(MetadataBase):
 
         :param filenames: The names of the files that this metadata describes.
         """
-        # Ensure that filenames is a list, even if a single string is given
         if isinstance(filenames, str):
-            filenames = [filenames]
+            raise TypeError(
+                "Given 'filenames' is a single string. Give an iterable of "
+                "strings as the 'filenames' argument."
+            )
 
         self._filenames += filenames
 

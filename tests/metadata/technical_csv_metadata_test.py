@@ -30,48 +30,53 @@ def test_serialization():
 
 
 def test_giving_filename_as_string():
-    """Test that it is possible to give one filename as a string."""
-    data = TechnicalCSVMetadata(
-        filenames="example.csv",
-        header=["name", "email"],
-        charset="UTF-8",
-        delimiter=",",
-        record_separator="CR+LF",
-        quoting_character="'"
-    )
-    result = data.to_xml_element_tree()
+    """Test that it is not possible to give filename as a string."""
 
-    # Find all flatFile-elements
-    flat_files = result.xpath(
-        "//addml:flatFile",
-        namespaces={"addml": "http://www.arkivverket.no/standarder/addml"}
-    )
-    assert len(flat_files) == 1
-    assert flat_files[0].get("name") == "example.csv"
-
-
-@pytest.mark.parametrize(
-    ("files", "result"),
-    (
-        (
-            "example-2.csv",
-            ["example-1.csv", "example-2.csv"]
-        ),
-        (
-            ["example-2.csv", "example-3.csv"],
-            ["example-1.csv", "example-2.csv", "example-3.csv"]
+    with pytest.raises(TypeError) as error:
+        TechnicalCSVMetadata(
+            filenames="example.csv",
+            header=["name", "email"],
+            charset="UTF-8",
+            delimiter=",",
+            record_separator="CR+LF",
+            quoting_character="'"
         )
+    assert str(error.value) == (
+        "Given 'filenames' is a single string. Give an iterable of strings as "
+        "the 'filenames' attribute value."
     )
-)
-def test_add_files(files, result):
+
+
+def test_add_files():
     """Test that files can be added to the metadata after initialization."""
     data = TechnicalCSVMetadata(
-        filenames="example-1.csv",
+        filenames=["example-1.csv"],
         header=["name", "email"],
         charset="UTF-8",
         delimiter=",",
         record_separator="CR+LF",
         quoting_character="'"
     )
-    data.add_files(files)
-    assert data.filenames == result
+    data.add_files(["example-2.csv", "example-3.csv"])
+    assert data.filenames == [
+        "example-1.csv", "example-2.csv", "example-3.csv"
+    ]
+
+
+def test_adding_files_as_string():
+    """Test that files can not be added as strings."""
+    data = TechnicalCSVMetadata(
+        filenames=["example-1.csv"],
+        header=["name", "email"],
+        charset="UTF-8",
+        delimiter=",",
+        record_separator="CR+LF",
+        quoting_character="'"
+    )
+
+    with pytest.raises(TypeError) as error:
+        data.add_files("example-2.csv")
+    assert str(error.value) == (
+        "Given 'filenames' is a single string. Give an iterable of strings as "
+        "the 'filenames' argument."
+    )
