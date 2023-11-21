@@ -66,18 +66,18 @@ class TechnicalObjectMetadata(MetadataBase):
         can be given here as well. Look MetadataBase documentation for more
         information.
 
-        :param file_format: Mimetype of the file, e.g. 'image/tiff'
+        :param file_format: Mimetype of the file, e.g. 'image/tiff'.
         :param file_format_version: Version number of the file format, e.g.
             '1.2'.
-        :param file_created_date: The actual or approximate date and time the
-            object was created. The time information must be expressed using
-            either the ISO-8601 format, or its extended version ISO_8601-2.
         :param checksum_algorithm: The specific algorithm used to construct the
             checksum for the digital object. If given as string, the value is
             cast to ChecksumAlgorithm and results in error if it is not a valid
             checksum algorithm. The allowed values can be found from
             ChecksumAlgorithm documentation.
         :param checksum: The output of the message digest algorithm.
+        :param file_created_date: The actual or approximate date and time the
+            object was created. The time information must be expressed using
+            either the ISO-8601 format, or its extended version ISO_8601-2.
         :param object_identifier_type: Type of object identifier. Standardized
             identifier types should be used when possible (e.g., an ISBN for
             books).
