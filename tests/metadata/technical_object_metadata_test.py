@@ -87,25 +87,6 @@ def test_serialization():
     assert result == expected_xml
 
 
-def test_identifier_type_not_set():
-    """Test that an error is raised if object identifier type is not given
-    along with an identifier.
-    """
-    with pytest.raises(ValueError) as error:
-        TechnicalObjectMetadata(
-            file_format="video/x-matroska",
-            file_format_version="4",
-            file_created_date="2000-01-01T10:11:12",
-            checksum_algorithm="MD5",
-            checksum="checksum-value",
-            object_identifier_type=None,
-            object_identifier="object-identifier-value"
-        )
-    assert str(error.value) == (
-        "Object identifier type is not given, but object identifier is."
-    )
-
-
 def test_generate_object_identifier():
     """Test that object identifier is generated and type set to 'UUID', if
     identifier is not given by the user.
@@ -134,31 +115,6 @@ def test_user_given_identifier():
     )
     assert object_metadata.object_identifier_type == "user-type"
     assert object_metadata.object_identifier == "user-identifier"
-
-
-@pytest.mark.parametrize(
-    "invalid_checksum_algorithm",
-    (
-        ("invalid-checksum-algorithm"),
-        (""),
-        (None)
-    )
-)
-def test_invalid_checksum_algorithm(invalid_checksum_algorithm):
-    """Test that algorithms not allowed in DPRES specifications cannot be
-    set.
-    """
-    metadata = TechnicalObjectMetadata(
-        file_format="video/x-matroska",
-        file_format_version="4",
-        file_created_date="2000-01-01T10:11:12",
-        checksum_algorithm="MD5",
-        checksum="checksum-value",
-        object_identifier_type="user-type",
-        object_identifier="user-identifier"
-    )
-    with pytest.raises(ValueError):
-        metadata.checksum_algorithm = invalid_checksum_algorithm
 
 
 @pytest.mark.parametrize(
@@ -217,69 +173,82 @@ def test_valid_encodings(charset):
 
 
 @pytest.mark.parametrize(
-    "invalid_charset",
+    ("invalid_init_params", "error_message"),
     (
-        ("invalid-charset"),
-        ("")
+        (
+            {"file_format": ""},
+            "File format is not given or it is set to an empty value."
+        ),
+        (
+            {"file_format_version": ""},
+            "File format version is not given or it is set to an empty value."
+        ),
+        (
+            {"checksum": ""},
+            "Checksum is not given or it is set to an empty value."
+        ),
+        (
+            {"object_identifier_type": ""},
+            "Object identifier is given but object identifier type is not."
+        ),
+        (
+            {"object_identifier": ""},
+            "Object identifier type is given but object identifier is not."
+        ),
+        (
+            {"format_registry_name": ""},
+            "Format registry key is given but format registry name is not."
+        ),
+        (
+            {"format_registry_key": ""},
+            "Format registry name is given but format registry key is not."
+        ),
+        (
+            {"creating_application": ""},
+            ("Creating application version is given but creating application "
+             "is not.")
+        ),
+        (
+            {"creating_application_version": ""},
+            ("Creating application is given but creating application version "
+             "is not.")
+        ),
+        (
+            {"checksum_algorithm": ""},
+            "'' is not a valid ChecksumAlgorithm"
+        ),
+        (
+            {"checksum_algorithm": "invalid"},
+            "'invalid' is not a valid ChecksumAlgorithm"
+        ),
+        (
+            {"charset": ""},
+            "'' is not a valid Charset"
+        ),
+        (
+            {"charset": "invalid"},
+            "'invalid' is not a valid Charset"
+        ),
     )
 )
-def test_invalid_encoding(invalid_charset):
-    """Test that invalid encodings raise an error."""
-    metadata = TechnicalObjectMetadata(
-        file_format="text/plain",
-        file_format_version="(:unap)",
-        file_created_date="2000-01-01T10:11:12",
-        charset="UTF-8",
-        checksum_algorithm="MD5",
-        checksum="checksum-value"
-    )
-    with pytest.raises(ValueError):
-        metadata.charset = invalid_charset
+def test_invalid_parameters(invalid_init_params, error_message):
+    """Test that invalid parameter values raise a ValueError."""
+    init_params = {
+        "file_format": "video/x-matroska",
+        "file_format_version": "4",
+        "file_created_date": "2000-01-01T10:11:12",
+        "checksum_algorithm": "MD5",
+        "checksum": "3d7dcbd9ca4b5f37189cd2ec85cf0135",
+        "object_identifier_type": "object-identifier-type",
+        "object_identifier": "object-identifier-value",
+        "original_name": "original-name",
+        "format_registry_name": "format-registry-name",
+        "format_registry_key": "format-registry-key",
+        "creating_application": "application-name",
+        "creating_application_version": "1.0"
+    }
+    init_params.update(invalid_init_params)
 
-
-@pytest.mark.parametrize(
-    ("registry_name"),
-    (
-        (None),
-        ("")
-    )
-)
-def test_missing_format_registry_name(registry_name):
-    """Test that missing format registry name raises an error."""
     with pytest.raises(ValueError) as error:
-        TechnicalObjectMetadata(
-            file_format="video/x-matroska",
-            file_format_version="4",
-            file_created_date="2000-01-01T10:11:12",
-            checksum_algorithm="MD5",
-            checksum="checksum-value",
-            format_registry_name=registry_name,
-            format_registry_key="registry-key"
-        )
-    assert str(error.value) == (
-        "Format registry key is given, but not format registry name."
-    )
-
-
-@pytest.mark.parametrize(
-    ("registry_key"),
-    (
-        (None),
-        ("")
-    )
-)
-def test_missing_format_registry_key(registry_key):
-    """Test that missing format registry key raises an error."""
-    with pytest.raises(ValueError) as error:
-        TechnicalObjectMetadata(
-            file_format="video/x-matroska",
-            file_format_version="4",
-            file_created_date="2000-01-01T10:11:12",
-            checksum_algorithm="MD5",
-            checksum="checksum-value",
-            format_registry_name="registry_name",
-            format_registry_key=registry_key
-        )
-    assert str(error.value) == (
-        "Format registry name is given, but not format registry key."
-    )
+        TechnicalObjectMetadata(**init_params)
+    assert str(error.value) == error_message

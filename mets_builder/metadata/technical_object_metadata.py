@@ -80,10 +80,11 @@ class TechnicalObjectMetadata(MetadataBase):
             either the ISO-8601 format, or its extended version ISO_8601-2.
         :param object_identifier_type: Type of object identifier. Standardized
             identifier types should be used when possible (e.g., an ISBN for
-            books).
+            books). When set, object_identifier has to be set as well.
         :param object_identifier: The object identifier value. If not given by
             the user, object identifier is generated automatically. File
-            identifiers should be globally unique.
+            identifiers should be globally unique. When set,
+            object_identifier_type has to be set as well.
         :param charset: Character encoding of the file. If given as string, the
             value is cast to Charset and results in error if it is not a valid
             charset. The allowed values can be found from Charset
@@ -91,13 +92,15 @@ class TechnicalObjectMetadata(MetadataBase):
         :param original_name: Original name of the file.
         :param format_registry_name: Name identifying a format registry, if a
             format registry is used to give further information about the file
-            format.
+            format. When set, format_registry_key has to be set as well.
         :param format_registry_key: The unique key used to reference an entry
-            for this file format in a format registry.
+            for this file format in a format registry. When set,
+            format_registry_name has to be set as well.
         :param creating_application: Software that was used to create this
-            file.
+            file. When set, creating_application_version has to be set as well.
         :param creating_application_version: Version of the software that was
-            used to create this file.
+            used to create this file. When set, creating_application has to be
+            set as well.
         """
         self.file_format = file_format
         self.file_format_version = file_format_version
@@ -112,8 +115,9 @@ class TechnicalObjectMetadata(MetadataBase):
         self._set_format_registry_name_and_key(
             format_registry_name, format_registry_key
         )
-        self.creating_application = creating_application
-        self.creating_application_version = creating_application_version
+        self._set_creating_application_name_and_version(
+            creating_application, creating_application_version
+        )
 
         self.relationships: List[_Relationship] = []
 
@@ -125,6 +129,35 @@ class TechnicalObjectMetadata(MetadataBase):
         )
 
     @property
+    def file_format(self) -> str:
+        """Getter for file_format."""
+        return self._file_format
+
+    @file_format.setter
+    def file_format(self, file_format):
+        """Setter for file_format."""
+        if not file_format:
+            raise ValueError(
+                "File format is not given or it is set to an empty value."
+            )
+        self._file_format = file_format
+
+    @property
+    def file_format_version(self) -> str:
+        """Getter for file_format_version."""
+        return self._file_format_version
+
+    @file_format_version.setter
+    def file_format_version(self, file_format_version):
+        """Setter for file_format_version."""
+        if not file_format_version:
+            raise ValueError(
+                "File format version is not given or it is set to an empty "
+                "value."
+            )
+        self._file_format_version = file_format_version
+
+    @property
     def checksum_algorithm(self):
         """Getter for checksum_algorithm."""
         return self._checksum_algorithm
@@ -134,6 +167,20 @@ class TechnicalObjectMetadata(MetadataBase):
         """Setter for checksum_algorithm."""
         checksum_algorithm = ChecksumAlgorithm(checksum_algorithm)
         self._checksum_algorithm = checksum_algorithm
+
+    @property
+    def checksum(self) -> str:
+        """Getter for checksum."""
+        return self._checksum
+
+    @checksum.setter
+    def checksum(self, checksum):
+        """Setter for checksum."""
+        if not checksum:
+            raise ValueError(
+                "Checksum is not given or it is set to an empty value."
+            )
+        self._checksum = checksum
 
     @property
     def charset(self):
@@ -176,14 +223,18 @@ class TechnicalObjectMetadata(MetadataBase):
     def _set_object_identifier_and_type(self, identifier_type, identifier):
         """Resolve object identifier and identifier type.
 
-        If identifier is given, also identifier type must be declared by the
-        user. If identifier is not given by the user, object identifier should
-        be generated.
+        Identifier and identifier type have to either be both declared
+        together, or then neither should be declared. If neither are given by
+        the user, object identifier is generated as UUID.
         """
         if identifier and not identifier_type:
             raise ValueError(
-                "Object identifier type is not given, but object identifier "
-                "is."
+                "Object identifier is given but object identifier type is not."
+            )
+
+        if identifier_type and not identifier:
+            raise ValueError(
+                "Object identifier type is given but object identifier is not."
             )
 
         if not identifier:
@@ -200,15 +251,36 @@ class TechnicalObjectMetadata(MetadataBase):
         """
         if registry_name and not registry_key:
             raise ValueError(
-                "Format registry name is given, but not format registry key."
+                "Format registry name is given but format registry key is not."
             )
         if not registry_name and registry_key:
             raise ValueError(
-                "Format registry key is given, but not format registry name."
+                "Format registry key is given but format registry name is not."
             )
 
         self.format_registry_name = registry_name
         self.format_registry_key = registry_key
+
+    def _set_creating_application_name_and_version(
+            self, creating_application, creating_application_version
+    ):
+        """Resolve creating application and its version.
+
+        If one exists, the other one has to exist as well.
+        """
+        if creating_application and not creating_application_version:
+            raise ValueError(
+                "Creating application is given but creating application "
+                "version is not."
+            )
+        if not creating_application and creating_application_version:
+            raise ValueError(
+                "Creating application version is given but creating "
+                "application is not."
+            )
+
+        self.creating_application = creating_application
+        self.creating_application_version = creating_application_version
 
     def _resolve_serialized_format_name(self):
         """Resolve how the file format name should be shown in the serialized
