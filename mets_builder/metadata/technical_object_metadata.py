@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 import premis
 from lxml import etree
 
+from mets_builder.defaults import UNAP
 from mets_builder.metadata import (Charset, ChecksumAlgorithm, MetadataBase,
                                    MetadataFormat, MetadataType)
 
@@ -69,6 +70,9 @@ class TechnicalObjectMetadata(MetadataBase):
         :param file_format: Mimetype of the file, e.g. 'image/tiff'.
         :param file_format_version: Version number of the file format, e.g.
             '1.2'.
+
+            If given as '(:unap)' (unapplicable), the value will be left out
+            entirely from the serialized metadata.
         :param checksum_algorithm: The specific algorithm used to construct the
             checksum for the digital object. If given as string, the value is
             cast to ChecksumAlgorithm and results in error if it is not a valid
@@ -344,9 +348,15 @@ class TechnicalObjectMetadata(MetadataBase):
         )
 
         format_child_elements = []
+        format_version: Optional[str] = self.file_format_version
+        if format_version == UNAP:
+            # If format version is given as (:unap), it should be left out of
+            # the serialized metadata, as PAS interprets it as invalid value
+            # for premis:formatVersion
+            format_version = None
         format_designation = premis.format_designation(
             format_name=self._resolve_serialized_format_name(),
-            format_version=self.file_format_version
+            format_version=format_version
         )
         format_child_elements.append(format_designation)
         if self.format_registry_name and self.format_registry_key:

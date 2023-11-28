@@ -252,3 +252,23 @@ def test_invalid_parameters(invalid_init_params, error_message):
     with pytest.raises(ValueError) as error:
         TechnicalObjectMetadata(**init_params)
     assert str(error.value) == error_message
+
+
+def test_unapplicable_file_format_version():
+    """Test that when file format version is given as unapplicable, the value
+    is not shown in the final serialization.
+    """
+    object_metadata = TechnicalObjectMetadata(
+        file_format="Text/csv",
+        file_format_version="(:unap)",
+        file_created_date="2000-01-01T00:00:00",
+        checksum_algorithm="MD5",
+        checksum="checksum-value"
+    )
+    serialized = object_metadata.to_xml_element_tree()
+
+    # Find the format version element, if it exists
+    format_version_element = serialized.xpath(
+        "//premis:formatVersion", namespaces=_NAMESPACES
+    )
+    assert len(format_version_element) == 0
