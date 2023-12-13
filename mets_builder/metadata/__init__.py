@@ -2,18 +2,17 @@
 
 from mets_builder.metadata.metadata_base import (Charset, ChecksumAlgorithm,
                                                  MetadataBase, MetadataFormat,
-                                                 MetadataType)
-from mets_builder.metadata.technical_object_metadata import \
-    TechnicalObjectMetadata
+                                                 MetadataType, PREMISObjectType)
+from mets_builder.metadata.technical_object_metadata import (
+    TechnicalFileObjectMetadata, TechnicalObjectMetadata)
 from mets_builder.metadata.digital_provenance_agent_metadata import \
     DigitalProvenanceAgentMetadata
-from mets_builder.metadata.digital_provenance_event_metadata import \
-    DigitalProvenanceEventMetadata, EventOutcome
+from mets_builder.metadata.digital_provenance_event_metadata import (
+    DigitalProvenanceEventMetadata, EventOutcome)
 from mets_builder.metadata.imported_metadata import ImportedMetadata
 from mets_builder.metadata.technical_audio_metadata import \
     TechnicalAudioMetadata
-from mets_builder.metadata.technical_csv_metadata import \
-    TechnicalCSVMetadata
+from mets_builder.metadata.technical_csv_metadata import TechnicalCSVMetadata
 from mets_builder.metadata.technical_image_metadata import \
     TechnicalImageMetadata
 from mets_builder.metadata.technical_video_metadata import \
@@ -33,5 +32,7 @@ __all__ = [
     "DigitalProvenanceAgentMetadata",
     "DigitalProvenanceEventMetadata",
     "TechnicalObjectMetadata",
-    "EventOutcome"
+    "TechnicalFileObjectMetadata",
+    "EventOutcome",
+    "PREMISObjectType"
 ]

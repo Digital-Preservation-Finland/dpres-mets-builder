@@ -6,7 +6,7 @@ import xml_helpers.utils
 
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    DigitalProvenanceEventMetadata,
-                                   TechnicalObjectMetadata)
+                                   TechnicalFileObjectMetadata)
 
 
 def test_serialization():
@@ -36,7 +36,7 @@ def test_serialization():
     event.link_agent_metadata(agent_1, agent_role="agent-role-1")
     event.link_agent_metadata(agent_2, agent_role="agent-role-2")
 
-    object_1 = TechnicalObjectMetadata(
+    object_1 = TechnicalFileObjectMetadata(
         file_format="file-format",
         file_format_version="file-format-version",
         checksum_algorithm="MD5",
@@ -45,7 +45,7 @@ def test_serialization():
         object_identifier_type="test-type",
         object_identifier="object-1"
     )
-    object_2 = TechnicalObjectMetadata(
+    object_2 = TechnicalFileObjectMetadata(
         file_format="file-format",
         file_format_version="file-format-version",
         checksum_algorithm="MD5",

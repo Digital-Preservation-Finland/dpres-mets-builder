@@ -1,4 +1,5 @@
 """Module for TechnicalObjectMetadata class."""
+import abc
 import uuid
 from collections import defaultdict
 from typing import List, Optional, Union
@@ -8,7 +9,8 @@ from lxml import etree
 
 from mets_builder.defaults import UNAP
 from mets_builder.metadata import (Charset, ChecksumAlgorithm, MetadataBase,
-                                   MetadataFormat, MetadataType)
+                                   MetadataFormat, MetadataType,
+                                   PREMISObjectType)
 
 
 class _Relationship():
@@ -33,40 +35,11 @@ class _Relationship():
         return (self.relationship_type, self.relationship_subtype)
 
 
-class TechnicalObjectMetadata(MetadataBase):
-    """Class for creating technical object metadata.
-
-    The Object entity aggregates information about a digital object held by a
-    preservation repository and describes those characteristics relevant to
-    preservation management.
-    """
-    METADATA_TYPE = MetadataType.TECHNICAL
-    METADATA_FORMAT = MetadataFormat.PREMIS_OBJECT
-    METADATA_FORMAT_VERSION = "2.3"
-
-    def __init__(
-        self,
-        file_format: str,
-        file_format_version: str,
-        checksum_algorithm: Union[ChecksumAlgorithm, str],
-        checksum: str,
-        file_created_date: str,
-        object_identifier_type: Optional[str] = None,
-        object_identifier: Optional[str] = None,
-        charset: Union[Charset, str, None] = None,
-        original_name: Optional[str] = None,
-        format_registry_name: Optional[str] = None,
-        format_registry_key: Optional[str] = None,
-        creating_application: Optional[str] = None,
-        creating_application_version: Optional[str] = None,
-        **kwargs
-    ) -> None:
-        """Constructor for TechnicalObjectMetadata class.
-
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
-
+# Technical objects take a very long list of arguments. Since
+# duplicating it in many places would eventually lead to one of the copies
+# becoming inconsistent with the rest, append the list of arguments dynamically
+# to each docstring instead.
+_OBJECT_PARAMETERS_DOC = """
         :param file_format: Mimetype of the file, e.g. 'image/tiff'.
         :param file_format_version: Version number of the file format, e.g.
             '1.2'.
@@ -105,7 +78,40 @@ class TechnicalObjectMetadata(MetadataBase):
         :param creating_application_version: Version of the software that was
             used to create this file. When set, creating_application has to be
             set as well.
-        """
+"""
+
+
+class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
+    """Abstract class for representing technical object metadata.
+    Do not instantiate this directly, use either `TechnicalFileObjectMetadata`
+    or `TechnicalBitstreamObjectMetadata` instead!
+
+    The Object entity aggregates information about a digital object held by a
+    preservation repository and describes those characteristics relevant to
+    preservation management.
+    """
+    METADATA_TYPE = MetadataType.TECHNICAL
+    METADATA_FORMAT = MetadataFormat.PREMIS_OBJECT
+    METADATA_FORMAT_VERSION = "2.3"
+
+    @abc.abstractmethod
+    def __init__(
+        self,
+        file_format: str,
+        file_format_version: str,
+        checksum_algorithm: Optional[Union[ChecksumAlgorithm, str]] = None,
+        checksum: Optional[str] = None,
+        file_created_date: Optional[str] = None,
+        object_identifier_type: Optional[str] = None,
+        object_identifier: Optional[str] = None,
+        charset: Union[Charset, str, None] = None,
+        original_name: Optional[str] = None,
+        format_registry_name: Optional[str] = None,
+        format_registry_key: Optional[str] = None,
+        creating_application: Optional[str] = None,
+        creating_application_version: Optional[str] = None,
+        **kwargs
+    ) -> None:
         self.file_format = file_format
         self.file_format_version = file_format_version
         self.file_created_date = file_created_date
@@ -131,6 +137,16 @@ class TechnicalObjectMetadata(MetadataBase):
             format_version=self.METADATA_FORMAT_VERSION,
             **kwargs
         )
+
+    __init__.__doc__ = f"""Constructor for TechnicalObjectMetadata abstract
+        class.
+
+        For advanced configurations keyword arguments for MetadataBase class
+        can be given here as well. Look MetadataBase documentation for more
+        information.
+
+        {_OBJECT_PARAMETERS_DOC}
+        """
 
     @property
     def file_format(self) -> str:
@@ -342,11 +358,17 @@ class TechnicalObjectMetadata(MetadataBase):
             identifier_value=self.object_identifier
         )
 
-        fixity = premis.fixity(
-            message_digest=self.checksum,
-            digest_algorithm=self.checksum_algorithm.value
-        )
+        object_characteristics_elems = []
 
+        # Create 'fixity' if possible
+        if self.checksum:
+            fixity = premis.fixity(
+                message_digest=self.checksum,
+                digest_algorithm=self.checksum_algorithm.value
+            )
+            object_characteristics_elems.append(fixity)
+
+        # Create 'format'. This *always* exists.
         format_child_elements = []
         format_version: Optional[str] = self.file_format_version
         if format_version == UNAP:
@@ -366,7 +388,9 @@ class TechnicalObjectMetadata(MetadataBase):
             )
             format_child_elements.append(format_registry)
         format_ = premis.format(child_elements=format_child_elements)
+        object_characteristics_elems.append(format_)
 
+        # Create 'creatingApplication' if possible
         application_child_elements = []
         if self.creating_application:
             application_child_elements.append(
@@ -378,23 +402,89 @@ class TechnicalObjectMetadata(MetadataBase):
                     self.creating_application_version
                 )
             )
-        application_child_elements.append(
-            premis.date_created(self.file_created_date)
-        )
-        creating_application = premis.creating_application(
-            child_elements=application_child_elements
-        )
+        if self.file_created_date:
+            application_child_elements.append(
+                premis.date_created(self.file_created_date)
+            )
+
+        if application_child_elements:
+            creating_application = premis.creating_application(
+                child_elements=application_child_elements
+            )
+            object_characteristics_elems.append(creating_application)
 
         object_characteristics = premis.object_characteristics(
-            child_elements=[fixity, format_, creating_application]
+            child_elements=object_characteristics_elems
         )
         relationships = self._serialize_relationships_to_xml_elements()
         premis_object_child_elements = [object_characteristics] + relationships
 
+        # TODO: Make PREMIS object type in 'premis' library less awkward to
+        # define. Enum should be used instead of booleans.
+        is_bitstream = self.PREMIS_OBJECT_TYPE is PREMISObjectType.BITSTREAM
+        is_representation = \
+            self.PREMIS_OBJECT_TYPE is PREMISObjectType.REPRESENTATION
+
         premis_object = premis.object(
             object_id=object_id,
             original_name=self.original_name,
-            child_elements=premis_object_child_elements
+            child_elements=premis_object_child_elements,
+            # If neither 'bitstream' or 'representation' is set, 'file' is used
+            # instead.
+            bitstream=is_bitstream,
+            representation=is_representation
         )
 
         return premis_object
+
+
+class TechnicalFileObjectMetadata(TechnicalObjectMetadata):
+    """Class for creating technical object metadata for a single file.
+
+    The Object entity aggregates information about a digital object held by a
+    preservation repository and describes those characteristics relevant to
+    preservation management.
+    """
+    PREMIS_OBJECT_TYPE = PREMISObjectType.FILE
+
+    def __init__(
+        self,
+        file_format: str,
+        file_format_version: str,
+        checksum_algorithm: Union[ChecksumAlgorithm, str],
+        checksum: str,
+        file_created_date: str,
+        object_identifier_type: Optional[str] = None,
+        object_identifier: Optional[str] = None,
+        charset: Union[Charset, str, None] = None,
+        original_name: Optional[str] = None,
+        format_registry_name: Optional[str] = None,
+        format_registry_key: Optional[str] = None,
+        creating_application: Optional[str] = None,
+        creating_application_version: Optional[str] = None,
+        **kwargs
+    ) -> None:
+        super().__init__(
+            file_format=file_format,
+            file_format_version=file_format_version,
+            file_created_date=file_created_date,
+            checksum_algorithm=checksum_algorithm,
+            checksum=checksum,
+            object_identifier_type=object_identifier_type,
+            object_identifier=object_identifier,
+            charset=charset,
+            original_name=original_name,
+            format_registry_name=format_registry_name,
+            format_registry_key=format_registry_key,
+            creating_application=creating_application,
+            creating_application_version=creating_application_version,
+            **kwargs)
+
+    __init__.__doc__ = f"""Constructor for TechnicalFileObjectMetadata class.
+
+        For advanced configurations keyword arguments for MetadataBase class
+        can be given here as well. Look MetadataBase documentation for more
+        information.
+
+        {_OBJECT_PARAMETERS_DOC}
+        """

@@ -4,13 +4,26 @@ from pathlib import Path
 import pytest
 import xml_helpers.utils
 
-from mets_builder.metadata import TechnicalObjectMetadata
+from mets_builder.metadata import (TechnicalFileObjectMetadata,
+                                   TechnicalObjectMetadata)
 from mets_builder.serialize import _NAMESPACES
 
 
-def test_serialization():
-    """Test serializing the technical object metadata."""
-    container = TechnicalObjectMetadata(
+def test_abstract_init_not_allowed():
+    """
+    Test that creating an instance of the abstract TechnicalObjectMetadata
+    class is not allowed.
+    """
+    with pytest.raises(TypeError) as error:
+        TechnicalObjectMetadata()
+    assert str(error.value).startswith(
+        "Can't instantiate abstract class TechnicalObjectMetadata"
+    )
+
+
+def test_file_serialization():
+    """Test serializing the technical file object metadata."""
+    container = TechnicalFileObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
         file_created_date="2000-01-01T10:11:12",
@@ -29,7 +42,7 @@ def test_serialization():
     object_metadatas = []
     for i in range(6):
         object_metadatas.append(
-            TechnicalObjectMetadata(
+            TechnicalFileObjectMetadata(
                 file_format="file-format",
                 file_format_version="file-format-version",
                 file_created_date="2000-01-01T00:00:00",
@@ -81,7 +94,7 @@ def test_serialization():
     ).decode("utf-8")
 
     expected_xml = Path(
-        "tests/data/expected_technical_object_metadata.xml"
+        "tests/data/expected_technical_file_object_metadata.xml"
     ).read_text(encoding="utf-8")
 
     assert result == expected_xml
@@ -91,7 +104,7 @@ def test_generate_object_identifier():
     """Test that object identifier is generated and type set to 'UUID', if
     identifier is not given by the user.
     """
-    object_metadata = TechnicalObjectMetadata(
+    object_metadata = TechnicalFileObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
         file_created_date="2000-01-01T10:11:12",
@@ -104,7 +117,7 @@ def test_generate_object_identifier():
 
 def test_user_given_identifier():
     """Test that user can give object identifier and type."""
-    object_metadata = TechnicalObjectMetadata(
+    object_metadata = TechnicalFileObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
         file_created_date="2000-01-01T10:11:12",
@@ -130,7 +143,7 @@ def test_user_given_identifier():
 )
 def test_valid_checksum_algorithm(checksum_algorithm):
     """Test that algorithms allowed in DPRES specifications can be set."""
-    metadata = TechnicalObjectMetadata(
+    metadata = TechnicalFileObjectMetadata(
         file_format="video/x-matroska",
         file_format_version="4",
         file_created_date="2000-01-01T10:11:12",
@@ -155,7 +168,7 @@ def test_valid_encodings(charset):
     """Test that if encoding is given, it is appended to mimetype when
     metadata is serialized.
     """
-    data = TechnicalObjectMetadata(
+    data = TechnicalFileObjectMetadata(
         file_format="text/plain",
         file_format_version="(:unap)",
         file_created_date="2000-01-01T10:11:12",
@@ -231,8 +244,11 @@ def test_valid_encodings(charset):
         ),
     )
 )
-def test_invalid_parameters(invalid_init_params, error_message):
-    """Test that invalid parameter values raise a ValueError."""
+def test_invalid_file_parameters(invalid_init_params, error_message):
+    """
+    Test that invalid parameter values for TechnicalFileObjectMetadata raise
+    a ValueError.
+    """
     init_params = {
         "file_format": "video/x-matroska",
         "file_format_version": "4",
@@ -250,7 +266,7 @@ def test_invalid_parameters(invalid_init_params, error_message):
     init_params.update(invalid_init_params)
 
     with pytest.raises(ValueError) as error:
-        TechnicalObjectMetadata(**init_params)
+        TechnicalFileObjectMetadata(**init_params)
     assert str(error.value) == error_message
 
 
@@ -258,7 +274,7 @@ def test_unapplicable_file_format_version():
     """Test that when file format version is given as unapplicable, the value
     is not shown in the final serialization.
     """
-    object_metadata = TechnicalObjectMetadata(
+    object_metadata = TechnicalFileObjectMetadata(
         file_format="Text/csv",
         file_format_version="(:unap)",
         file_created_date="2000-01-01T00:00:00",

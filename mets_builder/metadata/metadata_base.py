@@ -38,6 +38,18 @@ class MetadataType(Enum):
     """Digital provenance metadata"""
 
 
+class PREMISObjectType(Enum):
+    """Enum for PREMIS object types."""
+    FILE = "file"
+    """Digital item representing a file"""
+
+    BITSTREAM = "bitstream"
+    """Object representing a bitstream, non stand-alone data within a file"""
+
+    REPRESENTATION = "representation"
+    """Object representing a set of file objects forming one entity"""
+
+
 class MetadataFormat(Enum):
     """Enum for metadata formats."""
 
