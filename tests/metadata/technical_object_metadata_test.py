@@ -190,15 +190,15 @@ def test_valid_encodings(charset):
     (
         (
             {"file_format": ""},
-            "File format is not given or it is set to an empty value."
+            "Empty value not allowed for 'file_format'"
         ),
         (
             {"file_format_version": ""},
-            "File format version is not given or it is set to an empty value."
+            "Empty value not allowed for 'file_format_version'"
         ),
         (
             {"checksum": ""},
-            "Checksum is not given or it is set to an empty value."
+            "Empty value not allowed for 'checksum'"
         ),
         (
             {"object_identifier_type": ""},
@@ -228,7 +228,7 @@ def test_valid_encodings(charset):
         ),
         (
             {"checksum_algorithm": ""},
-            "'' is not a valid ChecksumAlgorithm"
+            "Empty value not allowed for 'checksum_algorithm'"
         ),
         (
             {"checksum_algorithm": "invalid"},

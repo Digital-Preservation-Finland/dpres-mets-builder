@@ -1,5 +1,6 @@
 """Module for TechnicalObjectMetadata class."""
 import abc
+import functools
 import uuid
 from collections import defaultdict
 from typing import List, Optional, Union
@@ -11,6 +12,19 @@ from mets_builder.defaults import UNAP
 from mets_builder.metadata import (Charset, ChecksumAlgorithm, MetadataBase,
                                    MetadataFormat, MetadataType,
                                    PREMISObjectType)
+
+
+def _forbid_empty_value(setter):
+    @functools.wraps(setter)
+    def wrapper(self, value):
+        if not value:
+            raise ValueError(
+                f"Empty value not allowed for '{setter.__name__}'"
+            )
+
+        return setter(self, value)
+
+    return wrapper
 
 
 class _Relationship():
@@ -94,6 +108,11 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
     METADATA_FORMAT = MetadataFormat.PREMIS_OBJECT
     METADATA_FORMAT_VERSION = "2.3"
 
+    REQUIRED_PROPERTIES = (
+        "file_format",
+        "file_format_version"
+    )
+
     @abc.abstractmethod
     def __init__(
         self,
@@ -148,6 +167,27 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
         {_OBJECT_PARAMETERS_DOC}
         """
 
+    def __init_subclass__(cls, **kwargs):
+        """Subclass constructor for TechnicalObjectMetadata
+
+        Make fields mandatory depending on the object type
+        (eg. "file" or "bitstream") using the REQUIRED_PROPERTIES attribute
+        """
+        super().__init_subclass__(**kwargs)
+
+        for field_name in cls.REQUIRED_PROPERTIES:
+            orig_prop = getattr(cls, field_name)
+            # Redefine the property for the subclass. The only difference
+            # is the setter which is wrapped using '_forbid_empty_value'.
+            setattr(
+                cls, field_name,
+                property(
+                    fget=orig_prop.fget,
+                    fset=_forbid_empty_value(orig_prop.fset),
+                    fdel=orig_prop.fdel
+                )
+            )
+
     @property
     def file_format(self) -> str:
         """Getter for file_format."""
@@ -156,10 +196,6 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
     @file_format.setter
     def file_format(self, file_format):
         """Setter for file_format."""
-        if not file_format:
-            raise ValueError(
-                "File format is not given or it is set to an empty value."
-            )
         self._file_format = file_format
 
     @property
@@ -170,11 +206,6 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
     @file_format_version.setter
     def file_format_version(self, file_format_version):
         """Setter for file_format_version."""
-        if not file_format_version:
-            raise ValueError(
-                "File format version is not given or it is set to an empty "
-                "value."
-            )
         self._file_format_version = file_format_version
 
     @property
@@ -185,7 +216,8 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
     @checksum_algorithm.setter
     def checksum_algorithm(self, checksum_algorithm):
         """Setter for checksum_algorithm."""
-        checksum_algorithm = ChecksumAlgorithm(checksum_algorithm)
+        if checksum_algorithm is not None:
+            checksum_algorithm = ChecksumAlgorithm(checksum_algorithm)
         self._checksum_algorithm = checksum_algorithm
 
     @property
@@ -196,10 +228,6 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
     @checksum.setter
     def checksum(self, checksum):
         """Setter for checksum."""
-        if not checksum:
-            raise ValueError(
-                "Checksum is not given or it is set to an empty value."
-            )
         self._checksum = checksum
 
     @property
@@ -446,6 +474,12 @@ class TechnicalFileObjectMetadata(TechnicalObjectMetadata):
     preservation management.
     """
     PREMIS_OBJECT_TYPE = PREMISObjectType.FILE
+    REQUIRED_PROPERTIES = (
+        "file_format",
+        "file_format_version",
+        "checksum_algorithm",
+        "checksum"
+    )
 
     def __init__(
         self,
