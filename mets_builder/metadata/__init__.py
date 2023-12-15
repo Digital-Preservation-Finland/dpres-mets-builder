@@ -4,7 +4,8 @@ from mets_builder.metadata.metadata_base import (Charset, ChecksumAlgorithm,
                                                  MetadataBase, MetadataFormat,
                                                  MetadataType, PREMISObjectType)
 from mets_builder.metadata.technical_object_metadata import (
-    TechnicalFileObjectMetadata, TechnicalObjectMetadata)
+    TechnicalBitstreamObjectMetadata, TechnicalFileObjectMetadata,
+    TechnicalObjectMetadata)
 from mets_builder.metadata.digital_provenance_agent_metadata import \
     DigitalProvenanceAgentMetadata
 from mets_builder.metadata.digital_provenance_event_metadata import (
@@ -33,6 +34,7 @@ __all__ = [
     "DigitalProvenanceEventMetadata",
     "TechnicalObjectMetadata",
     "TechnicalFileObjectMetadata",
+    "TechnicalBitstreamObjectMetadata",
     "EventOutcome",
     "PREMISObjectType"
 ]

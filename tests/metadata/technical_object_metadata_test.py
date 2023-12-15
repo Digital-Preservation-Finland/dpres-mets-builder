@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 import xml_helpers.utils
 
-from mets_builder.metadata import (TechnicalFileObjectMetadata,
+from mets_builder.metadata import (TechnicalBitstreamObjectMetadata,
+                                   TechnicalFileObjectMetadata,
                                    TechnicalObjectMetadata)
 from mets_builder.serialize import _NAMESPACES
 
@@ -95,6 +96,26 @@ def test_file_serialization():
 
     expected_xml = Path(
         "tests/data/expected_technical_file_object_metadata.xml"
+    ).read_text(encoding="utf-8")
+
+    assert result == expected_xml
+
+
+def test_bitstream_serialization():
+    """Test serializing the technical bitstream metadata"""
+    bitstream = TechnicalBitstreamObjectMetadata(
+        file_format="video/x-ffv",
+        file_format_version="4",
+        object_identifier_type="UUID",
+        object_identifier="615a96f5-dce7-4471-b5a5-77d9150322ce",
+    )
+
+    result = xml_helpers.utils.serialize(
+        bitstream.to_xml_element_tree()
+    ).decode("utf-8")
+
+    expected_xml = Path(
+        "tests/data/expected_technical_bitstream_object_metadata.xml"
     ).read_text(encoding="utf-8")
 
     assert result == expected_xml

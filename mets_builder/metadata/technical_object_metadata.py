@@ -522,3 +522,58 @@ class TechnicalFileObjectMetadata(TechnicalObjectMetadata):
 
         {_OBJECT_PARAMETERS_DOC}
         """
+
+
+class TechnicalBitstreamObjectMetadata(TechnicalObjectMetadata):
+    """Class for creating technical object metadata for a single bitstream
+    contained within a file, such as an audio or video stream.
+
+    The Object entity aggregates information about a digital object held by a
+    preservation repository and describes those characteristics relevant to
+    preservation management.
+    """
+    PREMIS_OBJECT_TYPE = PREMISObjectType.BITSTREAM
+    REQUIRED_PROPERTIES = (
+        "file_format",
+        "file_format_version"
+    )
+
+    def __init__(
+        self,
+        file_format: str,
+        file_format_version: str,
+        checksum_algorithm: Optional[Union[ChecksumAlgorithm, str]] = None,
+        checksum: Optional[str] = None,
+        object_identifier_type: Optional[str] = None,
+        object_identifier: Optional[str] = None,
+        charset: Union[Charset, str, None] = None,
+        original_name: Optional[str] = None,
+        format_registry_name: Optional[str] = None,
+        format_registry_key: Optional[str] = None,
+        creating_application: Optional[str] = None,
+        creating_application_version: Optional[str] = None,
+        **kwargs
+    ) -> None:
+        super().__init__(
+            file_format=file_format,
+            file_format_version=file_format_version,
+            checksum_algorithm=checksum_algorithm,
+            checksum=checksum,
+            object_identifier_type=object_identifier_type,
+            object_identifier=object_identifier,
+            charset=charset,
+            original_name=original_name,
+            format_registry_name=format_registry_name,
+            format_registry_key=format_registry_key,
+            creating_application=creating_application,
+            creating_application_version=creating_application_version,
+            **kwargs)
+
+    __init__.__doc__ = f"""Constructor for TechnicalBitstreamObjectMetadata.
+
+        For advanced configurations keyword arguments for MetadataBase class
+        can be given here as well. Look MetadataBase documentation for more
+        information.
+
+        {_OBJECT_PARAMETERS_DOC}
+        """

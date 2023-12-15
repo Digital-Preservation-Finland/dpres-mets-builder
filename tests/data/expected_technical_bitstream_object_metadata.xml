@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<premis:object xmlns:premis="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="premis:bitstream">
+  <premis:objectIdentifier>
+    <premis:objectIdentifierType>UUID</premis:objectIdentifierType>
+    <premis:objectIdentifierValue>615a96f5-dce7-4471-b5a5-77d9150322ce</premis:objectIdentifierValue>
+  </premis:objectIdentifier>
+  <premis:objectCharacteristics>
+    <premis:compositionLevel>0</premis:compositionLevel>
+    <premis:format>
+      <premis:formatDesignation>
+        <premis:formatName>video/x-ffv</premis:formatName>
+        <premis:formatVersion>4</premis:formatVersion>
+      </premis:formatDesignation>
+    </premis:format>
+  </premis:objectCharacteristics>
+</premis:object>
