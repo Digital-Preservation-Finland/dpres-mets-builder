@@ -12,6 +12,7 @@ Added
 - Class ``TechnicalAudioMetadata`` for creating technical audio metadata in AudioMD standard
 - Class ``TechnicalVideoMetadata`` for creating technical video metadata in VideoMD standard
 - Class ``TechnicalCSVMetadata`` for creating technical CSV metadata in ADDML standard
+- Classes ``TechnicalFileObjectMetadata`` and ``TechnicalBitstreamObjectMetadata`` for representing file and bitstream technical metadata respectively using PREMIS objects
 
 0.1.0 - 2023-06-14
 ------------------
