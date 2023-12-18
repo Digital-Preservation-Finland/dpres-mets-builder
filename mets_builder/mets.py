@@ -20,11 +20,11 @@ class MetsProfile(Enum):
     """Enum for METS profiles."""
 
     CULTURAL_HERITAGE = (
-        "https://digitalpreservation.fi/mets-profiles/cultural-heritage")
+        "http://digitalpreservation.fi/mets-profiles/cultural-heritage")
     """Profile for cultural heritage resources."""
 
     RESEARCH_DATA = (
-        "https://digitalpreservation.fi/mets-profiles/research-data")
+        "http://digitalpreservation.fi/mets-profiles/research-data")
     """Profile for research data resources."""
 
 

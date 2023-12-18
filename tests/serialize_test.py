@@ -164,7 +164,7 @@ def test_parse_root_element(mets_object):
     # Attributes
     assert len(element.items()) == 8
     assert element.get("PROFILE") == (
-        "https://digitalpreservation.fi/mets-profiles/cultural-heritage"
+        "http://digitalpreservation.fi/mets-profiles/cultural-heritage"
     )
     assert element.get("OBJID") == "package_id"
     assert element.get("LABEL") == "label"
