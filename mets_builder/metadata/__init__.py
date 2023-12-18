@@ -1,11 +1,15 @@
 """mets_builder.metadata default imports."""
 
-from mets_builder.metadata.metadata_base import (Charset, ChecksumAlgorithm,
+# These *have* to be imported first; otherwise cyclical import occurs
+from mets_builder.metadata.metadata_base import (Charset,  # isort:skip
+                                                 ChecksumAlgorithm,
                                                  MetadataBase, MetadataFormat,
-                                                 MetadataType, PREMISObjectType)
-from mets_builder.metadata.technical_object_metadata import (
+                                                 MetadataType,
+                                                 PREMISObjectType)
+from mets_builder.metadata.technical_object_metadata import (  # isort:skip
     TechnicalBitstreamObjectMetadata, TechnicalFileObjectMetadata,
     TechnicalObjectMetadata)
+
 from mets_builder.metadata.digital_provenance_agent_metadata import \
     DigitalProvenanceAgentMetadata
 from mets_builder.metadata.digital_provenance_event_metadata import (
