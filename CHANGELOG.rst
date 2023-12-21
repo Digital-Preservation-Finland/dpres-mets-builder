@@ -1,12 +1,24 @@
 Changelog
 =========
+All notable changes to this project will be documented in this file.
+
+The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_,
+and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 Unreleased
 ----------
-- Add class TechnicalAudioMetadata for creating technical audio metadata in AudioMD standard
-- Add class TechnicalVideoMetadata for creating technical video metadata in VideoMD standard
-- Add class TechnicalCSVMetadata for creating technical CSV metadata in ADDML standard
+Added
+^^^^^
+- Class ``TechnicalAudioMetadata`` for creating technical audio metadata in AudioMD standard
+- Class ``TechnicalVideoMetadata`` for creating technical video metadata in VideoMD standard
+- Class ``TechnicalCSVMetadata`` for creating technical CSV metadata in ADDML standard
 
-All notable changes to this project will be documented in this file.
+0.1.0 - 2023-06-14
+------------------
+Added
+^^^^^
+- RHEL9 compatible RPM spec file
 
-The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_.
+0.0.1 - 2023-04-19
+------------------
+- First public release
