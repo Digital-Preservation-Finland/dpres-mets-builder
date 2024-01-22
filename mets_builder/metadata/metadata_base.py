@@ -193,6 +193,25 @@ class MetadataBase:
             created = datetime.now(tz=timezone.utc)
         self.created = created
 
+    def _vars(self):
+        """
+        Return copy of metadata object's variables.
+
+        This is used for equality comparisons between different objects and for
+        computing the hash. Since lists are not hashable, this `_vars` method
+        is used for converting any non-hashable fields where necessary.
+        """
+        return vars(self).copy()
+
+    def __eq__(self, other):
+        return (
+            isinstance(self, other.__class__)
+            and self._vars() == other._vars()
+        )
+
+    def __hash__(self):
+        return hash(tuple(self._vars().values()))
+
     @property
     def is_administrative(self) -> bool:
         """Tells if this metadata is administrative metadata.

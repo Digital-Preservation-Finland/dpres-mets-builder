@@ -59,6 +59,14 @@ class TechnicalCSVMetadata(MetadataBase):
             **kwargs
         )
 
+    def _vars(self):
+        vars_ = super()._vars()
+
+        vars_["_filenames"] = tuple(self._filenames)
+        vars_["header"] = tuple(self.header)
+
+        return vars_
+
     @property
     def filenames(self) -> Iterable[str]:
         """Getter for filenames."""

@@ -43,6 +43,15 @@ class _Relationship():
         self.relationship_type = relationship_type
         self.relationship_subtype = relationship_subtype
 
+    def __hash__(self):
+        return hash(tuple(vars(self).values()))
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__)
+            and vars(self) == vars(other)
+        )
+
     @property
     def type_and_subtype(self) -> tuple:
         """Get relationship type and subtype as tuple."""
@@ -187,6 +196,13 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
                     fdel=orig_prop.fdel
                 )
             )
+
+    def _vars(self):
+        vars_ = super()._vars()
+
+        vars_["relationships"] = tuple(vars_["relationships"])
+
+        return vars_
 
     @property
     def file_format(self) -> str:
