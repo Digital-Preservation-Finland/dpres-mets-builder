@@ -2,13 +2,18 @@
 from datetime import datetime, timezone
 from pathlib import Path
 
+import uuid
+
 import pytest
 from lxml import etree
 
 from mets_builder import metadata, serialize
 from mets_builder.digital_object import DigitalObject, DigitalObjectStream
+from mets_builder.metadata.technical_video_metadata import \
+    TechnicalVideoMetadata
 from mets_builder.mets import METS, MetsProfile
-from mets_builder.serialize import _NAMESPACES, _use_namespace
+from mets_builder.serialize import (_NAMESPACES, _SerializerState,
+                                    _use_namespace)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -236,7 +241,8 @@ def test_parse_metadata_element(metadata_type, root_element_tag):
         identifier="identifier",
         created=datetime(2000, 1, 2, 3, 4, 5, 6, tzinfo=timezone.utc)
     )
-    root_element = serialize._parse_metadata_element(data)
+    state = _SerializerState()
+    root_element = serialize._parse_metadata_element(data, state)
 
     # The root element tag depends on metadata type
     assert root_element.tag == _use_namespace("mets", root_element_tag)
@@ -284,7 +290,9 @@ def test_parse_metadata_with_estimated_create_time():
         format_version="1.0",
         created="2011?"
     )
-    root_element = serialize._parse_metadata_element(data)
+    state = _SerializerState()
+
+    root_element = serialize._parse_metadata_element(data, state)
     assert root_element.get(_use_namespace("fi", "CREATED")) == "2011?"
     assert root_element.get("CREATED") is None
 
@@ -316,7 +324,9 @@ def test_parse_file_references_file_element(mets_object):
         identifier="digital_object-id"
     )
 
-    file_element = serialize._parse_file_references_file(do)
+    state = _SerializerState()
+
+    file_element = serialize._parse_file_references_file(do, state)
 
     assert file_element.tag == _use_namespace("mets", "file")
     assert file_element.get("ID") == "digital_object-id"
@@ -421,6 +431,131 @@ def test_written_structural_maps(mets_object):
     assert len(subsub2) == 1
     fptr = subsub2.find("mets:fptr", namespaces=_NAMESPACES)
     assert fptr.get("FILEID") == "digital_object_2"
+
+
+def test_metadata_identifier_generated():
+    """
+    Test that missing identifiers will be generated for technical metadata
+    objects, and that said identifiers will be identical across objects
+    that share the same metadata
+    """
+    state = _SerializerState()
+
+    metadatas = []
+
+    for _ in range(0, 4):
+        metadatas.append(
+            TechnicalVideoMetadata(
+                identifier=None,
+                duration="PT2H05M",
+                data_rate="8",
+                bits_per_sample="24",
+                color="Color",
+                codec_creator_app="SoundForge",
+                codec_creator_app_version="10",
+                codec_name="(:unav)",
+                codec_quality="lossy",
+                data_rate_mode="Fixed",
+                frame_rate="24",
+                pixels_horizontal="640",
+                pixels_vertical="480",
+                par="1.0",
+                dar="4/3",
+                sampling="4:2:2",
+                signal_format="PAL",
+                sound="No"
+            )
+        )
+
+    # Change the third metadata to have slightly different metadata. This
+    # ensures it will have a different identifier.
+    metadatas[2].frame_rate = "48"
+
+    # Fourth metadata has manually set identifier
+    metadatas[3].identifier = "_bfb2a6fc-3df3-48ed-b8bc-d00fcafef00d"
+
+    metadata_elems = []
+    for metadata_ in metadatas:
+        metadata_elems.append(
+            serialize._parse_metadata_element(metadata_, state)
+        )
+
+    assert metadata_elems[0].attrib["ID"].startswith("_")
+    uuid.UUID(metadata_elems[0].attrib["ID"][1:])
+
+    # Metadata objects #1 and #2 have identical identifier due to sharing
+    # same metadata
+    assert metadata_elems[0].attrib["ID"] == metadata_elems[1].attrib["ID"]
+
+    # Metadata object #3 was assigned different identifier due to different
+    # metadata
+    assert metadata_elems[2].attrib["ID"].startswith("_")
+    uuid.UUID(metadata_elems[2].attrib["ID"][1:])
+    assert metadata_elems[2].attrib["ID"] != metadata_elems[0].attrib["ID"]
+
+    # Metadata object #4 uses its own identifier
+    assert metadata_elems[3].attrib["ID"] == \
+        "_bfb2a6fc-3df3-48ed-b8bc-d00fcafef00d"
+
+
+def test_metadata_created_generated():
+    """
+    Test that missing creation date for a metadata object will be generated
+    at serialization time if not already provided
+    """
+    state = _SerializerState()
+
+    data = {
+        "identifier": None,
+        "duration": "PT2H05M",
+        "data_rate": "8",
+        "bits_per_sample": "24",
+        "color": "Color",
+        "codec_creator_app": "SoundForge",
+        "codec_creator_app_version": "10",
+        "codec_name": "(:unav)",
+        "codec_quality": "lossy",
+        "data_rate_mode": "Fixed",
+        "frame_rate": "24",
+        "pixels_horizontal": "640",
+        "pixels_vertical": "480",
+        "par": "1.0",
+        "dar": "4/3",
+        "sampling": "4:2:2",
+        "signal_format": "PAL",
+        "sound": "No"
+    }
+
+    now = datetime.now(timezone.utc)
+
+    # A has no creation date, this will be set automatically at time of
+    # serialization
+    metadata_a = TechnicalVideoMetadata(**data)
+
+    # B has set creation date, this will be used by serializer
+    metadata_b = TechnicalVideoMetadata(
+        **{**data, **{"created": "2023-06-12"}}
+    )
+
+    elem_a = serialize._parse_metadata_element(metadata_a, state)
+
+    # TODO: Replace this drudgery with `datetime.datetime.fromisoformat` once
+    # we're on Python 3.7+. Or RHEL9, which ships Python 3.9.
+    date_a = datetime.strptime(
+        elem_a.attrib[f"{{{_NAMESPACES['fi']}}}CREATED"],
+        "%Y-%m-%dT%H:%M:%S.%f+00:00"
+    )
+    date_a = date_a.replace(tzinfo=timezone.utc)
+
+    # Check that automatically generated creation date A is within two
+    # seconds of the current time calculated at the start of test.
+    delta = date_a - now
+    assert abs(delta.total_seconds()) < 1
+
+    elem_b = serialize._parse_metadata_element(metadata_b, state)
+
+    # Creation date B is passed as-is
+    assert elem_b.attrib[f"{{{_NAMESPACES['fi']}}}CREATED"] == "2023-06-12"
 
 
 def test_to_xml_string(mets_object):

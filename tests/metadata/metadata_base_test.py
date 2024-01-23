@@ -51,39 +51,6 @@ def test_metadatabase_invalid_type():
         )
 
 
-def test_generated_identifier():
-    """Test that if identifier is not given, an uuid identifier is generated.
-    """
-    data = metadata.MetadataBase(
-        metadata_type="technical",
-        metadata_format="PREMIS:OBJECT",
-        format_version="1.0",
-        identifier=None
-    )
-
-    # First character is underscore
-    assert data.identifier[0] == "_"
-
-    # Rest shoud be valid UUID.
-    # This raises error if identifier is not valid UUID
-    UUID(data.identifier[1:])
-
-
-def test_generated_created_time():
-    """Test that if create time is not given, current time is used."""
-    data = metadata.MetadataBase(
-        metadata_type="technical",
-        metadata_format="PREMIS:OBJECT",
-        format_version="1.0",
-        created=None
-    )
-
-    # UTC time is used
-    assert data.created.tzinfo == timezone.utc
-    # Date matches to current date
-    assert data.created.date() == datetime.now().date()
-
-
 @pytest.mark.parametrize(
     ["metadata_type", "expected_result"],
     [

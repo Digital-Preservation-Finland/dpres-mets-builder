@@ -1,8 +1,12 @@
 """Module for serializing METS objects."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 from typing import TYPE_CHECKING
+
+from collections import defaultdict
+
+import uuid
 
 import mets as mets_elements
 from lxml import etree
@@ -30,6 +34,46 @@ _NAMESPACES = {
     "videomd": "http://www.loc.gov/videoMD/"
 }
 _METS_FI_SCHEMA = "http://digitalpreservation.fi/schemas/mets/mets.xsd"
+
+
+class _SerializerState:
+    """
+    State used during the serialization process.
+
+    This class is used to ensure deduplication for metadata objects by
+    generating identifiers that are shared by identical metadata instances;
+    this means that identical technical metadata instances
+    (eg. TechnicalVideoObjectMetadata) can be deduplicated.
+    """
+    def __init__(self):
+        self.now = datetime.now(timezone.utc)
+
+        self._metadata2identifier = defaultdict(lambda: f"_{uuid.uuid4()}")
+
+    def get_identifier(self, metadata: MetadataBase):
+        """
+        Get identifier for a metadata object. If the metadata object has no
+        identifier, generate an unique identifier that will be shared with all
+        other metadata objects that have identical data.
+        """
+        if metadata.identifier:
+            return metadata.identifier
+
+        # No manually set identifier for this metadata; generate/retrieve
+        # one that will be shared with all metadata objects sharing the same
+        # data
+        return self._metadata2identifier[metadata]
+
+    def get_created(self, metadata: MetadataBase):
+        """
+        Get creation date for a metadata object. If the metadata object has
+        no creation date, use a datetime that corresponds to the start of the
+        serialization
+        """
+        if metadata.created:
+            return metadata.created
+        else:
+            return self.now.isoformat()
 
 
 def _use_namespace(namespace, attribute):
@@ -110,10 +154,11 @@ def _parse_mets_header(mets):
     return mets_header
 
 
-def _parse_metadata_element(metadata: MetadataBase):
+def _parse_metadata_element(metadata: MetadataBase, state: _SerializerState):
     """Parse given metadata object.
 
     :param metadata: The metadata object that should be parsed.
+    :param state: _SerializerState instance
 
     :returns: The metadata wrapped in the correct base element (dmdSec, techMD
         etc.) as lxml.etree._Element
@@ -132,7 +177,7 @@ def _parse_metadata_element(metadata: MetadataBase):
 
     # Format create time and determine whether the time is an estimation (it
     # was given as a string)
-    created = metadata.created
+    created = state.get_created(metadata)
     created_is_estimation = True
     if isinstance(metadata.created, datetime):
         created = metadata.created.isoformat(timespec="seconds")
@@ -148,7 +193,7 @@ def _parse_metadata_element(metadata: MetadataBase):
 
     # Create element
     metadata_element = element_builder_function(
-        element_id=metadata.identifier,
+        element_id=state.get_identifier(metadata),
         created_date=created,
         child_elements=[md_wrap]
     )
@@ -164,48 +209,49 @@ def _parse_metadata_element(metadata: MetadataBase):
     return metadata_element
 
 
-def _write_descriptive_metadata(xml, mets):
+def _write_descriptive_metadata(xml, mets, state: _SerializerState):
     """Write descriptive metadata to the given XML file."""
-    descriptive_metadata = iter(
+    descriptive_metadata = list(set(
         metadata for metadata in mets.metadata
         if metadata.is_descriptive
-    )
+    ))
     for metadata in descriptive_metadata:
-        metadata_element = _parse_metadata_element(metadata)
+        metadata_element = _parse_metadata_element(metadata, state)
         xml.write(metadata_element)
 
 
-def _write_administrative_metadata(xml, mets):
+def _write_administrative_metadata(xml, mets, state: _SerializerState):
     """Write administrative metadata to the given XML file."""
-    administrative_metadata = iter(
+    administrative_metadata = list(set(
         metadata for metadata in mets.metadata
         if metadata.is_administrative
-    )
+    ))
     amdsec = mets_elements.amdsec()
     with xml.element(amdsec.tag):
         for metadata in administrative_metadata:
-            metadata_element = _parse_metadata_element(metadata)
+            metadata_element = _parse_metadata_element(metadata, state)
             xml.write(metadata_element)
 
 
-def _parse_file_references_file(digital_object: DigitalObject):
+def _parse_file_references_file(
+        digital_object: DigitalObject, state: _SerializerState):
     """Parse given digital object as file element in file references."""
     # Streams
     streams = []
     for stream in digital_object.streams:
-        administrative_metadata_identifiers = [
-            metadata.identifier for metadata in stream.metadata
+        administrative_metadata_identifiers = set(
+            state.get_identifier(metadata) for metadata in stream.metadata
             if metadata.is_administrative
-        ]
+        )
         streams.append(
             mets_elements.stream(administrative_metadata_identifiers)
         )
 
     # File
-    administrative_metadata_identifiers = [
-        metadata.identifier for metadata in digital_object.metadata
+    administrative_metadata_identifiers = set(
+        state.get_identifier(metadata) for metadata in digital_object.metadata
         if metadata.is_administrative
-    ]
+    )
     digital_object_element = mets_elements.file_elem(
         file_id=digital_object.identifier,
         admid_elements=administrative_metadata_identifiers,
@@ -219,7 +265,7 @@ def _parse_file_references_file(digital_object: DigitalObject):
     return digital_object_element
 
 
-def _write_file_references(xml, file_references):
+def _write_file_references(xml, file_references, state: _SerializerState):
     """Write file references to the given XML file."""
     file_references_root = mets_elements.filesec()
     with xml.element(file_references_root.tag, file_references_root.attrib):
@@ -227,21 +273,23 @@ def _write_file_references(xml, file_references):
             group_root = mets_elements.filegrp(use=group.use)
             with xml.element(group_root.tag, group_root.attrib):
                 for digital_object in group.digital_objects:
-                    xml.write(_parse_file_references_file(digital_object))
+                    xml.write(
+                        _parse_file_references_file(digital_object, state)
+                    )
 
 
-def _write_structural_map_div(xml, div):
+def _write_structural_map_div(xml, div, state):
     """Write a structural map div and recursively its nested divs to the given
     xml file.
     """
-    administrative_metadata_identifiers = [
-        metadata.identifier for metadata in div.metadata
+    administrative_metadata_identifiers = set(
+        state.get_identifier(metadata) for metadata in div.metadata
         if metadata.is_administrative
-    ]
-    descriptive_metadata_identifiers = [
-        metadata.identifier for metadata in div.metadata
+    )
+    descriptive_metadata_identifiers = iter(
+        state.get_identifier(metadata) for metadata in div.metadata
         if metadata.is_descriptive
-    ]
+    )
     file_pointer_elements = [
         mets_elements.fptr(digital_object.identifier)
         for digital_object in div.digital_objects
@@ -264,10 +312,10 @@ def _write_structural_map_div(xml, div):
         for element in file_pointer_elements:
             xml.write(element)
         for nested_div in div.divs:
-            _write_structural_map_div(xml, nested_div)
+            _write_structural_map_div(xml, nested_div, state)
 
 
-def _write_structural_map(xml, structural_map):
+def _write_structural_map(xml, structural_map, state: _SerializerState):
     """Write structural map to the given XML file."""
     structural_map_root = mets_elements.structmap(
         type_attr=structural_map.structural_map_type,
@@ -285,7 +333,7 @@ def _write_structural_map(xml, structural_map):
         )
 
     with xml.element(structural_map_root.tag, structural_map_root.attrib):
-        _write_structural_map_div(xml, structural_map.root_div)
+        _write_structural_map_div(xml, structural_map.root_div, state)
 
 
 def _write_mets(mets, output_file):
@@ -299,6 +347,9 @@ def _write_mets(mets, output_file):
 
     :returns: The given output_file.
     """
+    # Serializer state used for deduplicating metadata entries
+    state = _SerializerState()
+
     # Use incremental XML generation with context managers.
     # This saves memory by writing elements incrementally rather than
     # constructing the entire tree in memory before writing
@@ -312,18 +363,18 @@ def _write_mets(mets, output_file):
             xml.write(_parse_mets_header(mets))
 
             # Descriptive metadata
-            _write_descriptive_metadata(xml, mets)
+            _write_descriptive_metadata(xml, mets, state)
 
             # Administrative metadata
-            _write_administrative_metadata(xml, mets)
+            _write_administrative_metadata(xml, mets, state)
 
             # File references
             if mets.file_references:
-                _write_file_references(xml, mets.file_references)
+                _write_file_references(xml, mets.file_references, state)
 
             # Structural maps
             for structural_map in mets.structural_maps:
-                _write_structural_map(xml, structural_map)
+                _write_structural_map(xml, structural_map, state)
 
     return output_file
 

@@ -1,7 +1,6 @@
 """Module for MetadataBase class and associated enums."""
 
-import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
 
@@ -136,7 +135,7 @@ class MetadataBase:
             MetadataFormat.OTHER.
         :param identifier: Identifier for the metadata element. The identifier
             must be unique in the METS document. If None, the identifier is
-            generated automatically.
+            generated during serialization.
         :param created: The time the metadata record was created.
 
             If given as a datetime object, it is interpreted as the precise
@@ -146,8 +145,9 @@ class MetadataBase:
             metadata record was created, and has to be given in the extended
             ISO 8601 format [ISO_8601-1, ISO_8601-2].
 
-            If set to None, the time this object is created is used as the
-            default value.
+            If set to None, the metadata creation date will be generated
+            during serialization and will be set to the same date on all
+            metadata objects that have it set to None.
         """
         # Handle metadata format and version
         if other_format:
@@ -182,15 +182,7 @@ class MetadataBase:
         metadata_type = MetadataType(metadata_type)
         self.metadata_type = metadata_type
 
-        # Handle identifier
-        if identifier is None:
-            # Generate identifier if identifier is not given
-            identifier = "_" + str(uuid.uuid4())
         self.identifier = identifier
-
-        # Handle created
-        if created is None:
-            created = datetime.now(tz=timezone.utc)
         self.created = created
 
     def _vars(self):
