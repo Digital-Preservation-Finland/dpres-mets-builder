@@ -1,8 +1,9 @@
 """Tests for serialize.py."""
+import shutil
+import subprocess
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-
-import uuid
 
 import pytest
 from lxml import etree
@@ -23,7 +24,7 @@ def mets_object():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id="urn:uuid:5b1afac8-4b51-4d2f-8c77-c7e9ddbdd019",
         creator_name="Mr. Foo",
         creator_type="INDIVIDUAL",
         content_id="content_id",
@@ -31,8 +32,8 @@ def mets_object():
         create_date=datetime(2022, 1, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
         last_mod_date=datetime(2022, 2, 3, 4, 5, 6, 7, tzinfo=timezone.utc),
         record_status="submission",
-        catalog_version="1.0",
-        specification="2.0",
+        catalog_version="1.7.5",
+        specification="1.7.5",
     )
     mets.add_agent(
         name="Ms. Bar",
@@ -47,7 +48,7 @@ def mets_object():
         metadata_format="other",
         other_format="PAS-special",
         format_version="1.0",
-        identifier="1"
+        identifier="_1"
     )
     do_1 = DigitalObject(
         sip_filepath="path/1",
@@ -61,7 +62,7 @@ def mets_object():
         metadata_format="other",
         other_format="PAS-special",
         format_version="1.0",
-        identifier="2"
+        identifier="_2"
     )
     do_2 = DigitalObject(
         sip_filepath="path/2",
@@ -76,7 +77,7 @@ def mets_object():
         metadata_format="other",
         other_format="PAS-special",
         format_version="1.0",
-        identifier="3"
+        identifier="_3"
     )
     # Create structural map with the following div structure:
     # root_div (has metadata md_3)
@@ -173,10 +174,11 @@ def test_parse_root_element(mets_object):
     )
     assert element.get("OBJID") == "package_id"
     assert element.get("LABEL") == "label"
-    assert element.get(_use_namespace("fi", "CONTRACTID")) == "contract_id"
+    assert element.get(_use_namespace("fi", "CONTRACTID")) \
+        == "urn:uuid:5b1afac8-4b51-4d2f-8c77-c7e9ddbdd019"
     assert element.get(_use_namespace("fi", "CONTENTID")) == "content_id"
-    assert element.get(_use_namespace("fi", "CATALOG")) == "1.0"
-    assert element.get(_use_namespace("fi", "SPECIFICATION")) == "2.0"
+    assert element.get(_use_namespace("fi", "CATALOG")) == "1.7.5"
+    assert element.get(_use_namespace("fi", "SPECIFICATION")) == "1.7.5"
     assert element.get(_use_namespace("xsi", "schemaLocation")) == (
         "http://www.loc.gov/METS/ "
         "http://digitalpreservation.fi/schemas/mets/mets.xsd"
@@ -391,7 +393,7 @@ def test_written_structural_maps(mets_object):
     root_div = structmap[0]
     assert root_div.tag == _use_namespace("mets", "div")
     assert root_div.get("TYPE") == "test_type"
-    assert root_div.get("DMDID") == "3"
+    assert root_div.get("DMDID") == "_3"
 
     # sub divs
     assert len(root_div) == 2
@@ -567,3 +569,45 @@ def test_to_xml_string(mets_object):
     xml = serialize.to_xml_string(mets_object)
     assert b"<mets:mets" in xml
     assert b"</mets:mets>" in xml
+
+
+def test_schema_validation(mets_object, tmp_path):
+    """Test that METS document passes XML schema validation"""
+    tool_path = shutil.which("check-xml-schema-features-3")
+
+    if not tool_path:
+        tool_path = shutil.which("check-xml-schema-features")
+
+    if not tool_path:
+        pytest.skip("dpres-ipt not installed, skipping METS validation test")
+
+    path = tmp_path / "mets.xml"
+    mets_object.write(path)
+
+    result = subprocess.run(
+        [tool_path, str(path)], check=False
+    )
+    assert result.returncode == 0
+
+
+def test_schematron_validation(mets_object, tmp_path):
+    """Test that METS document passes Schematron validation"""
+    tool_path = shutil.which("check-xml-schematron-features-3")
+
+    if not tool_path:
+        tool_path = shutil.which("check-xml-schematron-features")
+
+    if not tool_path:
+        pytest.skip("dpres-ipt not installed, skipping METS validation test")
+
+    path = tmp_path / "mets.xml"
+    mets_object.write(path)
+
+    result = subprocess.run(
+        [
+            tool_path,
+            "-s", "/usr/share/dpres-xml-schemas/schematron/mets_root.sch",
+            str(path)
+        ], check=False
+    )
+    assert result.returncode == 0
