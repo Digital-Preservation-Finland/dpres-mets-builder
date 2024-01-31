@@ -1,7 +1,4 @@
 """Tests for metadata objects."""
-from datetime import datetime, timezone
-from uuid import UUID
-
 import pytest
 
 from mets_builder import metadata
