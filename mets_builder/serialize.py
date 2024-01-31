@@ -286,7 +286,7 @@ def _write_structural_map_div(xml, div, state):
         state.get_identifier(metadata) for metadata in div.metadata
         if metadata.is_administrative
     )
-    descriptive_metadata_identifiers = iter(
+    descriptive_metadata_identifiers = set(
         state.get_identifier(metadata) for metadata in div.metadata
         if metadata.is_descriptive
     )
