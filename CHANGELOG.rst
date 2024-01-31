@@ -14,6 +14,7 @@ Added
 - Class ``TechnicalCSVMetadata`` for creating technical CSV metadata in ADDML standard
 - Classes ``TechnicalFileObjectMetadata`` and ``TechnicalBitstreamObjectMetadata`` for representing file and bitstream technical metadata respectively using PREMIS objects
 - Identical technical media metadata entries will automatically be deduplicated in the generated METS if possible
+- Method ``StructuralMap.from_directory_structure`` to generate structural map from the directory structure of given digital objects
 
 0.1.0 - 2023-06-14
 ------------------

@@ -278,3 +278,62 @@ def test_add_div_with_parent_to_a_div():
         root_div.add_divs([div_with_parent])
 
     assert str(error.value) == "An added div is already has a parent div."
+
+
+def test_generating_structural_map_from_directory():
+    """Test generating structural map from directory contents.
+
+    There should be a div for each directory, and the divs should be nested
+    according to the directory structure. The type of each div should be the
+    corresponding directory name. The file is not represented with a div, but
+    as a DigitalObject stored in the correct div.
+
+    The root div should be an additional wrapping div with type 'directory'.
+    """
+    do1 = DigitalObject(sip_filepath="data/a/file1.txt")
+    do2 = DigitalObject(sip_filepath="data/a/file2.txt")
+    do3 = DigitalObject(sip_filepath="data/b/deep/directory/chain/file3.txt")
+    digital_objects = (do1, do2, do3)
+
+    structural_map = StructuralMap.from_directory_structure(digital_objects)
+
+    assert structural_map.structural_map_type is None
+
+    # defined directory structure is wrapped in a root div with type
+    # "directory"
+    root_div = structural_map.root_div
+    assert root_div.div_type == "directory"
+    assert len(root_div.divs) == 1
+
+    # root of the user defined tree is a directory called "data", containing
+    # two other directories
+    data_div = root_div.divs.pop()
+    assert data_div.div_type == "data"
+    assert len(data_div.divs) == 2
+
+    # directory "a" in "data" contains digital objects 1 and 2
+    a_div = next(div for div in data_div if div.div_type == "a")
+    assert a_div.digital_objects == {do1, do2}
+
+    # directory "b" in "data" has a deep directory structure, at the bottom of
+    # which is digital object 3
+    b_div = next(div for div in data_div if div.div_type == "b")
+    deep_div = b_div.divs.pop()
+    assert deep_div.div_type == "deep"
+    directory_div = deep_div.divs.pop()
+    assert directory_div.div_type == "directory"
+    chain_div = directory_div.divs.pop()
+    assert chain_div.div_type == "chain"
+    assert chain_div.digital_objects == {do3}
+
+
+def test_generating_structural_map_with_no_digital_objects():
+    """Test that generating structural map with zero digital objects raises an
+    error.
+    """
+    with pytest.raises(ValueError) as error:
+        StructuralMap.from_directory_structure([])
+    assert str(error.value) == (
+        "Given 'digital_objects' is empty. Structural map can not be "
+        "generated with zero digital objects."
+    )

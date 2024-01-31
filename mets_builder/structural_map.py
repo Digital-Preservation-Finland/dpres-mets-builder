@@ -1,5 +1,7 @@
 """Module for classes related to structural map (METS structMap)."""
 
+from collections import defaultdict
+from pathlib import Path
 from typing import Iterable, Optional, Set
 
 from mets_builder.digital_object import DigitalObject
@@ -329,3 +331,90 @@ class StructuralMap:
                 "printable US-ASCII characters"
             )
         self._pid_type = value
+
+    @classmethod
+    def from_directory_structure(
+        cls,
+        digital_objects: Iterable[DigitalObject]
+    ) -> "StructuralMap":
+        """A shortcut method for generating a structural map according to the
+        directory structure of the digital objects.
+
+        Returns a StructuralMap instance with StructuralMapDivs generated and
+        DigitalObjects added to the generated StructuralMapDivs according to
+        the directory structure as inferred from the sip_filepath attributes of
+        the given digital objects.
+
+        The div types will be set to be the same as the corresponding directory
+        name. The entire div tree will be placed into a wrapping div with type
+        "directory".
+
+        For example, if three digital objects are given, and their respective
+        sip_filepath attributes are:
+        - "data/directory_1/file_1.txt"
+        - "data/directory_1/file_2.txt"
+        - "data/directory_2/file_3.txt"
+
+        Then this method will create a structural map with:
+        - root div with type "directory"
+        - div with type "data" inside the root div
+        - div with type "directory_1", added to the "data" div
+        - div with type "directory_2", added to the "data" div
+        - the DigitalObjects representing "file_1.txt" and "file_2.txt" added
+          to the "directory_1" div
+        - the DigitalObject representing "file_3.txt" added to the
+          "directory_2" div
+
+        :param digital_objects: The DigitalObject instances that are used to
+            generate the structural map
+
+        :raises: ValueError if 'digital_objects' is empty.
+
+        :returns: A StructuralMap instance structured according to the
+            directory structure inferred from the given digital objects
+        """
+        if not digital_objects:
+            raise ValueError(
+                "Given 'digital_objects' is empty. Structural map can not be "
+                "generated with zero digital objects."
+            )
+
+        root_div = StructuralMapDiv(div_type="directory")
+
+        # dict directory filepath -> corresponding div
+        # In the algorithm below, Path(".") can be thought of as the root div
+        # that has already been created, initialize the dict with that
+        divs = {Path("."): root_div}
+
+        # dict directory filepath -> child directory filepaths
+        directory_relationships = defaultdict(set)
+
+        for digital_object in digital_objects:
+
+            sip_filepath = Path(digital_object.sip_filepath)
+
+            for path in sip_filepath.parents:
+                # Do not process path "."
+                if path == Path("."):
+                    continue
+
+                # Create corresponding div for directories if they do not exist
+                # yet
+                if path not in divs:
+                    divs[path] = StructuralMapDiv(div_type=path.name)
+
+                # Save directory relationships to be dealt with later
+                directory_relationships[path.parent].add(path)
+
+            # Add the digital object to the div corresponding its parent
+            # directory
+            digital_object_parent_div = divs[sip_filepath.parent]
+            digital_object_parent_div.add_digital_objects([digital_object])
+
+        # Nest divs according to the directory structure
+        for parent_dir, child_dirs in directory_relationships.items():
+            parent_div = divs[parent_dir]
+            child_divs = {divs[directory] for directory in child_dirs}
+            parent_div.add_divs(child_divs)
+
+        return StructuralMap(root_div=root_div)
