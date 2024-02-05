@@ -13,7 +13,7 @@ from mets_builder.digital_object import DigitalObject, DigitalObjectStream
 from mets_builder.metadata.technical_video_metadata import \
     TechnicalVideoMetadata
 from mets_builder.mets import METS, MetsProfile
-from mets_builder.serialize import (_NAMESPACES, _SerializerState,
+from mets_builder.serialize import (NAMESPACES, _SerializerState,
                                     _use_namespace)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
@@ -150,17 +150,17 @@ def test_parse_mets(mets_object):
     element = etree.fromstring(serialized)
 
     assert len(element) == 6
-    assert element.find("mets:metsHdr", namespaces=_NAMESPACES) is not None
-    assert element.find("mets:dmdSec", namespaces=_NAMESPACES) is not None
-    assert element.find("mets:fileSec", namespaces=_NAMESPACES) is not None
-    assert len(element.findall("mets:structMap", namespaces=_NAMESPACES)) == 2
+    assert element.find("mets:metsHdr", namespaces=NAMESPACES) is not None
+    assert element.find("mets:dmdSec", namespaces=NAMESPACES) is not None
+    assert element.find("mets:fileSec", namespaces=NAMESPACES) is not None
+    assert len(element.findall("mets:structMap", namespaces=NAMESPACES)) == 2
 
     # Assert administrative metadata exists and contains other metadata than
     # descriptive metadata
-    amd_sec = element.find("mets:amdSec", namespaces=_NAMESPACES)
+    amd_sec = element.find("mets:amdSec", namespaces=NAMESPACES)
     assert amd_sec is not None
     assert len(amd_sec) == 2
-    assert len(amd_sec.findall("mets:techMD", namespaces=_NAMESPACES)) == 2
+    assert len(amd_sec.findall("mets:techMD", namespaces=NAMESPACES)) == 2
 
 
 def test_parse_root_element(mets_object):
@@ -333,12 +333,12 @@ def test_parse_file_references_file_element(mets_object):
     assert file_element.tag == _use_namespace("mets", "file")
     assert file_element.get("ID") == "digital_object-id"
     assert file_element.get("ADMID") == "metadata-digital_object-id"
-    file_location = file_element.find("mets:FLocat", namespaces=_NAMESPACES)
+    file_location = file_element.find("mets:FLocat", namespaces=NAMESPACES)
     assert file_location is not None
     assert file_location.get("LOCTYPE") == "URL"
     assert file_location.get(_use_namespace("xlink", "href")) == "file:///path"
     assert file_location.get(_use_namespace("xlink", "type")) == "simple"
-    stream = file_element.find("mets:stream", namespaces=_NAMESPACES)
+    stream = file_element.find("mets:stream", namespaces=NAMESPACES)
     assert stream is not None
     assert stream.get("ADMID") == "metadata-stream-id"
 
@@ -352,19 +352,19 @@ def test_written_file_references(mets_object):
     # inspection
     serialized = serialize.to_xml_string(mets_object)
     element = etree.fromstring(serialized)
-    filesec = element.find("mets:fileSec", namespaces=_NAMESPACES)
+    filesec = element.find("mets:fileSec", namespaces=NAMESPACES)
 
     assert filesec is not None
 
     # Contains one group
     assert len(filesec) == 1
-    group = filesec.find("mets:fileGrp", namespaces=_NAMESPACES)
+    group = filesec.find("mets:fileGrp", namespaces=NAMESPACES)
     assert group is not None
 
     # Group contains 2 files
     # Files are tested in a separate test
     assert len(group) == 2
-    assert len(group.findall("mets:file", namespaces=_NAMESPACES)) == 2
+    assert len(group.findall("mets:file", namespaces=NAMESPACES)) == 2
 
 
 def test_written_structural_maps(mets_object):
@@ -373,7 +373,7 @@ def test_written_structural_maps(mets_object):
     # inspection
     serialized = serialize.to_xml_string(mets_object)
     element = etree.fromstring(serialized)
-    structmaps = element.findall("mets:structMap", namespaces=_NAMESPACES)
+    structmaps = element.findall("mets:structMap", namespaces=NAMESPACES)
 
     assert len(structmaps) == 2
 
@@ -397,13 +397,13 @@ def test_written_structural_maps(mets_object):
 
     # sub divs
     assert len(root_div) == 2
-    sub1 = root_div.findall("mets:div[@LABEL='sub1']", namespaces=_NAMESPACES)
+    sub1 = root_div.findall("mets:div[@LABEL='sub1']", namespaces=NAMESPACES)
     assert len(sub1) == 1
     sub1 = sub1[0]
     assert sub1.get("TYPE") == "test_type"
     assert len(sub1) == 0
 
-    sub2 = root_div.findall("mets:div[@LABEL='sub2']", namespaces=_NAMESPACES)
+    sub2 = root_div.findall("mets:div[@LABEL='sub2']", namespaces=NAMESPACES)
     assert len(sub2) == 1
     sub2 = sub2[0]
     assert sub2.get("TYPE") == "test_type"
@@ -411,7 +411,7 @@ def test_written_structural_maps(mets_object):
 
     # subsub divs
     subsub1 = sub2.findall(
-        "mets:div[@LABEL='subsub1']", namespaces=_NAMESPACES
+        "mets:div[@LABEL='subsub1']", namespaces=NAMESPACES
     )
     assert len(subsub1) == 1
     subsub1 = subsub1[0]
@@ -419,11 +419,11 @@ def test_written_structural_maps(mets_object):
     assert subsub1.get("ORDER") == "1"
     assert subsub1.get("ORDERLABEL") == "i"
     assert len(subsub1) == 1
-    fptr = subsub1.find("mets:fptr", namespaces=_NAMESPACES)
+    fptr = subsub1.find("mets:fptr", namespaces=NAMESPACES)
     assert fptr.get("FILEID") == "digital_object_1"
 
     subsub2 = sub2.findall(
-        "mets:div[@LABEL='subsub2']", namespaces=_NAMESPACES
+        "mets:div[@LABEL='subsub2']", namespaces=NAMESPACES
     )
     assert len(subsub2) == 1
     subsub2 = subsub2[0]
@@ -431,7 +431,7 @@ def test_written_structural_maps(mets_object):
     assert subsub2.get("ORDER") == "2"
     assert subsub2.get("ORDERLABEL") == "ii"
     assert len(subsub2) == 1
-    fptr = subsub2.find("mets:fptr", namespaces=_NAMESPACES)
+    fptr = subsub2.find("mets:fptr", namespaces=NAMESPACES)
     assert fptr.get("FILEID") == "digital_object_2"
 
 
@@ -544,7 +544,7 @@ def test_metadata_created_generated():
     # TODO: Replace this drudgery with `datetime.datetime.fromisoformat` once
     # we're on Python 3.7+. Or RHEL9, which ships Python 3.9.
     date_a = datetime.strptime(
-        elem_a.attrib[f"{{{_NAMESPACES['fi']}}}CREATED"],
+        elem_a.attrib[f"{{{NAMESPACES['fi']}}}CREATED"],
         "%Y-%m-%dT%H:%M:%S.%f+00:00"
     )
     date_a = date_a.replace(tzinfo=timezone.utc)
@@ -557,7 +557,7 @@ def test_metadata_created_generated():
     elem_b = serialize._parse_metadata_element(metadata_b, state)
 
     # Creation date B is passed as-is
-    assert elem_b.attrib[f"{{{_NAMESPACES['fi']}}}CREATED"] == "2023-06-12"
+    assert elem_b.attrib[f"{{{NAMESPACES['fi']}}}CREATED"] == "2023-06-12"
 
 
 def test_to_xml_string(mets_object):

@@ -21,7 +21,7 @@ from mets_builder.metadata import MetadataBase, MetadataType
 if TYPE_CHECKING:
     from mets_builder.mets import METS
 
-_NAMESPACES = {
+NAMESPACES = {
     "mets": "http://www.loc.gov/METS/",
     "xsi": "http://www.w3.org/2001/XMLSchema-instance",
     "premis": "info:lc/xmlns/premis-v2",
@@ -78,7 +78,7 @@ class _SerializerState:
 
 def _use_namespace(namespace, attribute):
     """Get a string prepended with a namespace prefix."""
-    return f"{{{_NAMESPACES[namespace]}}}{attribute}"
+    return f"{{{NAMESPACES[namespace]}}}{attribute}"
 
 
 def _parse_mets_root_element(mets):
@@ -93,7 +93,7 @@ def _parse_mets_root_element(mets):
         profile=mets.mets_profile.value,
         objid=mets.package_id,
         label=mets.label,
-        namespaces=_NAMESPACES
+        namespaces=NAMESPACES
     )
 
     # Set Finnish national METS schema specific attributes to the root element
@@ -113,7 +113,7 @@ def _parse_mets_root_element(mets):
     # Set Finnish national METS schema location to the root element
     mets_root.set(
         _use_namespace("xsi", "schemaLocation"),
-        f"{_NAMESPACES['mets']} {_METS_FI_SCHEMA}"
+        f"{NAMESPACES['mets']} {_METS_FI_SCHEMA}"
     )
 
     return mets_root

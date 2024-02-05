@@ -7,7 +7,7 @@ import xml_helpers.utils
 from mets_builder.metadata import (TechnicalBitstreamObjectMetadata,
                                    TechnicalFileObjectMetadata,
                                    TechnicalObjectMetadata)
-from mets_builder.serialize import _NAMESPACES
+from mets_builder.serialize import NAMESPACES
 
 
 def test_abstract_init_not_allowed():
@@ -201,7 +201,7 @@ def test_valid_encodings(charset):
     result = data.to_xml_element_tree()
     name_element = result.find(
         "premis:objectCharacteristics//premis:formatName",
-        namespaces=_NAMESPACES
+        namespaces=NAMESPACES
     )
     assert name_element.text == "text/plain; encoding=" + charset
 
@@ -306,6 +306,6 @@ def test_unapplicable_file_format_version():
 
     # Find the format version element, if it exists
     format_version_element = serialized.xpath(
-        "//premis:formatVersion", namespaces=_NAMESPACES
+        "//premis:formatVersion", namespaces=NAMESPACES
     )
     assert len(format_version_element) == 0

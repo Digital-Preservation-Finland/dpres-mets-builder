@@ -5,7 +5,7 @@ import pytest
 import xml_helpers.utils
 
 from mets_builder.metadata import DigitalProvenanceAgentMetadata
-from mets_builder.serialize import _NAMESPACES
+from mets_builder.serialize import NAMESPACES
 
 
 def test_invalid_agent_type():
@@ -61,7 +61,7 @@ def test_serialized_agent_version(agent_type, expected_name):
     )
 
     result = data.to_xml_element_tree()
-    name_element = result.find("premis:agentName", namespaces=_NAMESPACES)
+    name_element = result.find("premis:agentName", namespaces=NAMESPACES)
     assert name_element.text == expected_name
 
 

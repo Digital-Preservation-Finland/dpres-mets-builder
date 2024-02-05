@@ -20,6 +20,10 @@ Fixed
 ^^^^^
 - Removed empty DMDID attributes from structMap divs in the serialized METS
 
+Changed
+^^^^^^^
+- ``NAMESPACES`` constant in ``serialize`` module was made public
+
 0.1.0 - 2023-06-14
 ------------------
 Added
