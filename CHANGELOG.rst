@@ -15,6 +15,7 @@ Added
 - Classes ``TechnicalFileObjectMetadata`` and ``TechnicalBitstreamObjectMetadata`` for representing file and bitstream technical metadata respectively using PREMIS objects
 - Identical technical media metadata entries will automatically be deduplicated in the generated METS if possible
 - Method ``StructuralMap.from_directory_structure`` to generate structural map from the directory structure of given digital objects
+- Method ``DigitalProvenanceAgentMetadata.dpres_mets_builder`` for creating agent metadata for ``dpres-mets-builder``
 
 Fixed
 ^^^^^

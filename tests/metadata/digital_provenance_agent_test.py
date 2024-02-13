@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 import xml_helpers.utils
 
+from mets_builder import __version__
 from mets_builder.metadata import DigitalProvenanceAgentMetadata
 from mets_builder.serialize import NAMESPACES
 
@@ -107,3 +108,15 @@ def test_user_given_identifier():
     )
     assert agent.agent_identifier_type == "user-type"
     assert agent.agent_identifier == "user-identifier"
+
+
+def test_mets_builder_agent():
+    """Test that user can easily get the agent metadata for mets-builder."""
+    agent = DigitalProvenanceAgentMetadata.dpres_mets_builder()
+    assert agent.agent_name == "dpres-mets-builder"
+    assert agent.agent_type.value == "software"
+    assert agent.agent_version == __version__
+    assert agent.agent_identifier_type == "local"
+    assert agent.agent_identifier == (
+        f"fi-dpres-dpres-mets-builder-{__version__}"
+    )

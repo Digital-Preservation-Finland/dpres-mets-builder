@@ -6,6 +6,7 @@ from typing import Optional, Union
 import premis
 from lxml import etree
 
+import mets_builder
 from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
 
 
@@ -74,6 +75,23 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
             metadata_format=self.METADATA_FORMAT,
             format_version=self.METADATA_FORMAT_VERSION,
             **kwargs
+        )
+
+    @classmethod
+    def dpres_mets_builder(cls) -> "DigitalProvenanceAgentMetadata":
+        """Get agent metadata representing dpres-mets-builder.
+
+        Convenience method for creating agent metadata object that represents
+        this library itself, dpres-mets-builder.
+        """
+        return DigitalProvenanceAgentMetadata(
+            agent_name="dpres-mets-builder",
+            agent_type=DigitalProvenanceAgentType.SOFTWARE,
+            agent_version=mets_builder.__version__,
+            agent_identifier_type="local",
+            agent_identifier=(
+                f"fi-dpres-dpres-mets-builder-{mets_builder.__version__}"
+            )
         )
 
     def _resolve_agent_version(self, agent_version, agent_type):
