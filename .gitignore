@@ -22,5 +22,8 @@ junit.xml
 # Vim
 *.swp
 
-# Ato-generated doc files
+# Auto-generated doc files
 doc/source/generated
+
+# Auto-generated version number file
+mets_builder/_version.py
