@@ -135,6 +135,14 @@ class DigitalProvenanceEventMetadata(MetadataBase):
             **kwargs
         )
 
+    def _vars(self):
+        vars_ = super()._vars()
+
+        vars_["linked_agents"] = tuple(self.linked_agents)
+        vars_["linked_objects"] = tuple(self.linked_objects)
+
+        return vars_
+
     @property
     def event_outcome(self):
         """Getter for event_outcome."""
