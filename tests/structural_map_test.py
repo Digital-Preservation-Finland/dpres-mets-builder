@@ -1,8 +1,12 @@
 """Tests for structural map classes."""
+from uuid import UUID
+
 import pytest
 
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
+                                   DigitalProvenanceEventMetadata,
+                                   MetadataBase, MetadataFormat, MetadataType)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -337,3 +341,85 @@ def test_generating_structural_map_with_no_digital_objects():
         "Given 'digital_objects' is empty. Structural map can not be "
         "generated with zero digital objects."
     )
+
+
+def test_generating_structural_map_digital_provenance():
+    """Test that digital provenance metadata is created correctly when
+    structural map is generated.
+
+    Event (structmap generation) and agent (dpres-mets-builder) should have
+    been added to the root div of the generated structural map. The agent
+    should also be linked to the event as the executing program.
+    """
+    digital_object = DigitalObject(sip_filepath="data/file.txt")
+    structural_map = StructuralMap.from_directory_structure([digital_object])
+
+    root_div = structural_map.root_div
+    assert len(root_div.metadata) == 2
+
+    # Event
+    event = next(
+        metadata for metadata in root_div.metadata
+        if isinstance(metadata, DigitalProvenanceEventMetadata)
+    )
+    assert event.event_type == "creation"
+    assert event.event_detail == (
+        "Creation of structural metadata with the "
+        "StructuralMap.from_directory_structure method"
+    )
+    assert event.event_outcome.value == "success"
+    assert event.event_outcome_detail == (
+        "Created METS structural map with type 'directory'"
+    )
+    assert event.event_identifier_type == "UUID"
+    # Fails if not a valid UUID v4
+    UUID(event.event_identifier, version=4)
+
+    # Agent
+    assert len(event.linked_agents) == 1
+    linked_agent = event.linked_agents[0]
+    assert linked_agent.agent_role == "executing program"
+    assert linked_agent.agent_metadata.agent_name == "dpres-mets-builder"
+
+    agent_in_div = next(
+        metadata for metadata in root_div.metadata
+        if isinstance(metadata, DigitalProvenanceAgentMetadata)
+    )
+    assert agent_in_div == linked_agent.agent_metadata
+
+
+def test_generating_structural_map_digital_provenance_with_custom_agents():
+    """Test that custom agents can be added to generated structural map.
+
+    The agents should have been added to the root div of the generated
+    structural map. The agents should also be linked to the structmap creation
+    event as executing programs.
+    """
+    digital_object = DigitalObject(sip_filepath="data/file.txt")
+    custom_agent_1 = DigitalProvenanceAgentMetadata(
+        agent_name="custom_agent_1",
+        agent_version="1.0",
+        agent_type="software"
+    )
+    custom_agent_2 = DigitalProvenanceAgentMetadata(
+        agent_name="custom_agent_2",
+        agent_version="1.0",
+        agent_type="software"
+    )
+
+    structural_map = StructuralMap.from_directory_structure(
+        [digital_object],
+        additional_agents=[custom_agent_1, custom_agent_2]
+    )
+
+    root_div = structural_map.root_div
+    assert custom_agent_1 in root_div.metadata
+    assert custom_agent_2 in root_div.metadata
+
+    event = next(
+        metadata for metadata in root_div.metadata
+        if isinstance(metadata, DigitalProvenanceEventMetadata)
+    )
+    linked_agents = (agent.agent_metadata for agent in event.linked_agents)
+    assert custom_agent_1 in linked_agents
+    assert custom_agent_2 in linked_agents

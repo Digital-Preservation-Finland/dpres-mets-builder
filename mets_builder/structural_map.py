@@ -1,12 +1,15 @@
 """Module for classes related to structural map (METS structMap)."""
 
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, Optional, Set
 
-from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import MetadataBase
 from mets_builder import validation
+from mets_builder.digital_object import DigitalObject
+from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
+                                   DigitalProvenanceEventMetadata,
+                                   MetadataBase)
 
 
 class StructuralMapDiv:
@@ -335,7 +338,9 @@ class StructuralMap:
     @classmethod
     def from_directory_structure(
         cls,
-        digital_objects: Iterable[DigitalObject]
+        digital_objects: Iterable[DigitalObject],
+        additional_agents:
+            Optional[Iterable[DigitalProvenanceAgentMetadata]] = None
     ) -> "StructuralMap":
         """A shortcut method for generating a structural map according to the
         directory structure of the digital objects.
@@ -365,8 +370,21 @@ class StructuralMap:
         - the DigitalObject representing "file_3.txt" added to the
           "directory_2" div
 
+        The structural map generation process is also documented as digital
+        provenance metadata (event and the executing agent) that are added to
+        the root div of the generated structural map. The event type is
+        'creation' and the agent linked to the event as the executing program
+        is dpres-mets-builder.
+
         :param digital_objects: The DigitalObject instances that are used to
             generate the structural map
+        :param additional_agents: Digital provenance agent metadata to be added
+            as additional executing programs for the structural map creation
+            event. These agents will be added alongside dpres-mets-builder as
+            executing programs for the event, and as metadata for the root
+            div of the structural map. This parameter can be used to document
+            the involvement of other programs that call this method to create
+            the structural map.
 
         :raises: ValueError if 'digital_objects' is empty.
 
@@ -417,4 +435,53 @@ class StructuralMap:
             child_divs = {divs[directory] for directory in child_dirs}
             parent_div.add_divs(child_divs)
 
+        # Document the process as digital provenance metadata
+        _add_digital_provenance_for_structural_map_creation(
+            root_div, additional_agents
+        )
+
         return StructuralMap(root_div=root_div)
+
+
+def _add_digital_provenance_for_structural_map_creation(
+    root_div,
+    additional_agents=None
+):
+    """Creates digital provenance metadata for structural map creation.
+
+    Creates an event for structural map creation, an agent representing
+    dpres-mets-builder, and links the agent as an agent for the event. Also
+    adds the event and agent as metadata for the root div.
+
+    :param root_div: The root div of the structural map in question
+    :param additional_agents: Optional agents to be linked to the event
+        additionally to the dpres-mets-builder agent, and added as metadata to
+        the root_div
+    """
+    if additional_agents is None:
+        additional_agents = []
+
+    time = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+    event = DigitalProvenanceEventMetadata(
+        event_type="creation",
+        event_datetime=time,
+        event_detail=(
+            "Creation of structural metadata with the "
+            "StructuralMap.from_directory_structure method"
+        ),
+        event_outcome="success",
+        event_outcome_detail=(
+            "Created METS structural map with type 'directory'"
+        )
+    )
+    agent = DigitalProvenanceAgentMetadata.dpres_mets_builder()
+
+    for agent in [agent] + additional_agents:
+        event.link_agent_metadata(
+            agent_metadata=agent,
+            agent_role="executing program"
+        )
+
+    for metadata in [event, agent] + additional_agents:
+        root_div.add_metadata(metadata)
