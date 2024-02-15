@@ -12,8 +12,8 @@ from mets_builder.file_references import FileReferences
 from mets_builder.metadata import MetadataBase
 from mets_builder.structural_map import StructuralMap
 
-METS_CATALOG = "1.7.5"
-METS_SPECIFICATION = "1.7.5"
+METS_CATALOG = "1.7.6"
+METS_SPECIFICATION = "1.7.6"
 
 
 class MetsProfile(Enum):

@@ -23,6 +23,7 @@ Fixed
 Changed
 ^^^^^^^
 - ``NAMESPACES`` constant in ``serialize`` module was made public
+- Updated to meet specifications version 1.7.6
 
 0.1.0 - 2023-06-14
 ------------------

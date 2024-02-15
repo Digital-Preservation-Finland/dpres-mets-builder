@@ -32,8 +32,8 @@ def mets_object():
         create_date=datetime(2022, 1, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
         last_mod_date=datetime(2022, 2, 3, 4, 5, 6, 7, tzinfo=timezone.utc),
         record_status="submission",
-        catalog_version="1.7.5",
-        specification="1.7.5",
+        catalog_version="1.7.6",
+        specification="1.7.6",
     )
     mets.add_agent(
         name="Ms. Bar",
@@ -177,8 +177,8 @@ def test_parse_root_element(mets_object):
     assert element.get(_use_namespace("fi", "CONTRACTID")) \
         == "urn:uuid:5b1afac8-4b51-4d2f-8c77-c7e9ddbdd019"
     assert element.get(_use_namespace("fi", "CONTENTID")) == "content_id"
-    assert element.get(_use_namespace("fi", "CATALOG")) == "1.7.5"
-    assert element.get(_use_namespace("fi", "SPECIFICATION")) == "1.7.5"
+    assert element.get(_use_namespace("fi", "CATALOG")) == "1.7.6"
+    assert element.get(_use_namespace("fi", "SPECIFICATION")) == "1.7.6"
     assert element.get(_use_namespace("xsi", "schemaLocation")) == (
         "http://www.loc.gov/METS/ "
         "http://digitalpreservation.fi/schemas/mets/mets.xsd"
