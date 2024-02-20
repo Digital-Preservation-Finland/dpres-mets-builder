@@ -112,7 +112,7 @@ def test_user_given_identifier():
 
 def test_mets_builder_agent():
     """Test that user can easily get the agent metadata for mets-builder."""
-    agent = DigitalProvenanceAgentMetadata.dpres_mets_builder()
+    agent = DigitalProvenanceAgentMetadata.get_mets_builder_agent()
     assert agent.agent_name == "dpres-mets-builder"
     assert agent.agent_type.value == "software"
     assert agent.agent_version == __version__

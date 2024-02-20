@@ -78,7 +78,7 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
         )
 
     @classmethod
-    def dpres_mets_builder(cls) -> "DigitalProvenanceAgentMetadata":
+    def get_mets_builder_agent(cls) -> "DigitalProvenanceAgentMetadata":
         """Get agent metadata representing dpres-mets-builder.
 
         Convenience method for creating agent metadata object that represents

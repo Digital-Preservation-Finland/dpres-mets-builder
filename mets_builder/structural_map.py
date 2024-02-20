@@ -475,7 +475,7 @@ def _add_digital_provenance_for_structural_map_creation(
             "Created METS structural map with type 'directory'"
         )
     )
-    agent = DigitalProvenanceAgentMetadata.dpres_mets_builder()
+    agent = DigitalProvenanceAgentMetadata.get_mets_builder_agent()
 
     for agent in [agent] + additional_agents:
         event.link_agent_metadata(
