@@ -413,6 +413,8 @@ def test_generating_structural_map_digital_provenance_with_custom_agents():
     )
 
     root_div = structural_map.root_div
+    mets_builder = DigitalProvenanceAgentMetadata.get_mets_builder_agent()
+    assert mets_builder in root_div.metadata
     assert custom_agent_1 in root_div.metadata
     assert custom_agent_2 in root_div.metadata
 
@@ -421,5 +423,6 @@ def test_generating_structural_map_digital_provenance_with_custom_agents():
         if isinstance(metadata, DigitalProvenanceEventMetadata)
     )
     linked_agents = (agent.agent_metadata for agent in event.linked_agents)
+    assert mets_builder in linked_agents
     assert custom_agent_1 in linked_agents
     assert custom_agent_2 in linked_agents
