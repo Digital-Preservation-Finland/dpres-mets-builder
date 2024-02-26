@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import PurePath
 from typing import Iterable, Optional, Set
 
 from mets_builder import validation
@@ -400,39 +400,39 @@ class StructuralMap:
         root_div = StructuralMapDiv(div_type="directory")
 
         # dict directory filepath -> corresponding div
-        # In the algorithm below, Path(".") can be thought of as the root div
-        # that has already been created, initialize the dict with that
-        divs = {Path("."): root_div}
+        # In the algorithm below, PurePath(".") can be thought of as the root
+        # div that has already been created, initialize the dict with that
+        path2div = {PurePath("."): root_div}
 
         # dict directory filepath -> child directory filepaths
         directory_relationships = defaultdict(set)
 
         for digital_object in digital_objects:
 
-            sip_filepath = Path(digital_object.sip_filepath)
+            sip_filepath = PurePath(digital_object.sip_filepath)
 
             for path in sip_filepath.parents:
                 # Do not process path "."
-                if path == Path("."):
+                if path == PurePath("."):
                     continue
 
                 # Create corresponding div for directories if they do not exist
                 # yet
-                if path not in divs:
-                    divs[path] = StructuralMapDiv(div_type=path.name)
+                if path not in path2div:
+                    path2div[path] = StructuralMapDiv(div_type=path.name)
 
                 # Save directory relationships to be dealt with later
                 directory_relationships[path.parent].add(path)
 
             # Add the digital object to the div corresponding its parent
             # directory
-            digital_object_parent_div = divs[sip_filepath.parent]
+            digital_object_parent_div = path2div[sip_filepath.parent]
             digital_object_parent_div.add_digital_objects([digital_object])
 
         # Nest divs according to the directory structure
         for parent_dir, child_dirs in directory_relationships.items():
-            parent_div = divs[parent_dir]
-            child_divs = {divs[directory] for directory in child_dirs}
+            parent_div = path2div[parent_dir]
+            child_divs = {path2div[directory] for directory in child_dirs}
             parent_div.add_divs(child_divs)
 
         # Document the process as digital provenance metadata
