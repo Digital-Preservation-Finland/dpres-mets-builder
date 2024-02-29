@@ -8,6 +8,8 @@ Creating a METS document with METS builder consists of the following steps:
 4. Create/generate file references
 5. Transform the METS object instance to an XML file
 
+The example code here can be found in full at the :doc:`example_code` section.
+
 Create a METS object instance
 -----------------------------
 

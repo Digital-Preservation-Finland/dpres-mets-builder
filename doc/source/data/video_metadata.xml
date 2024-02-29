@@ -1,0 +1,25 @@
+<vmd:VIDEOMD xmlns:vmd="http://www.loc.gov/videoMD/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/VideoMD/ https://www.loc.gov/standards/vmdvmd/VideoMD.xsd" ANALOGDIGITALFLAG="FileDigital">
+  <vmd:fileData>
+    <vmd:duration>PT1S</vmd:duration>
+    <vmd:dataRate>0</vmd:dataRate>
+    <vmd:bitsPerSample>8</vmd:bitsPerSample>
+    <vmd:color>Color</vmd:color>
+    <vmd:compression>
+      <vmd:codecCreatorApp>Lavf56.40.101</vmd:codecCreatorApp>
+      <vmd:codecCreatorAppVersion>56.40.101</vmd:codecCreatorAppVersion>
+      <vmd:codecName>FFV1</vmd:codecName>
+      <vmd:codecQuality>lossless</vmd:codecQuality>
+    </vmd:compression>
+    <vmd:dataRateMode>Variable</vmd:dataRateMode>
+    <vmd:frame>
+      <vmd:pixelsHorizontal>320</vmd:pixelsHorizontal>
+      <vmd:pixelsVertical>180</vmd:pixelsVertical>
+      <vmd:PAR>1</vmd:PAR>
+      <vmd:DAR>1.778</vmd:DAR>
+    </vmd:frame>
+    <vmd:frameRate>30</vmd:frameRate>
+    <vmd:sampling>4:2:0</vmd:sampling>
+    <vmd:signalFormat>(:unap)</vmd:signalFormat>
+    <vmd:sound>Yes</vmd:sound>
+  </vmd:fileData>
+</vmd:VIDEOMD>
