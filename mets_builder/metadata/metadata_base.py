@@ -7,6 +7,36 @@ from typing import Optional, Union
 from lxml import etree
 
 
+class ComparableMixin:
+    """
+    Mixin that makes most classes comparable as-is. This means that class
+    instances with identical data will be evaluated as identical: for example,
+    sets will only accept one instance with the correct metadata.
+
+    Some classes might contain non-hashable fields. In such case, override
+    `_vars` to return a copy of metadata object's variables where they are all
+    hashable. In most cases, this means converting lists to tuples.
+    """
+    def _vars(self):
+        """
+        Return copy of metadata object's variables.
+
+        This is used for equality comparisons between different objects and for
+        computing the hash. Since lists are not hashable, this `_vars` method
+        is used for converting any non-hashable fields where necessary.
+        """
+        return vars(self).copy()
+
+    def __eq__(self, other):
+        return (
+            isinstance(self, other.__class__)
+            and self._vars() == other._vars()
+        )
+
+    def __hash__(self):
+        return hash(tuple(self._vars().values()))
+
+
 class ChecksumAlgorithm(Enum):
     """Enum for allowed checksum algorithms."""
     MD5 = "MD5"
@@ -101,7 +131,7 @@ class MetadataFormat(Enum):
     """Use if none of the other options apply to the metadata format."""
 
 
-class MetadataBase:
+class MetadataBase(ComparableMixin):
     """Base class representing metadata elements in a METS document.
 
     This class is abstract and should not be instantiated.
@@ -184,25 +214,6 @@ class MetadataBase:
 
         self.identifier = identifier
         self.created = created
-
-    def _vars(self):
-        """
-        Return copy of metadata object's variables.
-
-        This is used for equality comparisons between different objects and for
-        computing the hash. Since lists are not hashable, this `_vars` method
-        is used for converting any non-hashable fields where necessary.
-        """
-        return vars(self).copy()
-
-    def __eq__(self, other):
-        return (
-            isinstance(self, other.__class__)
-            and self._vars() == other._vars()
-        )
-
-    def __hash__(self):
-        return hash(tuple(self._vars().values()))
 
     @property
     def is_administrative(self) -> bool:

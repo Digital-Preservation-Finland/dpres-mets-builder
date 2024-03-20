@@ -1,7 +1,8 @@
 """mets_builder.metadata default imports."""
 
 # These *have* to be imported first; otherwise cyclical import occurs
-from mets_builder.metadata.metadata_base import (Charset,  # isort:skip
+from mets_builder.metadata.metadata_base import (ComparableMixin,  # isort:skip
+                                                 Charset,
                                                  ChecksumAlgorithm,
                                                  MetadataBase, MetadataFormat,
                                                  MetadataType,
@@ -24,6 +25,7 @@ from mets_builder.metadata.technical_video_metadata import \
     TechnicalVideoMetadata
 
 __all__ = [
+    "ComparableMixin",
     "Charset",
     "ChecksumAlgorithm",
     "MetadataBase",
