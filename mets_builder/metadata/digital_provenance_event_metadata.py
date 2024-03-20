@@ -6,7 +6,8 @@ from typing import List, Optional, Union
 import premis
 from lxml import etree
 
-from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
+from mets_builder.metadata import (ComparableMixin,
+                                   DigitalProvenanceAgentMetadata,
                                    MetadataBase, MetadataFormat, MetadataType,
                                    TechnicalObjectMetadata)
 
@@ -48,7 +49,7 @@ class EventOutcome(Enum):
     """Too numerous to list (et alia)."""
 
 
-class _LinkedAgent:
+class _LinkedAgent(ComparableMixin):
     """Class holding information of a agent linked to an event."""
 
     def __init__(
@@ -61,7 +62,7 @@ class _LinkedAgent:
         self.agent_role = agent_role
 
 
-class _LinkedObject:
+class _LinkedObject(ComparableMixin):
     """Class holding information of an object linked to an event."""
 
     def __init__(
