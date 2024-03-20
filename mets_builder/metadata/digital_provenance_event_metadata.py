@@ -87,10 +87,10 @@ class DigitalProvenanceEventMetadata(MetadataBase):
     def __init__(
         self,
         event_type: str,
-        event_datetime: str,
         event_detail: str,
         event_outcome: Union[EventOutcome, str],
         event_outcome_detail: str,
+        event_datetime: Optional[str] = None,
         event_identifier_type: Optional[str] = None,
         event_identifier: Optional[str] = None,
         **kwargs
@@ -102,8 +102,6 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         information.
 
         :param event_type: A categorization of the nature of the event.
-        :param event_datetime: The single date and time, or date and time
-            range, at or during which the event occurred.
         :param event_detail: Additional information about the event.
         :param event_outcome: A categorization of the overall result of the
             event in terms of success, partial success, or failure. If given as
@@ -112,6 +110,13 @@ class DigitalProvenanceEventMetadata(MetadataBase):
             from EventOutcome documentation.
         :param event_outcome_detail: A detailed description of the result or
             product of the event.
+        :param event_datetime: The single date and time, or date and time
+            range, at or during which the event occurred.
+
+            If set to None, the event date will be generated
+            during serialization and will be set to the same date on all
+            metadata objects that have it set to None.
+
         :param event_identifier_type: Type of event identifier.
         :param event_identifier: The event identifier value. If not given by
             the user, event identifier is generated automatically.
@@ -264,7 +269,7 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         event = premis.event(
             event_id=event_id,
             event_type=self.event_type,
-            event_date_time=self.event_datetime,
+            event_date_time=state.get_event_datetime(self),
             event_detail=self.event_detail,
             child_elements=event_child_elements
         )

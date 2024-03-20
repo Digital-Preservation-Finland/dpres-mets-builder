@@ -75,6 +75,16 @@ class _SerializerState:
         else:
             return self.now.isoformat()
 
+    def get_event_datetime(self, metadata: MetadataBase):
+        """
+        Get event datetime for a metadata object. If no event datetime exists,
+        use a datetime that corresponds to the start of the serialization
+        """
+        if metadata.event_datetime:
+            return metadata.event_datetime
+        else:
+            return self.now.isoformat()
+
 
 def _use_namespace(namespace, attribute):
     """Get a string prepended with a namespace prefix."""
