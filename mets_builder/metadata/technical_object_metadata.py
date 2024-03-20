@@ -392,7 +392,7 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
 
         return premis_relationships
 
-    def to_xml_element_tree(self) -> etree._Element:
+    def _to_xml_element_tree(self, state) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
         :returns: The root element of the metadata serialized into XML.
