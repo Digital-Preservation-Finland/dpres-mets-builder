@@ -372,8 +372,7 @@ def test_generating_structural_map_digital_provenance():
         "Created METS structural map with type 'directory'"
     )
     assert event.event_identifier_type == "UUID"
-    # Fails if not a valid UUID v4
-    UUID(event.event_identifier, version=4)
+    assert event.event_identifier is None
 
     # Agent
     assert len(event.linked_agents) == 1

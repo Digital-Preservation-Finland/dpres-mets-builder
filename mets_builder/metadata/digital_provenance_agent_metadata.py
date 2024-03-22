@@ -1,5 +1,4 @@
 """Module for DigitalProvenanceAgentMetadata class."""
-import uuid
 from enum import Enum
 from typing import Optional, Union
 
@@ -87,11 +86,7 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
         return DigitalProvenanceAgentMetadata(
             agent_name="dpres-mets-builder",
             agent_type=DigitalProvenanceAgentType.SOFTWARE,
-            agent_version=mets_builder.__version__,
-            agent_identifier_type="local",
-            agent_identifier=(
-                f"fi-dpres-dpres-mets-builder-{mets_builder.__version__}"
-            )
+            agent_version=mets_builder.__version__
         )
 
     def _resolve_agent_version(self, agent_version, agent_type):
@@ -112,8 +107,8 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
         """Resolve agent identifier and identifier type.
 
         If identifier is given, also identifier type must be declared by the
-        user. If identifier is not given by the user, agent identifier should
-        be generated.
+        user. If identifier is not given by the user, agent identifier will
+        be generated later during serialization.
         """
         if identifier and not identifier_type:
             raise ValueError(
@@ -121,8 +116,8 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
             )
 
         if not identifier:
-            identifier_type = "local"
-            identifier = str(uuid.uuid4())
+            identifier_type = "UUID"
+            identifier = None
 
         self.agent_identifier_type = identifier_type
         self.agent_identifier = identifier
@@ -144,15 +139,15 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
 
         :returns: The root element of the metadata serialized into XML.
         """
-        agent_identifier = premis.identifier(
+        agent_identifier_elem = premis.identifier(
             identifier_type=self.agent_identifier_type,
-            identifier_value=self.agent_identifier,
+            identifier_value=state.get_agent_identifier(self),
             prefix="agent",
             role=None
         )
 
         agent = premis.agent(
-            agent_id=agent_identifier,
+            agent_id=agent_identifier_elem,
             agent_name=self._resolve_serialized_agent_name(),
             agent_type=self.agent_type.value,
             note=self.agent_note

@@ -87,9 +87,9 @@ def test_identifier_type_not_set():
     )
 
 
-def test_generate_agent_identifier():
-    """Test that event identifier is generated and type set to 'UUID', if
-    identifier is not given by the user.
+def test_generate_event_identifier():
+    """Test that event identifier type is set to 'UUID',
+    if identifier is not given by the user.
     """
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
@@ -101,7 +101,7 @@ def test_generate_agent_identifier():
         event_identifier=None
     )
     assert event.event_identifier_type == "UUID"
-    assert event.event_identifier
+    assert event.event_identifier is None
 
 
 def test_user_given_identifier():

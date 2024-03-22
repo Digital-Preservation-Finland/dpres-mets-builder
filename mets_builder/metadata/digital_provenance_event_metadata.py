@@ -1,5 +1,4 @@
 """Module for DigitalProvenanceEventMetadata class."""
-import uuid
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -197,8 +196,8 @@ class DigitalProvenanceEventMetadata(MetadataBase):
         """Resolve event identifier and identifier type.
 
         If identifier is given, also identifier type must be declared by the
-        user. If identifier is not given by the user, event identifier should
-        be generated.
+        user. If identifier is not given by the user, event identifier will
+        be generated later during serialization.
         """
         if identifier and not identifier_type:
             raise ValueError(
@@ -207,12 +206,12 @@ class DigitalProvenanceEventMetadata(MetadataBase):
 
         if not identifier:
             identifier_type = "UUID"
-            identifier = str(uuid.uuid4())
+            identifier = None
 
         self.event_identifier_type = identifier_type
         self.event_identifier = identifier
 
-    def _serialize_linked_agents_to_xml_elements(self):
+    def _serialize_linked_agents_to_xml_elements(self, state):
         """Serialize linked agents to XML elements."""
         linked_agent_ids = [
             premis.identifier(
@@ -220,7 +219,9 @@ class DigitalProvenanceEventMetadata(MetadataBase):
                     linked_agent.agent_metadata.agent_identifier_type
                 ),
                 identifier_value=(
-                    linked_agent.agent_metadata.agent_identifier
+                    state.get_agent_identifier(
+                        linked_agent.agent_metadata
+                    )
                 ),
                 prefix='linkingAgent',
                 role=linked_agent.agent_role
@@ -251,9 +252,9 @@ class DigitalProvenanceEventMetadata(MetadataBase):
 
         :returns: The root element of the metadata serialized into XML.
         """
-        event_id = premis.identifier(
+        event_id_elem = premis.identifier(
             identifier_type=self.event_identifier_type,
-            identifier_value=self.event_identifier,
+            identifier_value=state.get_event_identifier(self),
             prefix="event"
         )
 
@@ -262,13 +263,13 @@ class DigitalProvenanceEventMetadata(MetadataBase):
             detail_note=self.event_outcome_detail
         )
 
-        linked_agents = self._serialize_linked_agents_to_xml_elements()
+        linked_agents = self._serialize_linked_agents_to_xml_elements(state)
         linked_objects = self._serialize_linked_objects_to_xml_elements()
 
         event_child_elements = [outcome] + linked_agents + linked_objects
 
         event = premis.event(
-            event_id=event_id,
+            event_id=event_id_elem,
             event_type=self.event_type,
             event_date_time=state.get_event_datetime(self),
             event_detail=self.event_detail,

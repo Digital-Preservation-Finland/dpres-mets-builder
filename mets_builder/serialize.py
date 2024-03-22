@@ -1,18 +1,18 @@
 """Module for serializing METS objects."""
 
+import uuid
+from collections import defaultdict
 from datetime import datetime, timezone
 from io import BytesIO
 from typing import TYPE_CHECKING
-
-from collections import defaultdict
-
-import uuid
 
 import mets as mets_elements
 from lxml import etree
 
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import MetadataBase, MetadataType
+from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
+                                   DigitalProvenanceEventMetadata,
+                                   MetadataBase, MetadataType)
 
 # Prevent circular import caused by type hints with special
 # typing.TYPE_CHECKING constant. See
@@ -49,6 +49,10 @@ class _SerializerState:
         self.now = datetime.now(timezone.utc)
 
         self._metadata2identifier = defaultdict(lambda: f"_{uuid.uuid4()}")
+        self._metadata2agent_identifier = \
+            defaultdict(lambda: str(uuid.uuid4()))
+        self._metadata2event_identifier = \
+            defaultdict(lambda: str(uuid.uuid4()))
 
     def get_identifier(self, metadata: MetadataBase):
         """
@@ -84,6 +88,28 @@ class _SerializerState:
             return metadata.event_datetime
         else:
             return self.now.isoformat()
+
+    def get_event_identifier(self, metadata: DigitalProvenanceEventMetadata):
+        """
+        Get identifier for a digital provenance event object.
+        If the metadata object has no identifier,
+        generate an unique identifier that will be shared with all
+        other events that have identical data.
+        """
+        if metadata.event_identifier:
+            return metadata.event_identifier
+        return self._metadata2event_identifier[metadata]
+
+    def get_agent_identifier(self, metadata: DigitalProvenanceAgentMetadata):
+        """
+        Get identifier for a digital provenance agent object.
+        If the metadata object has no identifier,
+        generate an unique identifier that will be shared with all
+        other agents that have identical data.
+        """
+        if metadata.agent_identifier:
+            return metadata.agent_identifier
+        return self._metadata2agent_identifier[metadata]
 
 
 def _use_namespace(namespace, attribute):

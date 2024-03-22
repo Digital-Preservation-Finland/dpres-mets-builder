@@ -12,6 +12,10 @@ Added
 ^^^^^
 - Identical digital provenance event metadata entries will automatically be deduplicated in the generated METS if possible
 
+Changed
+^^^^^^^
+- Pre-generated events and agents use UUIDs instead of hardcoded identifiers
+
 
 0.2.0 - 2024-02-29
 ------------------

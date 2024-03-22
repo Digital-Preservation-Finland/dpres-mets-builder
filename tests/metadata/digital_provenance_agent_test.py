@@ -83,8 +83,8 @@ def test_identifier_type_not_set():
 
 
 def test_generate_agent_identifier():
-    """Test that agent identifier is generated and type set to 'local', if
-    identifier is not given by the user.
+    """Test that agent identifier type is set to 'local',
+    if identifier is not given by the user.
     """
     agent = DigitalProvenanceAgentMetadata(
         agent_identifier_type=None,
@@ -93,8 +93,8 @@ def test_generate_agent_identifier():
         agent_type="software",
         agent_version="1.0"
     )
-    assert agent.agent_identifier_type == "local"
-    assert agent.agent_identifier
+    assert agent.agent_identifier_type == "UUID"
+    assert agent.agent_identifier is None
 
 
 def test_user_given_identifier():
@@ -116,7 +116,5 @@ def test_mets_builder_agent():
     assert agent.agent_name == "dpres-mets-builder"
     assert agent.agent_type.value == "software"
     assert agent.agent_version == __version__
-    assert agent.agent_identifier_type == "local"
-    assert agent.agent_identifier == (
-        f"fi-dpres-dpres-mets-builder-{__version__}"
-    )
+    assert agent.agent_identifier_type == "UUID"
+    assert agent.agent_identifier is None
