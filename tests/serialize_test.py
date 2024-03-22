@@ -10,11 +10,12 @@ from lxml import etree
 
 from mets_builder import metadata, serialize
 from mets_builder.digital_object import DigitalObject, DigitalObjectStream
+from mets_builder.metadata.digital_provenance_event_metadata import \
+    DigitalProvenanceEventMetadata, DigitalProvenanceAgentMetadata
 from mets_builder.metadata.technical_video_metadata import \
     TechnicalVideoMetadata
 from mets_builder.mets import METS, MetsProfile
-from mets_builder.serialize import (NAMESPACES, _SerializerState,
-                                    _use_namespace)
+from mets_builder.serialize import NAMESPACES, _SerializerState, _use_namespace
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -499,6 +500,79 @@ def test_metadata_identifier_generated():
     assert metadata_elems[3].attrib["ID"] == \
         "_bfb2a6fc-3df3-48ed-b8bc-d00fcafef00d"
 
+
+def test_metadata_identifier_shared():
+    """
+    Test that missing identifiers will be generated for digital provenance
+    event metadata objects, and that said identifiers will be identical across
+    objects that share the same metadata
+    """
+    state = _SerializerState()
+
+    events = []
+
+    for _ in range(0, 3):
+        events.append(
+            DigitalProvenanceEventMetadata(
+                event_type="calculation",
+                event_datetime="2000-01-01T12:00:00",
+                event_detail="Event detail",
+                event_outcome="success",
+                event_outcome_detail="Event outcome detail"
+            )
+        )
+
+    for i in range(0, 2):
+        events[i].link_agent_metadata(
+            DigitalProvenanceAgentMetadata(
+                agent_name="calculator",
+                agent_type="software",
+                agent_version="1.2.4"
+            ),
+            agent_role="executing program"
+        )
+
+    # The third event has a slightly different agent. This should be detected
+    # later when generating the identifier
+    events[2].link_agent_metadata(
+        DigitalProvenanceAgentMetadata(
+            agent_name="calculator",
+            agent_type="software",
+            agent_version="2.0"  # Different version
+        ),
+        agent_role="executing program"
+    )
+
+    event_elems = []
+    for event_ in events:
+        event_elems.append(
+            serialize._parse_metadata_element(event_, state)
+        )
+
+    # Events 1 and 2 have same UUID, as they have the same content
+    assert event_elems[0].attrib["ID"].startswith("_")
+    uuid.UUID(event_elems[0].attrib["ID"][1:])
+    assert event_elems[0].attrib["ID"] == event_elems[1].attrib["ID"]
+
+    # Event 3 has a different UUID, because the referenced agent software
+    # has a different version
+    assert event_elems[1].attrib["ID"] != event_elems[2].attrib["ID"]
+
+    # Agents also have their own identifiers which are proper UUIDs without
+    # the underscore prefix
+    agent_identifiers = [
+        event_elem.xpath(
+            "//premis:linkingAgentIdentifierValue",
+            namespaces=NAMESPACES
+        )[0].text for event_elem in event_elems
+    ]
+
+    # Like with events, the first and second agent have the same agent
+    # identifiers
+    uuid.UUID(agent_identifiers[0])
+    assert agent_identifiers[0] == agent_identifiers[1]
+
+    assert agent_identifiers[1] != agent_identifiers[2]
 
 def test_metadata_created_generated():
     """
