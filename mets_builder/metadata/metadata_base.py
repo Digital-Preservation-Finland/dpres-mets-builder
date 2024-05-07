@@ -66,6 +66,12 @@ class MetadataType(Enum):
     DIGITAL_PROVENANCE = "digital provenance"
     """Digital provenance metadata"""
 
+    RIGHTS = "rights"
+    """Intellectual property rights metadata"""
+
+    SOURCE = "source"
+    """Source metadata"""
+
 
 class PREMISObjectType(Enum):
     """Enum for PREMIS object types."""

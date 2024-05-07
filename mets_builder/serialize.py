@@ -226,6 +226,10 @@ def _parse_metadata_element(metadata: MetadataBase, state: _SerializerState):
         element_builder_function = mets_elements.digiprovmd
     elif metadata.metadata_type == MetadataType.DESCRIPTIVE:
         element_builder_function = mets_elements.dmdsec
+    elif metadata.metadata_type == MetadataType.RIGHTS:
+        raise NotImplementedError
+    elif metadata.metadata_type == MetadataType.SOURCE:
+        raise NotImplementedError
 
     # Create element
     metadata_element = element_builder_function(
@@ -264,9 +268,19 @@ def _write_administrative_metadata(xml, mets, state: _SerializerState):
     ))
     amdsec = mets_elements.amdsec()
     with xml.element(amdsec.tag):
-        for metadata in administrative_metadata:
-            metadata_element = _parse_metadata_element(metadata, state)
-            xml.write(metadata_element)
+        # The elements in amdSec must be in correct order: techMD,
+        # rightsMD, sourceMD, digiprovMD
+        for metadata_type in (MetadataType.TECHNICAL,
+                              MetadataType.RIGHTS,
+                              MetadataType.SOURCE,
+                              MetadataType.DIGITAL_PROVENANCE):
+            metadata_to_be_written = [
+                metadata for metadata in administrative_metadata
+                if metadata.metadata_type is metadata_type
+            ]
+            for metadata in metadata_to_be_written:
+                metadata_element = _parse_metadata_element(metadata, state)
+                xml.write(metadata_element)
 
 
 def _parse_file_references_file(

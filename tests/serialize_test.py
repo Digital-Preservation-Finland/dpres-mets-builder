@@ -51,9 +51,15 @@ def mets_object():
         format_version="1.0",
         identifier="_1"
     )
+    digiprov_md = metadata.DigitalProvenanceEventMetadata(
+        event_type="foo",
+        event_detail="bar",
+        event_outcome="success",
+        event_outcome_detail="baz"
+    )
     do_1 = DigitalObject(
         sip_filepath="path/1",
-        metadata=[md_1],
+        metadata=[md_1, digiprov_md],
         identifier="digital_object_1"
     )
 
@@ -160,8 +166,9 @@ def test_parse_mets(mets_object):
     # descriptive metadata
     amd_sec = element.find("mets:amdSec", namespaces=NAMESPACES)
     assert amd_sec is not None
-    assert len(amd_sec) == 2
+    assert len(amd_sec) == 3
     assert len(amd_sec.findall("mets:techMD", namespaces=NAMESPACES)) == 2
+    assert len(amd_sec.findall("mets:digiprovMD", namespaces=NAMESPACES)) == 1
 
 
 def test_parse_root_element(mets_object):
