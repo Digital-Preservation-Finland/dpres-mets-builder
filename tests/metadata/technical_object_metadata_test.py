@@ -203,7 +203,7 @@ def test_valid_encodings(charset):
         "premis:objectCharacteristics//premis:formatName",
         namespaces=NAMESPACES
     )
-    assert name_element.text == "text/plain; encoding=" + charset
+    assert name_element.text == "text/plain; charset=" + charset
 
 
 @pytest.mark.parametrize(

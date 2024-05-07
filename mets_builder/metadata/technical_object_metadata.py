@@ -355,7 +355,7 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
         """
         format_name = self.file_format
         if self.charset:
-            format_name += f"; encoding={self.charset.value}"
+            format_name += f"; charset={self.charset.value}"
         return format_name
 
     def _serialize_relationships_to_xml_elements(self):
