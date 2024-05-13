@@ -405,6 +405,11 @@ def _write_mets(mets, output_file):
     # constructing the entire tree in memory before writing
     with etree.xmlfile(output_file, encoding="utf-8") as xml:
 
+        # Encoding must be specified in XML declaration to ensure that
+        # all tools (for example xmllint) can read the document
+        # correctly
+        xml.write_declaration()
+
         # METS root element
         mets_root = _parse_mets_root_element(mets)
         with xml.element(mets_root.tag, mets_root.attrib, mets_root.nsmap):

@@ -280,8 +280,8 @@ def test_parse_metadata_element(metadata_type, root_element_tag):
 
     # The metadata content is
     # <root>
-    #   <sub1></sub1>
-    #   <sub2></sub2>
+    #   <sub1>Pekka</sub1>
+    #   <sub2>Puupää</sub2>
     # </root>
     assert metadata_element.tag == "root"
     assert len(metadata_element) == 2
@@ -692,3 +692,20 @@ def test_schematron_validation(mets_object, tmp_path):
         ], check=False
     )
     assert result.returncode == 0
+
+
+def test_utf8(mets_object, tmp_path):
+    """Test that METS document is written in UTF-8."""
+    path = tmp_path / "mets.xml"
+    mets_object.write(path)
+
+    # Lxml should detect encoding as utf-8
+    parsed_mets = etree.parse(str(path))
+    assert parsed_mets.docinfo.encoding == 'utf-8'
+
+    # Non-ascii characters should be written correctly
+    xml_text = path.read_text(encoding="utf-8")
+    assert "Puupää" in xml_text
+
+    # XML declaration should specify the encoding.
+    assert "<?xml version='1.0' encoding='utf-8'?>" in xml_text
