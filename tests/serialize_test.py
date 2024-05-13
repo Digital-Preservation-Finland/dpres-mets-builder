@@ -60,7 +60,8 @@ def mets_object():
     do_1 = DigitalObject(
         sip_filepath="path/1",
         metadata=[md_1, digiprov_md],
-        identifier="digital_object_1"
+        identifier="digital_object_1",
+        use="test-use-attribute"
     )
 
     md_2 = metadata.ImportedMetadata(
@@ -709,3 +710,17 @@ def test_utf8(mets_object, tmp_path):
 
     # XML declaration should specify the encoding.
     assert "<?xml version='1.0' encoding='utf-8'?>" in xml_text
+
+
+def test_use_attribute(mets_object):
+    """Test adding USE attribute to a file."""
+    serialized = serialize.to_xml_string(mets_object)
+    element = etree.fromstring(serialized)
+
+    # One of the file elements should have USE attribute
+    files = element.xpath("//mets:file[@USE='test-use-attribute']",
+                          namespaces=NAMESPACES)
+    assert len(files) == 1
+    # Check that USE attribute was added to correct file
+    locat = files[0].xpath("mets:FLocat", namespaces=NAMESPACES)[0]
+    assert 'file:///path/1' in locat.attrib.values()

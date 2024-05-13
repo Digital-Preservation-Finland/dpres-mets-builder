@@ -96,7 +96,8 @@ class DigitalObject(DigitalObjectBase):
         sip_filepath: Union[str, Path],
         metadata: Optional[Iterable[MetadataBase]] = None,
         streams: Optional[Iterable[DigitalObjectStream]] = None,
-        identifier: Optional[str] = None
+        identifier: Optional[str] = None,
+        use: Optional[str] = None
     ) -> None:
         """Constructor for DigitalObject.
 
@@ -112,6 +113,10 @@ class DigitalObject(DigitalObjectBase):
         :param identifier: Identifier for the digital object. The identifier
             must be unique in the METS document. If None, the identifier is
             generated automatically.
+        :param use: USE attribute of file. USE attribute defines usage
+            of file. The recommended controlled vocabulary for
+            attribute:
+            http://digitalpreservation.fi/specifications/vocabularies
         """
         super().__init__(metadata=metadata)
 
@@ -125,6 +130,8 @@ class DigitalObject(DigitalObjectBase):
             # Generate identifier if identifier is not given
             identifier = "_" + str(uuid.uuid4())
         self.identifier = identifier
+
+        self.use = use
 
     @property
     def sip_filepath(self) -> str:

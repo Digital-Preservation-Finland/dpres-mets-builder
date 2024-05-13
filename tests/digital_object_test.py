@@ -62,6 +62,12 @@ def test_generated_identifier():
     UUID(digital_object.identifier[1:])
 
 
+def test_use_attribute():
+    """Test creating digital object with USE attribute."""
+    digital_object = DigitalObject(sip_filepath="path", use="foo")
+    assert digital_object.use == "foo"
+
+
 def test_add_stream_to_digital_object():
     """Test adding stream to a digital object."""
     digital_object = DigitalObject(sip_filepath="path")

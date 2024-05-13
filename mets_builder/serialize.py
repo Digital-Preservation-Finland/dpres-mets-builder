@@ -307,7 +307,8 @@ def _parse_file_references_file(
         admid_elements=administrative_metadata_identifiers,
         loctype="URL",
         xlink_href=f"file:///{digital_object.sip_filepath}",
-        xlink_type="simple"
+        xlink_type="simple",
+        use=digital_object.use
     )
     for stream in streams:
         digital_object_element.append(stream)
