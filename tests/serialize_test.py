@@ -582,6 +582,7 @@ def test_metadata_identifier_shared():
 
     assert agent_identifiers[1] != agent_identifiers[2]
 
+
 def test_metadata_created_generated():
     """
     Test that missing creation date for a metadata object will be generated

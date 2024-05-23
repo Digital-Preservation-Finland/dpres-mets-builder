@@ -273,7 +273,7 @@ def _write_administrative_metadata(xml, mets, state: _SerializerState):
         metadata_by_type = defaultdict(list)
         for metadata in administrative_metadata:
             metadata_by_type[metadata.metadata_type].append(metadata)
- 
+
         for metadata_type in (MetadataType.TECHNICAL,
                               MetadataType.RIGHTS,
                               MetadataType.SOURCE,

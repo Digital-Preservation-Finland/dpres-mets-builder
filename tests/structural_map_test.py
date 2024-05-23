@@ -1,6 +1,4 @@
 """Tests for structural map classes."""
-from uuid import UUID
-
 import pytest
 
 from mets_builder.digital_object import DigitalObject
