@@ -270,15 +270,15 @@ def _write_administrative_metadata(xml, mets, state: _SerializerState):
     with xml.element(amdsec.tag):
         # The elements in amdSec must be in correct order: techMD,
         # rightsMD, sourceMD, digiprovMD
+        metadata_by_type = defaultdict(list)
+        for metadata in administrative_metadata:
+            metadata_by_type[metadata.metadata_type].append(metadata)
+ 
         for metadata_type in (MetadataType.TECHNICAL,
                               MetadataType.RIGHTS,
                               MetadataType.SOURCE,
                               MetadataType.DIGITAL_PROVENANCE):
-            metadata_to_be_written = [
-                metadata for metadata in administrative_metadata
-                if metadata.metadata_type is metadata_type
-            ]
-            for metadata in metadata_to_be_written:
+            for metadata in metadata_by_type[metadata_type]:
                 metadata_element = _parse_metadata_element(metadata, state)
                 xml.write(metadata_element)
 
