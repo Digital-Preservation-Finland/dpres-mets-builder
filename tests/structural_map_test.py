@@ -4,7 +4,8 @@ import pytest
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    DigitalProvenanceEventMetadata,
-                                   MetadataBase, MetadataFormat, MetadataType)
+                                   ImportedMetadata, MetadataBase,
+                                   MetadataFormat, MetadataType)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -100,10 +101,34 @@ def test_add_metadata_to_div():
         metadata_type=MetadataType.DESCRIPTIVE,
         metadata_format=MetadataFormat.OTHER,
         other_format="PAS-special",
-        format_version="1.0"
+        format_version="1.0",
     )
     div.add_metadata(metadata)
     assert div.metadata == {metadata}
+
+
+def test_add_imported_metadata_to_div():
+    """Test adding imported metadata to a structural map division.
+
+    Metadata import event should be added to div.
+    """
+    div = StructuralMapDiv(div_type="test_type")
+    assert div.metadata == set()
+
+    metadata = ImportedMetadata(
+        metadata_type=MetadataType.DESCRIPTIVE,
+        metadata_format=MetadataFormat.OTHER,
+        other_format="PAS-special",
+        format_version="1.0",
+        data_path="tests/data/imported_metadata.xml"
+    )
+    div.add_metadata(metadata)
+    # In addtition to the added metadata, the div should contain event
+    # metadata
+    assert len(div.metadata) == 2
+    assert metadata in div.metadata
+    event_metadata = (div.metadata - {metadata}).pop()
+    assert event_metadata.event_type == 'metadata extraction'
 
 
 def test_add_digital_objects_to_div():

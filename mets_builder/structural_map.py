@@ -9,6 +9,7 @@ from mets_builder import validation
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    DigitalProvenanceEventMetadata,
+                                   ImportedMetadata,
                                    MetadataBase)
 
 
@@ -127,8 +128,24 @@ class StructuralMapDiv:
         The metadata should apply to all digital objects under this div (as
         well as digital objects under the divs nested in this div)
 
+        If metadata is imported metadata, also an event that describes
+        the import process is added to div.
+
         :param metadata: The metadata object that is added to this div.
         """
+        if isinstance(metadata, ImportedMetadata):
+            time = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            event = DigitalProvenanceEventMetadata(
+                event_type="metadata extraction",
+                event_datetime=time,
+                event_detail=("Descriptive metadata import from external"
+                              " source"),
+                event_outcome="success",
+                event_outcome_detail=("Descriptive metadata imported to "
+                                      "mets dmdSec from external source")
+            )
+            self.metadata.add(event)
+
         self.metadata.add(metadata)
 
     def add_divs(self, divs: Iterable["StructuralMapDiv"]) -> None:
