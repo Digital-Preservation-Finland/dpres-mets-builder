@@ -116,7 +116,7 @@ class DigitalObject(DigitalObjectBase):
         :param use: USE attribute of file. USE attribute defines usage
             of file. The recommended controlled vocabulary for
             attribute:
-            http://digitalpreservation.fi/specifications/vocabularies
+            https://digitalpreservation.fi/resources/vocabulary
         """
         super().__init__(metadata=metadata)
 
