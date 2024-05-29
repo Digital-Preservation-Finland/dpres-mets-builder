@@ -129,6 +129,12 @@ def test_add_imported_metadata_to_div():
     assert metadata in div.metadata
     event_metadata = (div.metadata - {metadata}).pop()
     assert event_metadata.event_type == 'metadata extraction'
+    assert event_metadata.event_datetime is None
+    assert event_metadata.event_detail \
+        == "Descriptive metadata import from external source"
+    assert event_metadata.event_outcome.value == "success"
+    assert event_metadata.event_outcome_detail\
+        == "Descriptive metadata imported to mets dmdSec from external source"
 
 
 def test_add_digital_objects_to_div():
@@ -396,6 +402,7 @@ def test_generating_structural_map_digital_provenance():
     )
     assert event.event_identifier_type == "UUID"
     assert event.event_identifier is None
+    assert event.event_datetime is None
 
     # Agent
     assert len(event.linked_agents) == 1

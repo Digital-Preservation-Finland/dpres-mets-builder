@@ -1,7 +1,6 @@
 """Module for classes related to structural map (METS structMap)."""
 
 from collections import defaultdict
-from datetime import datetime, timezone
 from pathlib import PurePath
 from typing import Iterable, Optional, Set
 
@@ -134,10 +133,8 @@ class StructuralMapDiv:
         :param metadata: The metadata object that is added to this div.
         """
         if isinstance(metadata, ImportedMetadata):
-            time = datetime.now(timezone.utc).isoformat(timespec="seconds")
             event = DigitalProvenanceEventMetadata(
                 event_type="metadata extraction",
-                event_datetime=time,
                 event_detail=("Descriptive metadata import from external"
                               " source"),
                 event_outcome="success",
@@ -478,11 +475,8 @@ def _add_digital_provenance_for_structural_map_creation(
     if additional_agents is None:
         additional_agents = []
 
-    time = datetime.now(timezone.utc).isoformat(timespec="seconds")
-
     event = DigitalProvenanceEventMetadata(
         event_type="creation",
-        event_datetime=time,
         event_detail=(
             "Creation of structural metadata with the "
             "StructuralMap.from_directory_structure method"
