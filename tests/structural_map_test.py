@@ -137,6 +137,26 @@ def test_add_imported_metadata_to_div():
         == "Descriptive metadata imported to mets dmdSec from external source"
 
 
+def test_init_div_with_imported_metadata():
+    """Test initializing div with imported metadata..
+
+    Metadata import event should be added to div.
+    """
+    metadata = ImportedMetadata(
+        metadata_type=MetadataType.DESCRIPTIVE,
+        metadata_format=MetadataFormat.OTHER,
+        other_format="PAS-special",
+        format_version="1.0",
+        data_path="tests/data/imported_metadata.xml"
+    )
+    div = StructuralMapDiv(div_type="test_type", metadata=[metadata])
+
+    assert len(div.metadata) == 2
+    assert metadata in div.metadata
+    event_metadata = (div.metadata - {metadata}).pop()
+    assert event_metadata.event_type == 'metadata extraction'
+
+
 def test_add_digital_objects_to_div():
     """Test adding digital objects to a structural map division."""
     div = StructuralMapDiv(div_type="test_type")

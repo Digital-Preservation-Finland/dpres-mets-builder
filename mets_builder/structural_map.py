@@ -94,7 +94,8 @@ class StructuralMapDiv:
         self.divs: Set["StructuralMapDiv"] = set()
 
         if metadata:
-            self.metadata = set(metadata)
+            for metadata_item in metadata:
+                self.add_metadata(metadata_item)
 
         if digital_objects:
             self.add_digital_objects(digital_objects)

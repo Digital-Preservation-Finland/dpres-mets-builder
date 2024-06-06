@@ -254,9 +254,6 @@ def test_get_metadata():
         other_format="PAS-special",
         format_version="1.0"
     )
-    expected_metadata = {
-        md_stream, md_digital_object, md_structural_map_1, md_structural_map_2
-    }
 
     stream = DigitalObjectStream(metadata=[md_stream])
     digital_object = DigitalObject(
@@ -286,7 +283,19 @@ def test_get_metadata():
     structural_map_2 = StructuralMap(root_div=root_div_2)
     mets.add_structural_map(structural_map_2)
 
-    assert mets.metadata == expected_metadata
+    # Check that mets contains metadata that was added
+    added_metadata = {
+        md_stream, md_digital_object, md_structural_map_1, md_structural_map_2
+    }
+    assert added_metadata <= mets.metadata
+
+    # Also PREMIS event for metadata import should be created
+    # automatically
+    other_metadata = mets.metadata - added_metadata
+    assert len(other_metadata) == 1
+    other_metadata_element = other_metadata.pop()
+    assert other_metadata_element.event_detail \
+        == "Descriptive metadata import from external source"
 
 
 def test_get_digital_objects():
