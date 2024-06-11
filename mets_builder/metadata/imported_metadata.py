@@ -14,17 +14,19 @@ class ImportedMetadata(MetadataBase):
 
     def __init__(
             self,
-            data_path: Union[str, Path],
             metadata_type: Union[MetadataType, str],
             metadata_format: Union[MetadataFormat, str, None],
             format_version: str,
+            data_path: Union[str, Path, None] = None,
+            data_string: Union[str, None] = None,
             other_format: Optional[str] = None,
             created: Union[datetime, str, None] = None,
             **kwargs
     ) -> None:
         """Constructor for ImportedMetadata class.
 
-        :param data_path: Path to the metadata file.
+        :param data_path: Path to the metadata file. Mutually exclusive with
+            data_string.
         :param metadata_type: The type of metadata, given as MetadataType enum
             or string. If given as string, the value is cast to MetadataType
             and results in error if it is not a valid metadata type. The
@@ -51,6 +53,8 @@ class ImportedMetadata(MetadataBase):
 
             If set to None, the time this object is created is used as the
             default value.
+        :param data_string: String containing metadata. Mutually exclusive
+            with data_path.
         """
         super().__init__(
             metadata_type=metadata_type,
@@ -61,14 +65,24 @@ class ImportedMetadata(MetadataBase):
             **kwargs
         )
 
-        data_path = Path(data_path).resolve()
-        if not data_path.is_file():
-            raise ValueError(f"Given path '{data_path}' is not a file.")
-        self.data_path = data_path
+        if data_path is None and data_string is None:
+            raise ValueError("No data path or data string given")
+        elif data_path is not None and data_string is not None:
+            raise ValueError("Both data path and data string given.")
+        elif data_path is not None:
+            data_path = Path(data_path).resolve()
+            if not data_path.is_file():
+                raise ValueError(f"Given path '{data_path}' is not a file.")
+            self.data_path = data_path
+        elif data_string is not None:
+            self.data_string = data_string
 
     def _to_xml_element_tree(self, state) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
         :returns: The root element of the metadata serialized into XML.
         """
-        return xml_helpers.utils.readfile(str(self.data_path)).getroot()
+        if hasattr(self, 'data_path'):
+            return xml_helpers.utils.readfile(str(self.data_path)).getroot()
+        elif hasattr(self, 'data_string'):
+            return etree.fromstring(self.data_string)
