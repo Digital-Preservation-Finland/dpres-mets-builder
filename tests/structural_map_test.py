@@ -350,7 +350,7 @@ def test_generating_structural_map_from_directory():
 
     structural_map = StructuralMap.from_directory_structure(digital_objects)
 
-    assert structural_map.structural_map_type is None
+    assert structural_map.structural_map_type == 'PHYSICAL'
 
     # defined directory structure is wrapped in a root div with type
     # "directory"
@@ -418,7 +418,7 @@ def test_generating_structural_map_digital_provenance():
     )
     assert event.event_outcome.value == "success"
     assert event.event_outcome_detail == (
-        "Created METS structural map with type 'directory'"
+        "Created METS structural map with type 'PHYSICAL'"
     )
     assert event.event_identifier_type == "UUID"
     assert event.event_identifier is None

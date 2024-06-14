@@ -412,12 +412,13 @@ class StructuralMap:
                 "generated with zero digital objects."
             )
 
-        root_div = StructuralMapDiv(div_type="directory")
+        structural_map = cls(StructuralMapDiv(div_type="directory"),
+                             structural_map_type='PHYSICAL')
 
         # dict directory filepath -> corresponding div
         # In the algorithm below, PurePath(".") can be thought of as the root
         # div that has already been created, initialize the dict with that
-        path2div = {PurePath("."): root_div}
+        path2div = {PurePath("."): structural_map.root_div}
 
         # dict directory filepath -> child directory filepaths
         directory_relationships = defaultdict(set)
@@ -452,14 +453,14 @@ class StructuralMap:
 
         # Document the process as digital provenance metadata
         _add_digital_provenance_for_structural_map_creation(
-            root_div, additional_agents
+            structural_map, additional_agents
         )
 
-        return StructuralMap(root_div=root_div)
+        return structural_map
 
 
 def _add_digital_provenance_for_structural_map_creation(
-    root_div,
+    structural_map,
     additional_agents=None
 ):
     """Creates digital provenance metadata for structural map creation.
@@ -484,7 +485,8 @@ def _add_digital_provenance_for_structural_map_creation(
         ),
         event_outcome="success",
         event_outcome_detail=(
-            "Created METS structural map with type 'directory'"
+            f"Created METS structural map with type "
+            f"'{structural_map.structural_map_type}'"
         )
     )
     mets_builder_agent = \
@@ -497,4 +499,4 @@ def _add_digital_provenance_for_structural_map_creation(
         )
 
     for metadata in [event, mets_builder_agent] + additional_agents:
-        root_div.add_metadata(metadata)
+        structural_map.root_div.add_metadata(metadata)
