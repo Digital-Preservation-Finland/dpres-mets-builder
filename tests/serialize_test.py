@@ -167,9 +167,9 @@ def test_parse_mets(mets_object):
     # descriptive metadata
     amd_sec = element.find("mets:amdSec", namespaces=NAMESPACES)
     assert amd_sec is not None
-    assert len(amd_sec) == 4
+    assert len(amd_sec) == 3
     assert len(amd_sec.findall("mets:techMD", namespaces=NAMESPACES)) == 2
-    assert len(amd_sec.findall("mets:digiprovMD", namespaces=NAMESPACES)) == 2
+    assert len(amd_sec.findall("mets:digiprovMD", namespaces=NAMESPACES)) == 1
 
 
 def test_parse_root_element(mets_object):

@@ -289,14 +289,6 @@ def test_get_metadata():
     }
     assert added_metadata <= mets.metadata
 
-    # Also PREMIS event for metadata import should be created
-    # automatically
-    other_metadata = mets.metadata - added_metadata
-    assert len(other_metadata) == 1
-    other_metadata_element = other_metadata.pop()
-    assert other_metadata_element.event_detail \
-        == "Descriptive metadata import from external source"
-
 
 def test_get_digital_objects():
     """Test getting the digital objects that have been added to a METS object

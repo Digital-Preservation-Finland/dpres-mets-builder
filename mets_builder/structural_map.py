@@ -3,9 +3,7 @@ from typing import Iterable, Optional, Set
 
 from mets_builder import validation
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import (DigitalProvenanceEventMetadata,
-                                   ImportedMetadata,
-                                   MetadataBase)
+from mets_builder.metadata import MetadataBase
 
 
 class StructuralMapDiv:
@@ -91,7 +89,7 @@ class StructuralMapDiv:
 
         if metadata:
             for metadata_item in metadata:
-                self.add_metadata(metadata_item)
+                self.metadata.add(metadata_item)
 
         if digital_objects:
             self.add_digital_objects(digital_objects)
@@ -124,22 +122,8 @@ class StructuralMapDiv:
         The metadata should apply to all digital objects under this div (as
         well as digital objects under the divs nested in this div)
 
-        If metadata is imported metadata, also an event that describes
-        the import process is added to div.
-
         :param metadata: The metadata object that is added to this div.
         """
-        if isinstance(metadata, ImportedMetadata):
-            event = DigitalProvenanceEventMetadata(
-                event_type="metadata extraction",
-                event_detail=("Descriptive metadata import from external"
-                              " source"),
-                event_outcome="success",
-                event_outcome_detail=("Descriptive metadata imported to "
-                                      "mets dmdSec from external source")
-            )
-            self.metadata.add(event)
-
         self.metadata.add(metadata)
 
     def add_divs(self, divs: Iterable["StructuralMapDiv"]) -> None:
