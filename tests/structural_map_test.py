@@ -2,7 +2,8 @@
 import pytest
 
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import MetadataFormat, MetadataType, Metadata
+from mets_builder.metadata import (MetadataFormat, MetadataType,
+                                   ImportedMetadata)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -94,7 +95,8 @@ def test_add_metadata_to_div():
     div = StructuralMapDiv(div_type="test_type")
     assert div.metadata == set()
 
-    metadata = Metadata(
+    metadata = ImportedMetadata(
+        data_string="<root><sub1></sub1><sub2></sub2></root>",
         metadata_type=MetadataType.DESCRIPTIVE,
         metadata_format=MetadataFormat.OTHER,
         other_format="PAS-special",

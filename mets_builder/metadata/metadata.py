@@ -1,5 +1,5 @@
 """Module for Metadata class and associated enums."""
-
+import abc
 from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
@@ -137,10 +137,10 @@ class MetadataFormat(Enum):
     """Use if none of the other options apply to the metadata format."""
 
 
-class Metadata(ComparableMixin):
+class Metadata(ComparableMixin, metaclass=abc.ABCMeta):
     """Base class representing metadata elements in a METS document.
 
-    This class is abstract and should not be instantiated.
+    This class is abstract and cannot be instantiated.
     """
     def __init__(
         self,
@@ -238,13 +238,13 @@ class Metadata(ComparableMixin):
         """
         return self.metadata_type == MetadataType.DESCRIPTIVE
 
+    @abc.abstractmethod
     def _to_xml_element_tree(self, state) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
         :returns: The root element of the metadata serialized into XML.
         """
-        # All metadata classes should implement this method
-        raise NotImplementedError()
+        pass
 
     def to_xml_element_tree(self) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
