@@ -6,10 +6,10 @@ import nisomix
 from lxml import etree
 
 from mets_builder.defaults import UNAV
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 
 
-class TechnicalImageMetadata(MetadataBase):
+class TechnicalImageMetadata(Metadata):
     """Class for creating technical metadata for image files."""
 
     METADATA_TYPE = MetadataType.TECHNICAL
@@ -32,9 +32,8 @@ class TechnicalImageMetadata(MetadataBase):
     ) -> None:
         """Constructor for TechnicalImageMetadata class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         :param compression: Compression scheme, e.g. 'jpeg' or 'zip'
         :param colorspace: Color space of the image, e.g. 'rgb'

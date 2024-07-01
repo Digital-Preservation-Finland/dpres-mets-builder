@@ -5,7 +5,7 @@ from typing import Union
 import videomd
 from lxml import etree
 
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 
 
 class Color(Enum):
@@ -39,7 +39,7 @@ class Sound(Enum):
     NO = "No"
 
 
-class TechnicalVideoMetadata(MetadataBase):
+class TechnicalVideoMetadata(Metadata):
     """Class for creating technical metadata for video files."""
     METADATA_TYPE = MetadataType.TECHNICAL
     METADATA_FORMAT = MetadataFormat.OTHER
@@ -69,9 +69,8 @@ class TechnicalVideoMetadata(MetadataBase):
     ):
         """Constructor for TechnicalVideoMetadata class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         :param duration: Elapsed time of the entire file, expressed using ISO
             8601 syntax; see http://www.w3.org/TR/NOTE-datetime.

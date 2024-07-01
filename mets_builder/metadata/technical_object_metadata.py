@@ -9,7 +9,7 @@ import premis
 from lxml import etree
 
 from mets_builder.defaults import UNAP
-from mets_builder.metadata import (Charset, ChecksumAlgorithm, MetadataBase,
+from mets_builder.metadata import (Charset, ChecksumAlgorithm, Metadata,
                                    MetadataFormat, MetadataType,
                                    PREMISObjectType)
 
@@ -104,7 +104,7 @@ _OBJECT_PARAMETERS_DOC = """
 """
 
 
-class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
+class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
     """Abstract class for representing technical object metadata.
     Do not instantiate this directly, use either `TechnicalFileObjectMetadata`
     or `TechnicalBitstreamObjectMetadata` instead!
@@ -169,9 +169,8 @@ class TechnicalObjectMetadata(MetadataBase, metaclass=abc.ABCMeta):
     __init__.__doc__ = f"""Constructor for TechnicalObjectMetadata abstract
         class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         {_OBJECT_PARAMETERS_DOC}
         """
@@ -532,9 +531,8 @@ class TechnicalFileObjectMetadata(TechnicalObjectMetadata):
 
     __init__.__doc__ = f"""Constructor for TechnicalFileObjectMetadata class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         {_OBJECT_PARAMETERS_DOC}
         """
@@ -587,8 +585,8 @@ class TechnicalBitstreamObjectMetadata(TechnicalObjectMetadata):
 
     __init__.__doc__ = f"""Constructor for TechnicalBitstreamObjectMetadata.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
+        For advanced configurations keyword arguments for Metadata class
+        can be given here as well. Look Metadata documentation for more
         information.
 
         {_OBJECT_PARAMETERS_DOC}

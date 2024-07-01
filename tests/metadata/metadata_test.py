@@ -18,7 +18,7 @@ from mets_builder import metadata
 def test_metadatabase_invalid_format(metadata_format, other_format):
     """Test creating metadataobject with invalid format configuration."""
     with pytest.raises(ValueError):
-        metadata.MetadataBase(
+        metadata.Metadata(
             metadata_type="technical",
             metadata_format=metadata_format,
             other_format=other_format,
@@ -28,7 +28,7 @@ def test_metadatabase_invalid_format(metadata_format, other_format):
 
 def test_metadatabase_with_other_format():
     """Test that other_format overrides metadata format."""
-    data = metadata.MetadataBase(
+    data = metadata.Metadata(
         metadata_type="technical",
         metadata_format="PREMIS:OBJECT",
         other_format="special_format",
@@ -41,7 +41,7 @@ def test_metadatabase_with_other_format():
 def test_metadatabase_invalid_type():
     """Test creating metadataobject with invalid type."""
     with pytest.raises(ValueError):
-        metadata.MetadataBase(
+        metadata.Metadata(
             metadata_type="invalid",
             metadata_format=metadata.MetadataFormat.PREMIS_OBJECT,
             format_version="1.0"
@@ -60,7 +60,7 @@ def test_is_administrative(metadata_type, expected_result):
     """Test if metadata object can tell correctly that it is administrative
     metadata.
     """
-    data = metadata.MetadataBase(
+    data = metadata.Metadata(
         metadata_type=metadata_type,
         metadata_format=None,
         other_format="PAS-special",
@@ -81,7 +81,7 @@ def test_is_descriptive(metadata_type, expected_result):
     """Test if metadata object can tell correctly that it is descriptive
     metadata.
     """
-    data = metadata.MetadataBase(
+    data = metadata.Metadata(
         metadata_type=metadata_type,
         metadata_format=None,
         other_format="PAS-special",

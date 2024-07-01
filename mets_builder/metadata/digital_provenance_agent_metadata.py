@@ -6,7 +6,7 @@ import premis
 from lxml import etree
 
 import mets_builder
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 
 
 class DigitalProvenanceAgentType(Enum):
@@ -17,7 +17,7 @@ class DigitalProvenanceAgentType(Enum):
     ORGANIZATION = "organization"
 
 
-class DigitalProvenanceAgentMetadata(MetadataBase):
+class DigitalProvenanceAgentMetadata(Metadata):
     """Class for creating digital provenance agent metadata.
 
     The Agent entity aggregates information about attributes or characteristics
@@ -42,9 +42,8 @@ class DigitalProvenanceAgentMetadata(MetadataBase):
     ) -> None:
         """Constructor for DigitalProvenanceAgentMetadata class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         :param agent_name: Name of the agent.
         :param agent_type: The type of this agent, given as

@@ -5,7 +5,7 @@ from typing import Union
 import audiomd
 from lxml import etree
 
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 
 
 class CodecQuality(Enum):
@@ -20,7 +20,7 @@ class DataRateMode(Enum):
     VARIABLE = "Variable"
 
 
-class TechnicalAudioMetadata(MetadataBase):
+class TechnicalAudioMetadata(Metadata):
     """Class for creating technical metadata for audio files."""
 
     METADATA_TYPE = MetadataType.TECHNICAL
@@ -45,9 +45,8 @@ class TechnicalAudioMetadata(MetadataBase):
     ):
         """Constructor for TechnicalAudioMetadata class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         :param codec_quality: Impact of the compression on quality e.g.
             'lossless' or 'lossy'. If given as string, the value is

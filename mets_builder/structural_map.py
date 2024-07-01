@@ -3,7 +3,7 @@ from typing import Iterable, Optional, Set
 
 from mets_builder import validation
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import MetadataBase
+from mets_builder.metadata import Metadata
 
 
 class StructuralMapDiv:
@@ -33,7 +33,7 @@ class StructuralMapDiv:
         order: Optional[int] = None,
         label: Optional[str] = None,
         orderlabel: Optional[str] = None,
-        metadata: Optional[Iterable[MetadataBase]] = None,
+        metadata: Optional[Iterable[Metadata]] = None,
         divs: Optional[Iterable["StructuralMapDiv"]] = None,
         digital_objects: Optional[Iterable[DigitalObject]] = None
     ) -> None:
@@ -116,7 +116,7 @@ class StructuralMapDiv:
             digital_objects |= div.digital_objects
         return digital_objects
 
-    def add_metadata(self, metadata: MetadataBase) -> None:
+    def add_metadata(self, metadata: Metadata) -> None:
         """Add metadata to this div.
 
         The metadata should apply to all digital objects under this div (as

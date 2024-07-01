@@ -1,4 +1,4 @@
-"""Module for MetadataBase class and associated enums."""
+"""Module for Metadata class and associated enums."""
 
 from datetime import datetime
 from enum import Enum
@@ -137,12 +137,11 @@ class MetadataFormat(Enum):
     """Use if none of the other options apply to the metadata format."""
 
 
-class MetadataBase(ComparableMixin):
+class Metadata(ComparableMixin):
     """Base class representing metadata elements in a METS document.
 
     This class is abstract and should not be instantiated.
     """
-
     def __init__(
         self,
         metadata_type: Union[MetadataType, str],
@@ -152,7 +151,7 @@ class MetadataBase(ComparableMixin):
         identifier: Optional[str] = None,
         created: Union[datetime, str, None] = None
     ) -> None:
-        """Constructor for MetadataBase class.
+        """Constructor for Metadata class.
 
         :param metadata_type: The type of metadata, given as MetadataType enum
             or string. If given as string, the value is cast to MetadataType

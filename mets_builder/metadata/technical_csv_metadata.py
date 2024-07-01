@@ -4,10 +4,10 @@ from typing import Iterable, Optional
 import addml
 from lxml import etree
 
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 
 
-class TechnicalCSVMetadata(MetadataBase):
+class TechnicalCSVMetadata(Metadata):
     """Class for creating technical metadata for CSV files."""
     METADATA_TYPE = MetadataType.TECHNICAL
     METADATA_FORMAT = MetadataFormat.OTHER
@@ -26,9 +26,8 @@ class TechnicalCSVMetadata(MetadataBase):
     ):
         """Constructor for TechnicalCSVMetadata class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         :param filenames: Iterable of names of the files that the metadata
             describes.

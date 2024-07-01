@@ -9,7 +9,7 @@ from typing import List, NamedTuple, Optional, Set, Union
 from mets_builder import serialize, validation
 from mets_builder.digital_object import DigitalObject
 from mets_builder.file_references import FileReferences
-from mets_builder.metadata import MetadataBase
+from mets_builder.metadata import Metadata
 from mets_builder.structural_map import StructuralMap
 
 METS_CATALOG = "1.7.6"
@@ -258,12 +258,12 @@ class METS:
         self._content_id = value
 
     @property
-    def metadata(self) -> Set[MetadataBase]:
+    def metadata(self) -> Set[Metadata]:
         """Get all metadata that have been added to this METS via digital
         objects.
         """
         # Metadata in digital objects
-        metadata: Set[MetadataBase] = set()
+        metadata: Set[Metadata] = set()
         for digital_object in self.digital_objects:
             metadata |= digital_object.metadata
 

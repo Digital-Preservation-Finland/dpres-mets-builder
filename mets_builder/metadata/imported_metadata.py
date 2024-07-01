@@ -6,10 +6,10 @@ from typing import Optional, Union
 import xml_helpers.utils
 from lxml import etree
 
-from mets_builder.metadata import MetadataBase, MetadataFormat, MetadataType
+from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 
 
-class ImportedMetadata(MetadataBase):
+class ImportedMetadata(Metadata):
     """Class for importing metadata files."""
 
     def __init__(

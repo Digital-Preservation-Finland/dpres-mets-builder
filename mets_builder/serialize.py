@@ -12,7 +12,7 @@ from lxml import etree
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    DigitalProvenanceEventMetadata,
-                                   MetadataBase, MetadataType)
+                                   Metadata, MetadataType)
 
 # Prevent circular import caused by type hints with special
 # typing.TYPE_CHECKING constant. See
@@ -54,7 +54,7 @@ class _SerializerState:
         self._metadata2event_identifier = \
             defaultdict(lambda: str(uuid.uuid4()))
 
-    def get_identifier(self, metadata: MetadataBase):
+    def get_identifier(self, metadata: Metadata):
         """
         Get identifier for a metadata object. If the metadata object has no
         identifier, generate an unique identifier that will be shared with all
@@ -68,7 +68,7 @@ class _SerializerState:
         # data
         return self._metadata2identifier[metadata]
 
-    def get_created(self, metadata: MetadataBase):
+    def get_created(self, metadata: Metadata):
         """
         Get creation date for a metadata object. If the metadata object has
         no creation date, use a datetime that corresponds to the start of the
@@ -79,7 +79,7 @@ class _SerializerState:
         else:
             return self.now.isoformat()
 
-    def get_event_datetime(self, metadata: MetadataBase):
+    def get_event_datetime(self, metadata: Metadata):
         """
         Get event datetime for a metadata object. If no event datetime exists,
         use a datetime that corresponds to the start of the serialization
@@ -190,7 +190,7 @@ def _parse_mets_header(mets):
     return mets_header
 
 
-def _parse_metadata_element(metadata: MetadataBase, state: _SerializerState):
+def _parse_metadata_element(metadata: Metadata, state: _SerializerState):
     """Parse given metadata object.
 
     :param metadata: The metadata object that should be parsed.

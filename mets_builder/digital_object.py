@@ -4,7 +4,7 @@ import uuid
 from pathlib import Path
 from typing import Iterable, Optional, Set, Union
 
-from mets_builder.metadata import MetadataBase
+from mets_builder.metadata import Metadata
 
 
 class DigitalObjectBase:
@@ -15,7 +15,7 @@ class DigitalObjectBase:
 
     def __init__(
         self,
-        metadata: Optional[Iterable[MetadataBase]] = None
+        metadata: Optional[Iterable[Metadata]] = None
     ) -> None:
         """Constructor for DigitalObjectBase.
 
@@ -24,12 +24,12 @@ class DigitalObjectBase:
             and any descriptive metadata of a digital object should be added to
             a div in a structural map.
         """
-        self.metadata: Set[MetadataBase] = set()
+        self.metadata: Set[Metadata] = set()
         if metadata is not None:
             for data in metadata:
                 self.add_metadata(data)
 
-    def add_metadata(self, metadata: MetadataBase) -> None:
+    def add_metadata(self, metadata: Metadata) -> None:
         """Add administrative metadata to this object.
 
         Any descriptive metadata should be added to a div in structural map
@@ -60,7 +60,7 @@ class DigitalObjectStream(DigitalObjectBase):
     """
     def __init__(
         self,
-        metadata: Optional[Iterable[MetadataBase]] = None
+        metadata: Optional[Iterable[Metadata]] = None
     ) -> None:
         """Constructor for DigitalObjectStream.
 
@@ -94,7 +94,7 @@ class DigitalObject(DigitalObjectBase):
     def __init__(
         self,
         sip_filepath: Union[str, Path],
-        metadata: Optional[Iterable[MetadataBase]] = None,
+        metadata: Optional[Iterable[Metadata]] = None,
         streams: Optional[Iterable[DigitalObjectStream]] = None,
         identifier: Optional[str] = None,
         use: Optional[str] = None

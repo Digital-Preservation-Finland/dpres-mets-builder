@@ -7,7 +7,7 @@ from lxml import etree
 
 from mets_builder.metadata import (ComparableMixin,
                                    DigitalProvenanceAgentMetadata,
-                                   MetadataBase, MetadataFormat, MetadataType,
+                                   Metadata, MetadataFormat, MetadataType,
                                    TechnicalObjectMetadata)
 
 
@@ -74,7 +74,7 @@ class _LinkedObject(ComparableMixin):
         self.object_role = object_role
 
 
-class DigitalProvenanceEventMetadata(MetadataBase):
+class DigitalProvenanceEventMetadata(Metadata):
     """Class for creating digital provenance event metadata.
 
     The Event entity aggregates information about an action that involves one
@@ -97,9 +97,8 @@ class DigitalProvenanceEventMetadata(MetadataBase):
     ) -> None:
         """Constructor for DigitalProvenanceEventMetadata class.
 
-        For advanced configurations keyword arguments for MetadataBase class
-        can be given here as well. Look MetadataBase documentation for more
-        information.
+        For advanced configurations keyword arguments for Metadata class can be
+        given here as well. Look Metadata documentation for more information.
 
         :param event_type: A categorization of the nature of the event.
         :param event_detail: Additional information about the event.

@@ -1,12 +1,12 @@
 """mets_builder.metadata default imports."""
 
 # These *have* to be imported first; otherwise cyclical import occurs
-from mets_builder.metadata.metadata_base import (ComparableMixin,  # isort:skip
-                                                 Charset,
-                                                 ChecksumAlgorithm,
-                                                 MetadataBase, MetadataFormat,
-                                                 MetadataType,
-                                                 PREMISObjectType)
+from mets_builder.metadata.metadata import (ComparableMixin,  # isort:skip
+                                            Charset,
+                                            ChecksumAlgorithm,
+                                            Metadata, MetadataFormat,
+                                            MetadataType,
+                                            PREMISObjectType)
 from mets_builder.metadata.technical_object_metadata import (  # isort:skip
     TechnicalBitstreamObjectMetadata, TechnicalFileObjectMetadata,
     TechnicalObjectMetadata)
@@ -28,7 +28,7 @@ __all__ = [
     "ComparableMixin",
     "Charset",
     "ChecksumAlgorithm",
-    "MetadataBase",
+    "Metadata",
     "MetadataType",
     "MetadataFormat",
     "ImportedMetadata",
