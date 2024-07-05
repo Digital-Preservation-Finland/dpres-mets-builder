@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import List, NamedTuple, Optional, Set, Union
 
-from mets_builder import serialize, validation
+from mets_builder import serialize
 from mets_builder.digital_object import DigitalObject
 from mets_builder.file_references import FileReferences
 from mets_builder.metadata import Metadata
@@ -217,7 +217,7 @@ class METS:
         if value in (None, ""):
             raise ValueError("package_id cannot be empty")
 
-        if not validation.is_printable_us_ascii(value):
+        if not (value.isascii() and value.isprintable()):
             raise ValueError(
                 f"package_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -235,7 +235,7 @@ class METS:
         if value is None:
             raise ValueError("contract_id can not be None")
 
-        if not validation.is_printable_us_ascii(value):
+        if not (value.isascii() and value.isprintable()):
             raise ValueError(
                 f"contract_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -250,7 +250,7 @@ class METS:
     @content_id.setter
     def content_id(self, value: str) -> None:
         """Setter for content_id."""
-        if value is not None and not validation.is_printable_us_ascii(value):
+        if value is not None and not (value.isascii() and value.isprintable()):
             raise ValueError(
                 f"content_id '{value}' contains characters that are not "
                 "printable US-ASCII characters"

@@ -1,7 +1,6 @@
 """Module for classes related to structural map (METS structMap)."""
 from typing import Iterable, Optional, Set
 
-from mets_builder import validation
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import Metadata
 
@@ -308,7 +307,7 @@ class StructuralMap:
     @pid.setter
     def pid(self, value: Optional[str]) -> None:
         """Setter for pid."""
-        if value is not None and not validation.is_printable_us_ascii(value):
+        if value is not None and not (value.isascii() and value.isprintable()):
             raise ValueError(
                 f"pid '{value}' contains characters that are not "
                 "printable US-ASCII characters"
@@ -323,7 +322,7 @@ class StructuralMap:
     @pid_type.setter
     def pid_type(self, value: Optional[str]) -> None:
         """Setter for pid_type."""
-        if value is not None and not validation.is_printable_us_ascii(value):
+        if value is not None and not (value.isascii() and value.isprintable()):
             raise ValueError(
                 f"pid_type '{value}' contains characters that are not "
                 "printable US-ASCII characters"
