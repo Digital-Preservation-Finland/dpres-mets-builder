@@ -1,6 +1,4 @@
 """Module for serializing METS objects."""
-
-import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
 from io import BytesIO
@@ -13,6 +11,7 @@ from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    DigitalProvenanceEventMetadata,
                                    Metadata, MetadataType)
+from mets_builder.uuid import uuid, underscore_uuid
 
 # Prevent circular import caused by type hints with special
 # typing.TYPE_CHECKING constant. See
@@ -48,11 +47,9 @@ class _SerializerState:
     def __init__(self):
         self.now = datetime.now(timezone.utc)
 
-        self._metadata2identifier = defaultdict(lambda: f"_{uuid.uuid4()}")
-        self._metadata2agent_identifier = \
-            defaultdict(lambda: str(uuid.uuid4()))
-        self._metadata2event_identifier = \
-            defaultdict(lambda: str(uuid.uuid4()))
+        self._metadata2identifier = defaultdict(lambda: underscore_uuid())
+        self._metadata2agent_identifier = defaultdict(lambda: uuid())
+        self._metadata2event_identifier = defaultdict(lambda: uuid())
 
     def get_identifier(self, metadata: Metadata):
         """

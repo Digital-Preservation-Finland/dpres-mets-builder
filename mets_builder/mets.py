@@ -1,5 +1,4 @@
 """Module for METS class representing a METS document."""
-import uuid
 from collections import namedtuple
 from datetime import datetime, timezone
 from enum import Enum
@@ -11,6 +10,7 @@ from mets_builder.digital_object import DigitalObject
 from mets_builder.file_references import FileReferences
 from mets_builder.metadata import Metadata
 from mets_builder.structural_map import StructuralMap
+from mets_builder.uuid import uuid
 
 METS_CATALOG = "1.7.6"
 METS_SPECIFICATION = "1.7.6"
@@ -190,7 +190,7 @@ class METS:
             create_date = datetime.now(tz=timezone.utc)
 
         if package_id is None:
-            package_id = str(uuid.uuid4())
+            package_id = uuid()
 
         self.mets_profile = MetsProfile(mets_profile)
         self.package_id = package_id

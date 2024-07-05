@@ -1,10 +1,10 @@
 """Module for classes related to digital objects."""
 
-import uuid
 from pathlib import Path
 from typing import Iterable, Optional, Set, Union
 
 from mets_builder.metadata import Metadata
+from mets_builder.uuid import underscore_uuid
 
 
 class DigitalObjectBase:
@@ -128,7 +128,7 @@ class DigitalObject(DigitalObjectBase):
 
         if identifier is None:
             # Generate identifier if identifier is not given
-            identifier = "_" + str(uuid.uuid4())
+            identifier = underscore_uuid()
         self.identifier = identifier
 
         self.use = use
