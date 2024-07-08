@@ -52,7 +52,7 @@ def test_generated_identifier():
     """Test that if identifier is not given, an UUID identifier is generated
     for digital object.
     """
-    digital_object = DigitalObject(sip_filepath="path", identifier=None)
+    digital_object = DigitalObject(path="path", identifier=None)
 
     # First character is underscore
     assert digital_object.identifier[0] == "_"
@@ -64,13 +64,13 @@ def test_generated_identifier():
 
 def test_use_attribute():
     """Test creating digital object with USE attribute."""
-    digital_object = DigitalObject(sip_filepath="path", use="foo")
+    digital_object = DigitalObject(path="path", use="foo")
     assert digital_object.use == "foo"
 
 
 def test_add_stream_to_digital_object():
     """Test adding stream to a digital object."""
-    digital_object = DigitalObject(sip_filepath="path")
+    digital_object = DigitalObject(path="path")
     assert digital_object.streams == set()
 
     stream = DigitalObjectStream()
@@ -78,30 +78,30 @@ def test_add_stream_to_digital_object():
     assert digital_object.streams == {stream}
 
 
-def test_sip_filepath_is_relative():
+def test_path_is_relative():
     """Test that giving absolute file path as digital object's sip filepath
     raises an error.
     """
     with pytest.raises(ValueError) as error:
-        DigitalObject(sip_filepath="/path")
+        DigitalObject(path="/path")
     assert str(error.value) == (
         "Given SIP file path '/path' is not a relative path."
     )
 
 
 @pytest.mark.parametrize(
-    "sip_filepath",
+    "path",
     [
         (".."),
         ("a/b/c/d/../../../../../b"),
         ("../../etc/passwd")
     ]
 )
-def test_sip_filepath_does_not_point_outside_sip(sip_filepath):
+def test_path_does_not_point_outside_sip(path):
     """Test that given SIP filepath does not point outside the SIP."""
     with pytest.raises(ValueError) as error:
-        DigitalObject(sip_filepath=sip_filepath)
+        DigitalObject(path=path)
     assert str(error.value) == (
-        f"Given SIP file path '{sip_filepath}' points outside the SIP root "
+        f"Given SIP file path '{path}' points outside the SIP root "
         "directory."
     )

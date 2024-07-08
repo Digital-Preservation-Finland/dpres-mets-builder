@@ -28,9 +28,9 @@ def test_add_digital_object_to_file_group():
 def test_generate_file_references():
     """Test generating file references automatically."""
     digital_objects = {
-        DigitalObject(sip_filepath="path/1"),
-        DigitalObject(sip_filepath="path/2"),
-        DigitalObject(sip_filepath="path/3")
+        DigitalObject(path="path/1"),
+        DigitalObject(path="path/2"),
+        DigitalObject(path="path/3")
     }
 
     file_references = FileReferences.generate_file_references(digital_objects)

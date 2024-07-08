@@ -58,7 +58,7 @@ def mets_object():
         event_outcome_detail="baz"
     )
     do_1 = DigitalObject(
-        sip_filepath="path/1",
+        path="path/1",
         metadata=[md_1, digiprov_md],
         identifier="digital_object_1",
         use="test-use-attribute"
@@ -73,7 +73,7 @@ def mets_object():
         identifier="_2"
     )
     do_2 = DigitalObject(
-        sip_filepath="path/2",
+        path="path/2",
         metadata=[md_2],
         identifier="digital_object_2"
     )
@@ -329,7 +329,7 @@ def test_parse_file_references_file_element(mets_object):
 
     stream = DigitalObjectStream(metadata=[md_stream])
     do = DigitalObject(
-        sip_filepath="path",
+        path="path",
         metadata=[md_do],
         streams=[stream],
         identifier="digital_object-id"

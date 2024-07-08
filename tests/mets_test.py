@@ -257,7 +257,7 @@ def test_get_metadata():
 
     stream = DigitalObjectStream(metadata=[md_stream])
     digital_object = DigitalObject(
-        sip_filepath="path",
+        path="path",
         streams=[stream],
         metadata=[md_digital_object]
     )
@@ -303,14 +303,14 @@ def test_get_digital_objects():
     )
 
     subdiv_digital_objects = {
-        DigitalObject(sip_filepath="path/1"),
-        DigitalObject(sip_filepath="path/2"),
-        DigitalObject(sip_filepath="path/3")
+        DigitalObject(path="path/1"),
+        DigitalObject(path="path/2"),
+        DigitalObject(path="path/3")
     }
     root_div_digital_objects = {
-        DigitalObject(sip_filepath="path/1"),
-        DigitalObject(sip_filepath="path/2"),
-        DigitalObject(sip_filepath="path/3")
+        DigitalObject(path="path/1"),
+        DigitalObject(path="path/2"),
+        DigitalObject(path="path/3")
     }
     all_digital_objects = subdiv_digital_objects | root_div_digital_objects
 
@@ -353,9 +353,9 @@ def test_generating_file_references():
     )
 
     digital_objects = {
-        DigitalObject(sip_filepath="path/1"),
-        DigitalObject(sip_filepath="path/2"),
-        DigitalObject(sip_filepath="path/3")
+        DigitalObject(path="path/1"),
+        DigitalObject(path="path/2"),
+        DigitalObject(path="path/3")
     }
 
     root_div = StructuralMapDiv("test_type", digital_objects=digital_objects)

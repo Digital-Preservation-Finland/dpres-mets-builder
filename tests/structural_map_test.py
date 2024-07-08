@@ -111,8 +111,8 @@ def test_add_digital_objects_to_div():
     div = StructuralMapDiv(div_type="test_type")
     assert div.digital_objects == set()
 
-    digital_object_1 = DigitalObject(sip_filepath="path/1")
-    digital_object_2 = DigitalObject(sip_filepath="path/2")
+    digital_object_1 = DigitalObject(path="path/1")
+    digital_object_2 = DigitalObject(path="path/2")
     div.add_digital_objects([digital_object_1, digital_object_2])
     assert div.digital_objects == {digital_object_1, digital_object_2}
 

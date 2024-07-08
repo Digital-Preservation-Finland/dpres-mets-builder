@@ -93,7 +93,7 @@ class DigitalObject(DigitalObjectBase):
     """
     def __init__(
         self,
-        sip_filepath: Union[str, Path],
+        path: Union[str, Path],
         metadata: Optional[Iterable[Metadata]] = None,
         streams: Optional[Iterable[DigitalObjectStream]] = None,
         identifier: Optional[str] = None,
@@ -101,7 +101,7 @@ class DigitalObject(DigitalObjectBase):
     ) -> None:
         """Constructor for DigitalObject.
 
-        :param sip_filepath: File path of this digital object in the SIP,
+        :param path: File path of this digital object in the SIP,
             relative to the SIP root directory. Note that this can be different
             than the path in the local filesystem.
         :param metadata: Iterable of metadata objects that describe this
@@ -120,7 +120,7 @@ class DigitalObject(DigitalObjectBase):
         """
         super().__init__(metadata=metadata)
 
-        self.sip_filepath = str(sip_filepath)
+        self.path = str(path)
 
         if streams is None:
             streams = set()
@@ -134,31 +134,31 @@ class DigitalObject(DigitalObjectBase):
         self.use = use
 
     @property
-    def sip_filepath(self) -> str:
-        """Getter for sip_filepath."""
-        return self._sip_filepath
+    def path(self) -> str:
+        """Getter for path."""
+        return self._path
 
-    @sip_filepath.setter
-    def sip_filepath(self, sip_filepath: Union[str, Path]) -> None:
-        """Setter for sip_filepath."""
-        sip_filepath = Path(sip_filepath)
+    @path.setter
+    def path(self, path: Union[str, Path]) -> None:
+        """Setter for path."""
+        path = Path(path)
 
-        if sip_filepath.is_absolute():
+        if path.is_absolute():
             raise ValueError(
-                f"Given SIP file path '{sip_filepath}' is not a relative path."
+                f"Given SIP file path '{path}' is not a relative path."
             )
 
         # TODO: Replace with Path.is_relative_to in Python 3.9+
         try:
             # This will raise ValueError on paths that are not relative
-            sip_filepath.resolve().relative_to(Path(".").resolve())
+            path.resolve().relative_to(Path(".").resolve())
         except ValueError:
             raise ValueError(
-                f"Given SIP file path '{sip_filepath}' points outside the "
+                f"Given SIP file path '{path}' points outside the "
                 "SIP root directory."
             )
 
-        self._sip_filepath = str(sip_filepath)
+        self._path = str(path)
 
     def add_stream(self, stream: DigitalObjectStream) -> None:
         """Add a stream to this digital object.

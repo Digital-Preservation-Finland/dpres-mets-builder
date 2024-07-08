@@ -51,7 +51,7 @@ A ``DigitalObject`` instance should be created for each digital object that shou
     )
 
     picture = DigitalObject(
-        sip_filepath="data/pictures/cat_picture.jpg"
+        path="data/pictures/cat_picture.jpg"
     )
 
     object_md = TechnicalFileObjectMetadata(
@@ -109,7 +109,7 @@ If a digital object has streams (for example video files often consist of video 
         file_created_date="2000-12-24T22:00:00"
     )
     movie = DigitalObject(
-        sip_filepath="data/movies/cat_video.mkv",
+        path="data/movies/cat_video.mkv",
         metadata=[container_md]
     )
 
@@ -131,7 +131,7 @@ Create/generate a structural map organizing the digital objects to a wanted stru
 -------------------------------------------------------------------------------------
 The digital objects should be given a structure with structural maps, using the ``StructuralMap`` class. Digital objects are grouped into divisions with ``StructuralMapDiv`` objects. Finally the structural maps are given to the ``METS`` object.
 
-A structural map can be generated according to the directory structure inferred from the ``sip_filepath`` attributes of the given ``DigitalObject`` instances, turning each directory found in the filepaths to a division in the structural map, finally placing the digital objects in the correct division:
+A structural map can be generated according to the directory structure inferred from the ``path`` attributes of the given ``DigitalObject`` instances, turning each directory found in the filepaths to a division in the structural map, finally placing the digital objects in the correct division:
 
 .. code-block:: python
 

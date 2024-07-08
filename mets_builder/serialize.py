@@ -303,7 +303,7 @@ def _parse_file_references_file(
         file_id=digital_object.identifier,
         admid_elements=administrative_metadata_identifiers,
         loctype="URL",
-        xlink_href=f"file:///{digital_object.sip_filepath}",
+        xlink_href=f"file:///{digital_object.path}",
         xlink_type="simple",
         use=digital_object.use
     )

@@ -28,7 +28,7 @@ mets.add_agent(
 
 # DigitalObject should be created for each digital object included in the METS
 picture = DigitalObject(
-    sip_filepath="data/pictures/cat_picture.jpg"
+    path="data/pictures/cat_picture.jpg"
 )
 
 # Metadata can be added to digital objects using calsses from metadata module
@@ -83,7 +83,7 @@ container_md = TechnicalFileObjectMetadata(
     file_created_date="2000-12-24T22:00:00"
 )
 movie = DigitalObject(
-    sip_filepath="data/movies/cat_video.mkv",
+    path="data/movies/cat_video.mkv",
     metadata=[container_md]
 )
 audio_bitstream_md = TechnicalBitstreamObjectMetadata(
@@ -104,13 +104,12 @@ movie.add_stream(video_stream)
 # objects.
 #
 # Structural map can be generated according to the directory structure as
-# inferred from the 'sip_filepath' attributes of the DigitalObjects.  Here
-# 'picture' and 'movie' has their 'sip_filepath' defined as
-# 'data/pictures/cat_picture.jpg' and 'data/movies/cat_video.mkv', so the
-# method will create StructuralMapDivs with types 'data', 'movies' and
-# 'pictures', and put the picture file to the 'pictures' div and video file to
-# the 'movies' div. The whole structure will also be put inside a root div with
-# type 'directory'.
+# inferred from the 'path' attributes of the DigitalObjects.  Here 'picture'
+# and 'movie' has their 'path' defined as 'data/pictures/cat_picture.jpg' and
+# 'data/movies/cat_video.mkv', so the method will create StructuralMapDivs with
+# types 'data', 'movies' and 'pictures', and put the picture file to the
+# 'pictures' div and video file to the 'movies' div. The whole structure will
+# also be put inside a root div with type 'directory'.
 structural_map = StructuralMap.from_directory_structure([picture, movie])
 mets.add_structural_map(structural_map)
 

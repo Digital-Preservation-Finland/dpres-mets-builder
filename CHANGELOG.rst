@@ -13,6 +13,7 @@ Removed
 - ``from_directory_structure`` method from ``StructureMap`` class. This functionality is moved over to ``siptool-ng``.
 - Rename MetadataBase class to Metadata
 - Make Metadata an abstract base class
+- Rename ``DigitalObject`` attribute ``sip_filepath`` to ``path``
 
 0.3.0 - 2024-03-27
 ------------------
