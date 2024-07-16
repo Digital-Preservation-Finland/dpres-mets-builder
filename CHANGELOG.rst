@@ -7,13 +7,16 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Unreleased
 ----------
+Changed
+^^^^^^^
+- Rename MetadataBase class to Metadata
+- Make Metadata an abstract base class
+- Rename ``DigitalObject`` attribute ``sip_filepath`` to ``path``
+
 Removed
 ^^^^^^^
 - Creation of automatic PREMIS events when adding imported metadata to structural map. This functionality is moved over to ``siptool-ng``.
 - ``from_directory_structure`` method from ``StructureMap`` class. This functionality is moved over to ``siptool-ng``.
-- Rename MetadataBase class to Metadata
-- Make Metadata an abstract base class
-- Rename ``DigitalObject`` attribute ``sip_filepath`` to ``path``
 
 0.3.0 - 2024-03-27
 ------------------
