@@ -2,7 +2,7 @@
 from typing import Iterable, Optional, Set
 
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import Metadata
+from mets_builder.metadata import Metadata, DigitalProvenanceEventMetadata
 
 
 class StructuralMapDiv:
@@ -119,11 +119,15 @@ class StructuralMapDiv:
         """Add metadata to this div.
 
         The metadata should apply to all digital objects under this div (as
-        well as digital objects under the divs nested in this div)
+        well as digital objects under the divs nested in this div).
+        Additionally agents linked to an event are added to this div.
 
         :param metadata: The metadata object that is added to this div.
         """
         self.metadata.add(metadata)
+        if isinstance(metadata, DigitalProvenanceEventMetadata):
+            for agent in metadata.linked_agents:
+                self.metadata.add(agent)
 
     def add_divs(self, divs: Iterable["StructuralMapDiv"]) -> None:
         """Add a further divisions to this division.

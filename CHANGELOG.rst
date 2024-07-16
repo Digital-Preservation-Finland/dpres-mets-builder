@@ -7,6 +7,10 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Unreleased
 ----------
+Added
+^^^^^
+- Automatically add PREMIS agent to structural map div metadata, if an event to which the agent is linked is added.
+
 Changed
 ^^^^^^^
 - Rename MetadataBase class to Metadata
