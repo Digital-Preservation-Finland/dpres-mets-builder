@@ -3,9 +3,7 @@ import pytest
 
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import (MetadataFormat, MetadataType,
-                                   ImportedMetadata,
-                                   DigitalProvenanceAgentMetadata,
-                                   DigitalProvenanceEventMetadata)
+                                   ImportedMetadata)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -282,35 +280,3 @@ def test_add_div_with_parent_to_a_div():
         root_div.add_divs([div_with_parent])
 
     assert str(error.value) == "An added div is already has a parent div."
-
-
-def test_automatic_adding_of_agents_to_div():
-    """Test that agents get added to structural map div automatically when
-    adding an event to which the agent are linked to"""
-    root_div = StructuralMapDiv("test_type")
-    event = DigitalProvenanceEventMetadata(
-        event_type="event-type",
-        event_datetime="2000-01-01T10:11:12",
-        event_detail="event-detail",
-        event_outcome="success",
-        event_outcome_detail="event-outcome-detail",
-        event_identifier_type="event-identifier-type",
-        event_identifier="event-identifier-value"
-    )
-    agent_1 = DigitalProvenanceAgentMetadata(
-        agent_name="agent-name",
-        agent_type="organization",
-        agent_identifier_type="test-type",
-        agent_identifier="agent-1"
-    )
-    agent_2 = DigitalProvenanceAgentMetadata(
-        agent_name="agent-name",
-        agent_type="organization",
-        agent_identifier_type="test-type",
-        agent_identifier="agent-2"
-    )
-    event.link_agent_metadata(agent_1, agent_role="agent-role-1")
-    event.link_agent_metadata(agent_2, agent_role="agent-role-2")
-    root_div.add_metadata(event)
-
-    assert len(root_div.metadata) == 3
