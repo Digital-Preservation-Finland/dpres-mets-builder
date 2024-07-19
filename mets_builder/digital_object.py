@@ -45,6 +45,8 @@ class DigitalObjectBase:
                 "should be added to a div in a structural map."
             )
         self.metadata.add(metadata)
+        for linked_metadata in metadata.linked_metadata:
+            self.add_metadata(linked_metadata)
 
 
 class DigitalObjectStream(DigitalObjectBase):

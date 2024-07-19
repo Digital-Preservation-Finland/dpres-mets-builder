@@ -221,6 +221,14 @@ class Metadata(ComparableMixin, metaclass=abc.ABCMeta):
         self.created = created
 
     @property
+    def linked_metadata(self):
+        """Gets set of linked metadata.
+
+        :returns: The set of metadata linked metadata.
+        """
+        return {}
+
+    @property
     def is_administrative(self) -> bool:
         """Tells if this metadata is administrative metadata.
 

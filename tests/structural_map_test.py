@@ -2,8 +2,7 @@
 import pytest
 
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import (MetadataFormat, MetadataType,
-                                   ImportedMetadata)
+import mets_builder.metadata
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -95,15 +94,42 @@ def test_add_metadata_to_div():
     div = StructuralMapDiv(div_type="test_type")
     assert div.metadata == set()
 
-    metadata = ImportedMetadata(
+    metadata = mets_builder.metadata.ImportedMetadata(
         data_string="<root><sub1></sub1><sub2></sub2></root>",
-        metadata_type=MetadataType.DESCRIPTIVE,
-        metadata_format=MetadataFormat.OTHER,
+        metadata_type=mets_builder.metadata.MetadataType.DESCRIPTIVE,
+        metadata_format=mets_builder.metadata.MetadataFormat.OTHER,
         other_format="PAS-special",
         format_version="1.0",
     )
     div.add_metadata(metadata)
     assert div.metadata == {metadata}
+
+def test_add_linked_metadata_to_div():
+    """Test adding metadata with linked metadata."""
+    div = StructuralMapDiv(div_type="test_type")
+    assert div.metadata == set()
+
+    # Create event metadata and agent metadata
+    event = mets_builder.metadata.DigitalProvenanceEventMetadata(
+        event_type="foo",
+        event_detail="bar",
+        event_outcome="success",
+        event_outcome_detail="baz",
+    )
+    agent = mets_builder.metadata.DigitalProvenanceAgentMetadata(
+        agent_name="cowsay",
+        agent_type="software",
+    )
+
+    # Link agent metadata to event metadata
+    event.link_agent_metadata(
+        agent_metadata=agent,
+        agent_role="creator"
+    )
+
+    # The agent metadata should be automatically added to div
+    div.add_metadata(event)
+    assert div.metadata == {event, agent}
 
 
 def test_add_digital_objects_to_div():

@@ -88,7 +88,7 @@ class StructuralMapDiv:
 
         if metadata:
             for metadata_item in metadata:
-                self.metadata.add(metadata_item)
+                self.add_metadata(metadata_item)
 
         if digital_objects:
             self.add_digital_objects(digital_objects)
@@ -124,6 +124,8 @@ class StructuralMapDiv:
         :param metadata: The metadata object that is added to this div.
         """
         self.metadata.add(metadata)
+        for linked_metadata in metadata.linked_metadata:
+            self.add_metadata(linked_metadata)
 
     def add_divs(self, divs: Iterable["StructuralMapDiv"]) -> None:
         """Add a further divisions to this division.

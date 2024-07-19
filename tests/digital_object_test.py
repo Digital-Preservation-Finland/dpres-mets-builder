@@ -48,6 +48,35 @@ def test_add_descriptive_metadata():
     )
 
 
+def test_add_linked_metadata():
+    """Test adding metadata with linked metadata."""
+    digital_object = DigitalObjectBase()
+    assert digital_object.metadata == set()
+
+    # Create event metadata and agent metadata
+    event = metadata.DigitalProvenanceEventMetadata(
+        event_type="foo",
+        event_detail="bar",
+        event_outcome="success",
+        event_outcome_detail="baz",
+    )
+    agent = metadata.DigitalProvenanceAgentMetadata(
+        agent_name="cowsay",
+        agent_type="software",
+    )
+
+    # Link agent metadata to event metadata
+    event.link_agent_metadata(
+        agent_metadata=agent,
+        agent_role="creator"
+    )
+
+    # The agent metadata should be automatically added to digital
+    # object, when the event is added
+    digital_object.add_metadata(event)
+    assert digital_object.metadata == {event, agent}
+
+
 def test_generated_identifier():
     """Test that if identifier is not given, an UUID identifier is generated
     for digital object.

@@ -158,6 +158,16 @@ class DigitalProvenanceEventMetadata(Metadata):
         event_outcome = EventOutcome(event_outcome)
         self._event_outcome = event_outcome
 
+    @property
+    def linked_metadata(self):
+        """Return linked metadata i.e. agents and object linked to this event.
+
+        :returns: The set of metadata linked metadata.
+        """
+        agents = {agent.agent_metadata for agent in self.linked_agents}
+        objects = {object_.object_metadata for object_ in self.linked_objects}
+        return agents | objects
+
     def link_agent_metadata(
         self,
         agent_metadata: DigitalProvenanceAgentMetadata,

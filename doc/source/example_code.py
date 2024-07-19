@@ -153,8 +153,8 @@ event_md.link_agent_metadata(
     agent_metadata=agent_md,
     agent_role="executing program"
 )
+# The agent linked to the event is added to metadata automatically
 root_div.add_metadata(event_md)
-root_div.add_metadata(agent_md)
 
 # File references can be generated with the following command
 mets.generate_file_references()
