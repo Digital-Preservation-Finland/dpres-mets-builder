@@ -1,12 +1,18 @@
 """Tests for mets.py."""
+import datetime
 from pathlib import Path
+import uuid
 
 import pytest
 
 from mets_builder import metadata
 from mets_builder.digital_object import DigitalObject, DigitalObjectStream
 from mets_builder.file_references import FileReferences
-from mets_builder.mets import METS, AgentRole, AgentType, MetsProfile
+from mets_builder.mets import (METS,
+                               AgentRole,
+                               AgentType,
+                               MetsProfile,
+                               MetsRecordStatus)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
@@ -125,6 +131,31 @@ def test_no_specification_or_catalog_version():
     assert str(error.value) == (
         "Either catalog_version or specification has to be set"
     )
+
+
+def test_default_values():
+    """Test creating METS with default values."""
+    # Create METS with only required arguments
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        contract_id="contract_id",
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL,
+    )
+
+    # Generated package_id should be valid UUID
+    assert uuid.UUID(mets.package_id)
+
+    # Creation date should be current time
+    assert datetime.datetime.now(tz=datetime.timezone.utc) \
+        - mets.create_date < datetime.timedelta(minutes=1)
+
+    # Catalog version, specification and recored status should be set
+    assert mets.catalog_version == "1.7.6"
+    assert mets.specification == "1.7.6"
+    assert mets.record_status == MetsRecordStatus.SUBMISSION
+
+
 
 
 def test_add_agent():
