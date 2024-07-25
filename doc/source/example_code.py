@@ -101,22 +101,7 @@ movie.add_stream(video_stream)
 
 # Structure of the digital objects can be documented with the StructuralMap
 # class, dividing the digital objects to wanted groups with StructuralMapDiv
-# objects.
-#
-# Structural map can be generated according to the directory structure as
-# inferred from the 'path' attributes of the DigitalObjects.  Here 'picture'
-# and 'movie' has their 'path' defined as 'data/pictures/cat_picture.jpg' and
-# 'data/movies/cat_video.mkv', so the method will create StructuralMapDivs with
-# types 'data', 'movies' and 'pictures', and put the picture file to the
-# 'pictures' div and video file to the 'movies' div. The whole structure will
-# also be put inside a root div with type 'directory'.
-structural_map = StructuralMap.from_directory_structure([picture, movie])
-mets.add_structural_map(structural_map)
-
-# If a special structure is needed, it can also be created manually.
-#
-# There can be multiple structural maps, so this will be added alongside the
-# previously added structural map
+# objects. METS object can contain multiple structural maps.
 root_div = StructuralMapDiv(div_type="directory")
 pictures_div = StructuralMapDiv(
     div_type="image_files",
