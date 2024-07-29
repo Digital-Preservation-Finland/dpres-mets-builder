@@ -88,8 +88,8 @@ class DigitalProvenanceEventMetadata(Metadata):
         self,
         event_type: str,
         detail: str,
-        event_outcome: Union[EventOutcome, str],
-        event_outcome_detail: str,
+        outcome: Union[EventOutcome, str],
+        outcome_detail: str,
         event_datetime: Optional[str] = None,
         event_identifier_type: Optional[str] = None,
         event_identifier: Optional[str] = None,
@@ -102,12 +102,12 @@ class DigitalProvenanceEventMetadata(Metadata):
 
         :param event_type: A categorization of the nature of the event.
         :param detail: Additional information about the event.
-        :param event_outcome: A categorization of the overall result of the
+        :param outcome: A categorization of the overall result of the
             event in terms of success, partial success, or failure. If given as
             string, the value is cast to EventOutcome and results in error if
             it is not a valid event outcome. The allowed values can be found
             from EventOutcome documentation.
-        :param event_outcome_detail: A detailed description of the result or
+        :param outcome_detail: A detailed description of the result or
             product of the event.
         :param event_datetime: The single date and time, or date and time
             range, at or during which the event occurred.
@@ -123,8 +123,8 @@ class DigitalProvenanceEventMetadata(Metadata):
         self.event_type = event_type
         self.event_datetime = event_datetime
         self.detail = detail
-        self.event_outcome = event_outcome
-        self.event_outcome_detail = event_outcome_detail
+        self.outcome = outcome
+        self.outcome_detail = outcome_detail
         self._set_event_identifier_and_type(
             event_identifier_type, event_identifier
         )
@@ -148,15 +148,15 @@ class DigitalProvenanceEventMetadata(Metadata):
         return vars_
 
     @property
-    def event_outcome(self):
-        """Getter for event_outcome."""
-        return self._event_outcome
+    def outcome(self):
+        """Getter for outcome."""
+        return self._outcome
 
-    @event_outcome.setter
-    def event_outcome(self, event_outcome):
-        """Setter for event_outcome."""
-        event_outcome = EventOutcome(event_outcome)
-        self._event_outcome = event_outcome
+    @outcome.setter
+    def outcome(self, outcome):
+        """Setter for outcome."""
+        outcome = EventOutcome(outcome)
+        self._outcome = outcome
 
     @property
     def linked_metadata(self):
@@ -268,8 +268,8 @@ class DigitalProvenanceEventMetadata(Metadata):
         )
 
         outcome = premis.outcome(
-            outcome=self.event_outcome.value,
-            detail_note=self.event_outcome_detail
+            outcome=self.outcome.value,
+            detail_note=self.outcome_detail
         )
 
         linked_agents = self._serialize_linked_agents_to_xml_elements(state)

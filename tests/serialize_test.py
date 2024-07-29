@@ -54,8 +54,8 @@ def mets_object():
     digiprov_md = metadata.DigitalProvenanceEventMetadata(
         event_type="foo",
         detail="bar",
-        event_outcome="success",
-        event_outcome_detail="baz"
+        outcome="success",
+        outcome_detail="baz"
     )
     do_1 = DigitalObject(
         path="path/1",
@@ -525,8 +525,8 @@ def test_metadata_identifier_shared():
                 event_type="calculation",
                 event_datetime="2000-01-01T12:00:00",
                 detail="Event detail",
-                event_outcome="success",
-                event_outcome_detail="Event outcome detail"
+                outcome="success",
+                outcome_detail="Event outcome detail"
             )
         )
 

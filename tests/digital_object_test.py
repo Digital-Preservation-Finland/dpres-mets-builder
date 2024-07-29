@@ -57,8 +57,8 @@ def test_add_linked_metadata():
     event = metadata.DigitalProvenanceEventMetadata(
         event_type="foo",
         detail="bar",
-        event_outcome="success",
-        event_outcome_detail="baz",
+        outcome="success",
+        outcome_detail="baz",
     )
     agent = metadata.DigitalProvenanceAgentMetadata(
         agent_name="cowsay",
