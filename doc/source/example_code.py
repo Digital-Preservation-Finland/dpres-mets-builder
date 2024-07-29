@@ -122,7 +122,7 @@ mets.add_structural_map(structural_map)
 # to the root div of the structural map
 event_md = DigitalProvenanceEventMetadata(
     event_type="message digest calculation",
-    event_datetime="2000-01-01T12:00:00",
+    datetime="2000-01-01T12:00:00",
     detail="Checksum calculation for digital objects",
     outcome="success",
     outcome_detail=(

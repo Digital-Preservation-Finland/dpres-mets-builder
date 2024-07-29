@@ -13,7 +13,7 @@ def test_serialization():
     """Test serializing the digital provenance event object."""
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
-        event_datetime="2000-01-01T10:11:12",
+        datetime="2000-01-01T10:11:12",
         detail="event-detail",
         outcome="success",
         outcome_detail="event-outcome-detail",
@@ -75,7 +75,7 @@ def test_identifier_type_not_set():
     with pytest.raises(ValueError) as error:
         DigitalProvenanceEventMetadata(
             event_type="event-type",
-            event_datetime="2000-01-01T10:11:12",
+            datetime="2000-01-01T10:11:12",
             detail="event-detail",
             outcome="success",
             outcome_detail="event-outcome-detail",
@@ -93,7 +93,7 @@ def test_generate_event_identifier():
     """
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
-        event_datetime="2000-01-01T10:11:12",
+        datetime="2000-01-01T10:11:12",
         detail="event-detail",
         outcome="success",
         outcome_detail="event-outcome-detail",
@@ -108,7 +108,7 @@ def test_user_given_identifier():
     """Test that user gan give event identifier and type."""
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
-        event_datetime="2000-01-01T10:11:12",
+        datetime="2000-01-01T10:11:12",
         detail="event-detail",
         outcome="success",
         outcome_detail="event-outcome-detail",
@@ -139,7 +139,7 @@ def test_valid_outcomes(outcome):
     """Test that valid event outcomes can be set."""
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
-        event_datetime="2000-01-01T10:11:12",
+        datetime="2000-01-01T10:11:12",
         detail="event-detail",
         outcome=outcome,
         outcome_detail="event-outcome-detail"
@@ -159,7 +159,7 @@ def test_invalid_event_outcomes(invalid_outcome):
     """Test that invalid event outcomes raise an error."""
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
-        event_datetime="2000-01-01T10:11:12",
+        datetime="2000-01-01T10:11:12",
         detail="event-detail",
         outcome="success",
         outcome_detail="event-outcome-detail"

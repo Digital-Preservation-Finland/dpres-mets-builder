@@ -90,7 +90,7 @@ class DigitalProvenanceEventMetadata(Metadata):
         detail: str,
         outcome: Union[EventOutcome, str],
         outcome_detail: str,
-        event_datetime: Optional[str] = None,
+        datetime: Optional[str] = None,
         event_identifier_type: Optional[str] = None,
         event_identifier: Optional[str] = None,
         **kwargs
@@ -109,7 +109,7 @@ class DigitalProvenanceEventMetadata(Metadata):
             from EventOutcome documentation.
         :param outcome_detail: A detailed description of the result or
             product of the event.
-        :param event_datetime: The single date and time, or date and time
+        :param datetime: The single date and time, or date and time
             range, at or during which the event occurred.
 
             If set to None, the event date will be generated
@@ -121,7 +121,7 @@ class DigitalProvenanceEventMetadata(Metadata):
             the user, event identifier is generated automatically.
         """
         self.event_type = event_type
-        self.event_datetime = event_datetime
+        self.datetime = datetime
         self.detail = detail
         self.outcome = outcome
         self.outcome_detail = outcome_detail
@@ -280,7 +280,7 @@ class DigitalProvenanceEventMetadata(Metadata):
         event = premis.event(
             event_id=event_id_elem,
             event_type=self.event_type,
-            event_date_time=state.get_event_datetime(self),
+            event_date_time=state.get_datetime(self),
             event_detail=self.detail,
             child_elements=event_child_elements
         )

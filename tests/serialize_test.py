@@ -523,7 +523,7 @@ def test_metadata_identifier_shared():
         events.append(
             DigitalProvenanceEventMetadata(
                 event_type="calculation",
-                event_datetime="2000-01-01T12:00:00",
+                datetime="2000-01-01T12:00:00",
                 detail="Event detail",
                 outcome="success",
                 outcome_detail="Event outcome detail"
