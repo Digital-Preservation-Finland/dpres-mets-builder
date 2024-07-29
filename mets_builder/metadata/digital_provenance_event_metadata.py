@@ -87,7 +87,7 @@ class DigitalProvenanceEventMetadata(Metadata):
     def __init__(
         self,
         event_type: str,
-        event_detail: str,
+        detail: str,
         event_outcome: Union[EventOutcome, str],
         event_outcome_detail: str,
         event_datetime: Optional[str] = None,
@@ -101,7 +101,7 @@ class DigitalProvenanceEventMetadata(Metadata):
         given here as well. Look Metadata documentation for more information.
 
         :param event_type: A categorization of the nature of the event.
-        :param event_detail: Additional information about the event.
+        :param detail: Additional information about the event.
         :param event_outcome: A categorization of the overall result of the
             event in terms of success, partial success, or failure. If given as
             string, the value is cast to EventOutcome and results in error if
@@ -122,7 +122,7 @@ class DigitalProvenanceEventMetadata(Metadata):
         """
         self.event_type = event_type
         self.event_datetime = event_datetime
-        self.event_detail = event_detail
+        self.detail = detail
         self.event_outcome = event_outcome
         self.event_outcome_detail = event_outcome_detail
         self._set_event_identifier_and_type(
@@ -281,7 +281,7 @@ class DigitalProvenanceEventMetadata(Metadata):
             event_id=event_id_elem,
             event_type=self.event_type,
             event_date_time=state.get_event_datetime(self),
-            event_detail=self.event_detail,
+            event_detail=self.detail,
             child_elements=event_child_elements
         )
 

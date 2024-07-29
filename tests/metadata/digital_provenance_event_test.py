@@ -14,7 +14,7 @@ def test_serialization():
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
-        event_detail="event-detail",
+        detail="event-detail",
         event_outcome="success",
         event_outcome_detail="event-outcome-detail",
         event_identifier_type="event-identifier-type",
@@ -76,7 +76,7 @@ def test_identifier_type_not_set():
         DigitalProvenanceEventMetadata(
             event_type="event-type",
             event_datetime="2000-01-01T10:11:12",
-            event_detail="event-detail",
+            detail="event-detail",
             event_outcome="success",
             event_outcome_detail="event-outcome-detail",
             event_identifier_type=None,
@@ -94,7 +94,7 @@ def test_generate_event_identifier():
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
-        event_detail="event-detail",
+        detail="event-detail",
         event_outcome="success",
         event_outcome_detail="event-outcome-detail",
         event_identifier_type=None,
@@ -109,7 +109,7 @@ def test_user_given_identifier():
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
-        event_detail="event-detail",
+        detail="event-detail",
         event_outcome="success",
         event_outcome_detail="event-outcome-detail",
         event_identifier_type="user-type",
@@ -140,7 +140,7 @@ def test_valid_event_outcomes(event_outcome):
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
-        event_detail="event-detail",
+        detail="event-detail",
         event_outcome=event_outcome,
         event_outcome_detail="event-outcome-detail"
     )
@@ -160,7 +160,7 @@ def test_invalid_event_outcomes(invalid_event_outcome):
     event = DigitalProvenanceEventMetadata(
         event_type="event-type",
         event_datetime="2000-01-01T10:11:12",
-        event_detail="event-detail",
+        detail="event-detail",
         event_outcome="success",
         event_outcome_detail="event-outcome-detail"
     )

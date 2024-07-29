@@ -113,7 +113,7 @@ def test_add_linked_metadata_to_div():
     # Create event metadata and agent metadata
     event = mets_builder.metadata.DigitalProvenanceEventMetadata(
         event_type="foo",
-        event_detail="bar",
+        detail="bar",
         event_outcome="success",
         event_outcome_detail="baz",
     )
@@ -315,7 +315,7 @@ def test_structural_map_div_metadata_bundling():
     """
     shared_event = mets_builder.metadata.DigitalProvenanceEventMetadata(
         event_type="shared",
-        event_detail="bar",
+        detail="bar",
         event_outcome="success",
         event_outcome_detail="baz",
     )
@@ -325,7 +325,7 @@ def test_structural_map_div_metadata_bundling():
     )
     unshared_event = mets_builder.metadata.DigitalProvenanceEventMetadata(
         event_type="unshared",
-        event_detail="bar",
+        detail="bar",
         event_outcome="success",
         event_outcome_detail="baz",
     )
@@ -335,7 +335,7 @@ def test_structural_map_div_metadata_bundling():
     )
     partly_shared_event = mets_builder.metadata.DigitalProvenanceEventMetadata(
         event_type="partly_shared",
-        event_detail="bar",
+        detail="bar",
         event_outcome="success",
         event_outcome_detail="baz",
     )
