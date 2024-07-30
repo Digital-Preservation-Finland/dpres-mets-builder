@@ -533,7 +533,7 @@ def test_metadata_identifier_shared():
     for i in range(0, 2):
         events[i].link_agent_metadata(
             DigitalProvenanceAgentMetadata(
-                agent_name="calculator",
+                name="calculator",
                 agent_type="software",
                 agent_version="1.2.4"
             ),
@@ -544,7 +544,7 @@ def test_metadata_identifier_shared():
     # later when generating the identifier
     events[2].link_agent_metadata(
         DigitalProvenanceAgentMetadata(
-            agent_name="calculator",
+            name="calculator",
             agent_type="software",
             agent_version="2.0"  # Different version
         ),

@@ -15,7 +15,7 @@ def test_invalid_agent_type():
         DigitalProvenanceAgentMetadata(
             agent_identifier_type="agent-identifier-type",
             agent_identifier="agent-identifier-value",
-            agent_name="agent-name",
+            name="agent-name",
             agent_type="invalid-agent",
         )
 
@@ -25,7 +25,7 @@ def test_serialization():
     data = DigitalProvenanceAgentMetadata(
         agent_identifier_type="agent-identifier-type",
         agent_identifier="agent-identifier-value",
-        agent_name="agent-name",
+        name="agent-name",
         agent_type="organization",
         agent_note="agent-note"
     )
@@ -56,7 +56,7 @@ def test_serialized_agent_version(agent_type, expected_name):
     data = DigitalProvenanceAgentMetadata(
         agent_identifier_type="agent-identifier-type",
         agent_identifier="agent-identifier-value",
-        agent_name="agent-name",
+        name="agent-name",
         agent_type=agent_type,
         agent_version="1.0"
     )
@@ -74,7 +74,7 @@ def test_identifier_type_not_set():
         DigitalProvenanceAgentMetadata(
             agent_identifier_type=None,
             agent_identifier="agent-identifier-value",
-            agent_name="agent-name",
+            name="agent-name",
             agent_type="organization"
         )
     assert str(error.value) == (
@@ -89,7 +89,7 @@ def test_generate_agent_identifier():
     agent = DigitalProvenanceAgentMetadata(
         agent_identifier_type=None,
         agent_identifier=None,
-        agent_name="agent-name",
+        name="agent-name",
         agent_type="software",
         agent_version="1.0"
     )
@@ -102,7 +102,7 @@ def test_user_given_identifier():
     agent = DigitalProvenanceAgentMetadata(
         agent_identifier_type="user-type",
         agent_identifier="user-identifier",
-        agent_name="agent-name",
+        name="agent-name",
         agent_type="software",
         agent_version="1.0"
     )
@@ -113,7 +113,7 @@ def test_user_given_identifier():
 def test_mets_builder_agent():
     """Test that user can easily get the agent metadata for mets-builder."""
     agent = DigitalProvenanceAgentMetadata.get_mets_builder_agent()
-    assert agent.agent_name == "dpres-mets-builder"
+    assert agent.name == "dpres-mets-builder"
     assert agent.agent_type.value == "software"
     assert agent.agent_version == __version__
     assert agent.agent_identifier_type == "UUID"

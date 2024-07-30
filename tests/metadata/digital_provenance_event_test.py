@@ -22,13 +22,13 @@ def test_serialization():
     )
 
     agent_1 = DigitalProvenanceAgentMetadata(
-        agent_name="agent-name",
+        name="agent-name",
         agent_type="organization",
         agent_identifier_type="test-type",
         agent_identifier="agent-1"
     )
     agent_2 = DigitalProvenanceAgentMetadata(
-        agent_name="agent-name",
+        name="agent-name",
         agent_type="organization",
         agent_identifier_type="test-type",
         agent_identifier="agent-2"

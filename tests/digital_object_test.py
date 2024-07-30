@@ -61,7 +61,7 @@ def test_add_linked_metadata():
         outcome_detail="baz",
     )
     agent = metadata.DigitalProvenanceAgentMetadata(
-        agent_name="cowsay",
+        name="cowsay",
         agent_type="software",
     )
 

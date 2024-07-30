@@ -32,7 +32,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
 
     def __init__(
         self,
-        agent_name: str,
+        name: str,
         agent_type: Union[DigitalProvenanceAgentType, str],
         agent_version: Optional[str] = None,
         agent_note: Optional[str] = None,
@@ -45,7 +45,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
         For advanced configurations keyword arguments for Metadata class can be
         given here as well. Look Metadata documentation for more information.
 
-        :param agent_name: Name of the agent.
+        :param name: Name of the agent.
         :param agent_type: The type of this agent, given as
             DigitalProvenanceAgentType enum or string. If given as string, the
             value is cast to DigitalProvenanceAgentType and results in error if
@@ -58,7 +58,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
         :param agent_identifier: The agent identifier value. If not given by
             the user, agent identifier is generated automatically.
         """
-        self.agent_name = agent_name
+        self.name = name
         self.agent_type = DigitalProvenanceAgentType(agent_type)
         self.agent_version = self._resolve_agent_version(
             agent_version, self.agent_type
@@ -83,7 +83,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
         this library itself, dpres-mets-builder.
         """
         return DigitalProvenanceAgentMetadata(
-            agent_name="dpres-mets-builder",
+            name="dpres-mets-builder",
             agent_type=DigitalProvenanceAgentType.SOFTWARE,
             agent_version=mets_builder.__version__
         )
@@ -121,17 +121,17 @@ class DigitalProvenanceAgentMetadata(Metadata):
         self.agent_identifier_type = identifier_type
         self.agent_identifier = identifier
 
-    def _resolve_serialized_agent_name(self):
+    def _resolve_serialized_name(self):
         """Resolve how the name of the agent should be shown in the serialized
         agent.
 
         The name is the given agent name, unless the agent has a version
         number, in which case the version number is appended to the name.
         """
-        agent_name = self.agent_name
+        name = self.name
         if self.agent_version is not None:
-            agent_name = f"{agent_name}-v{self.agent_version}"
-        return agent_name
+            name = f"{name}-v{self.agent_version}"
+        return name
 
     def _to_xml_element_tree(self, state) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
@@ -147,7 +147,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
 
         agent = premis.agent(
             agent_id=agent_identifier_elem,
-            agent_name=self._resolve_serialized_agent_name(),
+            agent_name=self._resolve_serialized_name(),
             agent_type=self.agent_type.value,
             note=self.agent_note
         )

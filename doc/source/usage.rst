@@ -167,7 +167,7 @@ Metadata that applies to all digital objects in a division can be added to the d
         )
     )
     agent_md = DigitalProvenanceAgentMetadata(
-        agent_name="checksum-calculator",
+        name="checksum-calculator",
         agent_type="software",
         agent_version="1.2.4"
     )
