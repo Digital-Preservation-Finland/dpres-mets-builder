@@ -35,7 +35,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
         name: str,
         agent_type: Union[DigitalProvenanceAgentType, str],
         version: Optional[str] = None,
-        agent_note: Optional[str] = None,
+        note: Optional[str] = None,
         agent_identifier_type: Optional[str] = None,
         agent_identifier: Optional[str] = None,
         **kwargs
@@ -53,7 +53,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
             can be found from DigitalProvenanceAgentType documentation.
         :param version: The version of the agent. Does not have effect if
             agent type is not 'software' or 'hardware'.
-        :param agent_note: Additional information about the agent.
+        :param note: Additional information about the agent.
         :param agent_identifier_type: Type of agent identifier.
         :param agent_identifier: The agent identifier value. If not given by
             the user, agent identifier is generated automatically.
@@ -63,7 +63,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
         self.version = self._resolve_version(
             version, self.agent_type
         )
-        self.agent_note = agent_note
+        self.note = note
         self._set_agent_identifier_and_type(
             agent_identifier_type, agent_identifier
         )
@@ -149,6 +149,6 @@ class DigitalProvenanceAgentMetadata(Metadata):
             agent_id=agent_identifier_elem,
             agent_name=self._resolve_serialized_name(),
             agent_type=self.agent_type.value,
-            note=self.agent_note
+            note=self.note
         )
         return agent

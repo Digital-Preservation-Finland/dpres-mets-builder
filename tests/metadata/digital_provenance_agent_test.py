@@ -27,7 +27,7 @@ def test_serialization():
         agent_identifier="agent-identifier-value",
         name="agent-name",
         agent_type="organization",
-        agent_note="agent-note"
+        note="agent-note"
     )
 
     result = xml_helpers.utils.serialize(
