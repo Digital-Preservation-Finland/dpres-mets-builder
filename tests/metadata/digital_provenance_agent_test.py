@@ -58,7 +58,7 @@ def test_serialized_agent_version(agent_type, expected_name):
         agent_identifier="agent-identifier-value",
         name="agent-name",
         agent_type=agent_type,
-        agent_version="1.0"
+        version="1.0"
     )
 
     result = data.to_xml_element_tree()
@@ -91,7 +91,7 @@ def test_generate_agent_identifier():
         agent_identifier=None,
         name="agent-name",
         agent_type="software",
-        agent_version="1.0"
+        version="1.0"
     )
     assert agent.agent_identifier_type == "UUID"
     assert agent.agent_identifier is None
@@ -104,7 +104,7 @@ def test_user_given_identifier():
         agent_identifier="user-identifier",
         name="agent-name",
         agent_type="software",
-        agent_version="1.0"
+        version="1.0"
     )
     assert agent.agent_identifier_type == "user-type"
     assert agent.agent_identifier == "user-identifier"
@@ -115,6 +115,6 @@ def test_mets_builder_agent():
     agent = DigitalProvenanceAgentMetadata.get_mets_builder_agent()
     assert agent.name == "dpres-mets-builder"
     assert agent.agent_type.value == "software"
-    assert agent.agent_version == __version__
+    assert agent.version == __version__
     assert agent.agent_identifier_type == "UUID"
     assert agent.agent_identifier is None

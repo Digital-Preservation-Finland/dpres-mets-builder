@@ -132,7 +132,7 @@ event_md = DigitalProvenanceEventMetadata(
 agent_md = DigitalProvenanceAgentMetadata(
     name="checksum-calculator",
     agent_type="software",
-    agent_version="1.2.4"
+    version="1.2.4"
 )
 event_md.link_agent_metadata(
     agent_metadata=agent_md,

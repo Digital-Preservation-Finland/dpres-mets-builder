@@ -34,7 +34,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
         self,
         name: str,
         agent_type: Union[DigitalProvenanceAgentType, str],
-        agent_version: Optional[str] = None,
+        version: Optional[str] = None,
         agent_note: Optional[str] = None,
         agent_identifier_type: Optional[str] = None,
         agent_identifier: Optional[str] = None,
@@ -51,7 +51,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
             value is cast to DigitalProvenanceAgentType and results in error if
             it is not a valid digital provenance agent type. The allowed values
             can be found from DigitalProvenanceAgentType documentation.
-        :param agent_version: The version of the agent. Does not have effect if
+        :param version: The version of the agent. Does not have effect if
             agent type is not 'software' or 'hardware'.
         :param agent_note: Additional information about the agent.
         :param agent_identifier_type: Type of agent identifier.
@@ -60,8 +60,8 @@ class DigitalProvenanceAgentMetadata(Metadata):
         """
         self.name = name
         self.agent_type = DigitalProvenanceAgentType(agent_type)
-        self.agent_version = self._resolve_agent_version(
-            agent_version, self.agent_type
+        self.version = self._resolve_version(
+            version, self.agent_type
         )
         self.agent_note = agent_note
         self._set_agent_identifier_and_type(
@@ -85,10 +85,10 @@ class DigitalProvenanceAgentMetadata(Metadata):
         return DigitalProvenanceAgentMetadata(
             name="dpres-mets-builder",
             agent_type=DigitalProvenanceAgentType.SOFTWARE,
-            agent_version=mets_builder.__version__
+            version=mets_builder.__version__
         )
 
-    def _resolve_agent_version(self, agent_version, agent_type):
+    def _resolve_version(self, version, agent_type):
         """Resolve agent version.
 
         The version should be None unless agent type is 'software' or
@@ -98,7 +98,7 @@ class DigitalProvenanceAgentMetadata(Metadata):
             DigitalProvenanceAgentType.SOFTWARE,
             DigitalProvenanceAgentType.HARDWARE
         ]:
-            return agent_version
+            return version
 
         return None
 
@@ -129,8 +129,8 @@ class DigitalProvenanceAgentMetadata(Metadata):
         number, in which case the version number is appended to the name.
         """
         name = self.name
-        if self.agent_version is not None:
-            name = f"{name}-v{self.agent_version}"
+        if self.version is not None:
+            name = f"{name}-v{self.version}"
         return name
 
     def _to_xml_element_tree(self, state) -> etree._Element:

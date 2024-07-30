@@ -535,7 +535,7 @@ def test_metadata_identifier_shared():
             DigitalProvenanceAgentMetadata(
                 name="calculator",
                 agent_type="software",
-                agent_version="1.2.4"
+                version="1.2.4"
             ),
             agent_role="executing program"
         )
@@ -546,7 +546,7 @@ def test_metadata_identifier_shared():
         DigitalProvenanceAgentMetadata(
             name="calculator",
             agent_type="software",
-            agent_version="2.0"  # Different version
+            version="2.0"  # Different version
         ),
         agent_role="executing program"
     )
