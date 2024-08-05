@@ -2,7 +2,7 @@
 from typing import Iterable, Optional, Set
 
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import Metadata
+from mets_builder.metadata import Metadata, MetadataType
 
 
 class StructuralMapDiv:
@@ -215,6 +215,48 @@ class StructuralMapDiv:
             )
 
         self.digital_objects |= added_objects
+
+    def bundle_metadata(self):
+        """Bundle shared non-technical metadata to structural map div
+        recursively.
+
+        If all child nodes share the same non-technical metadata, be it
+        structural map div or digital object, delete that metadata from the
+        child node and move it to the parent structural map div. The structural
+        map div tree is traversed depth-first in post-order i.e. starting from
+        the leaves and moving towards the root (self). This way the shared
+        metadata can be propagated as close to the root (self) as possible.
+        """
+        # Apply this function recursively to child divs. If there are no child
+        # divs left unvisited the rest of the function body is executed.
+        for subdiv in self.divs:
+            subdiv.bundle_metadata()
+
+        children = list(self.digital_objects | self.divs)
+
+        # Pick a child to check against the other children.
+        child = children[0]
+        shared_metadata = set(
+            metadata for metadata in child.metadata
+            if metadata.metadata_type != MetadataType.TECHNICAL
+        )
+
+        # Remove the unshared metadata. If 'shared_metadata' is empty it is not
+        # shared and we can stop wasting time by returning immediately.
+        for child in children:
+            shared_metadata &= set(
+                metadata for metadata in child.metadata
+                if metadata.metadata_type != MetadataType.TECHNICAL
+            )
+            if not shared_metadata:
+                return
+
+        # Delete the shared metadata from all child nodes
+        for child in children:
+            child.metadata -= shared_metadata
+
+        # Add the shared metadata to the parent node
+        self.metadata |= shared_metadata
 
 
 class StructuralMap:

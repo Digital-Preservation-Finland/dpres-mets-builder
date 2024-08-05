@@ -104,6 +104,7 @@ def test_add_metadata_to_div():
     div.add_metadata(metadata)
     assert div.metadata == {metadata}
 
+
 def test_add_linked_metadata_to_div():
     """Test adding metadata with linked metadata."""
     div = StructuralMapDiv(div_type="test_type")
@@ -236,7 +237,7 @@ def test_add_div_with_duplicate_digital_object_to_div():
 
 
 def test_nested_digital_objects():
-    """Test that all nested digital objects are retrievable drom a div.
+    """Test that all nested digital objects are retrievable from a div.
 
     Make sure that nested digital objects stay correct both when a digital
     object is added with a function, and when a div with digital objects is
@@ -306,3 +307,98 @@ def test_add_div_with_parent_to_a_div():
         root_div.add_divs([div_with_parent])
 
     assert str(error.value) == "An added div is already has a parent div."
+
+
+def test_structural_map_div_metadata_bundling():
+    """Test that shared metadata is bundled as close to the root div as
+    possible.
+    """
+    shared_event = mets_builder.metadata.DigitalProvenanceEventMetadata(
+        event_type="shared",
+        event_detail="bar",
+        event_outcome="success",
+        event_outcome_detail="baz",
+    )
+    shared_agent = mets_builder.metadata.DigitalProvenanceAgentMetadata(
+        agent_name="shared",
+        agent_type="software",
+    )
+    unshared_event = mets_builder.metadata.DigitalProvenanceEventMetadata(
+        event_type="unshared",
+        event_detail="bar",
+        event_outcome="success",
+        event_outcome_detail="baz",
+    )
+    unshared_agent = mets_builder.metadata.DigitalProvenanceAgentMetadata(
+        agent_name="unshared",
+        agent_type="software",
+    )
+    partly_shared_event = mets_builder.metadata.DigitalProvenanceEventMetadata(
+        event_type="partly_shared",
+        event_detail="bar",
+        event_outcome="success",
+        event_outcome_detail="baz",
+    )
+    partly_shared_agent = mets_builder.metadata.DigitalProvenanceAgentMetadata(
+        agent_name="partly_shared",
+        agent_type="software",
+    )
+
+    do_1 = DigitalObject("path/1")
+    do_2 = DigitalObject("path/2")
+    do_3 = DigitalObject("path/3")
+    do_4 = DigitalObject("path/4")
+    do_5 = DigitalObject("path/5")
+    do_6 = DigitalObject("path/6")
+
+    dos = [do_1, do_2, do_3, do_4, do_5, do_6]
+
+    do_2.add_metadata(unshared_event)
+    do_2.add_metadata(unshared_agent)
+
+    do_5.add_metadata(partly_shared_event)
+    do_5.add_metadata(partly_shared_agent)
+
+    do_6.add_metadata(partly_shared_event)
+    do_6.add_metadata(partly_shared_agent)
+
+    for do in dos:
+        do.add_metadata(shared_event)
+        do.add_metadata(shared_agent)
+
+    root_div = StructuralMapDiv("test_type")
+    div1 = StructuralMapDiv("test_type")
+    div2 = StructuralMapDiv("test_type")
+    div3 = StructuralMapDiv("test_type")
+
+    divs = [root_div, div1, div2, div3]
+
+    root_div.add_divs([div1, div2])
+    root_div.add_digital_objects([do_1])
+
+    div1.add_digital_objects([do_2, do_3])
+
+    div2.add_divs([div3])
+    div2.add_digital_objects([do_4])
+
+    div3.add_digital_objects([do_5, do_6])
+
+    root_div.bundle_metadata()
+
+    do_metadata = [metadata for do in dos for metadata in do.metadata]
+    div_metadata = [metadata for div in divs for metadata in div.metadata]
+
+    assert unshared_event not in div_metadata
+    assert unshared_agent not in div_metadata
+
+    assert partly_shared_event not in do_metadata
+    assert partly_shared_agent not in do_metadata
+
+    assert partly_shared_event in div3.metadata
+    assert partly_shared_agent in div3.metadata
+
+    assert shared_event not in do_metadata
+    assert shared_event in root_div.metadata
+
+    assert shared_agent not in do_metadata
+    assert shared_agent in root_div.metadata

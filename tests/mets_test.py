@@ -156,8 +156,6 @@ def test_default_values():
     assert mets.record_status == MetsRecordStatus.SUBMISSION
 
 
-
-
 def test_add_agent():
     """Test that agent can be added to a METS object."""
     mets = METS(

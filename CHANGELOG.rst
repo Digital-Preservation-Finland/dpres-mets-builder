@@ -10,6 +10,7 @@ Unreleased
 Added
 ^^^^^
 - Add linked metadata to structural maps and digital objects automatically
+- Add ```bundle_metadata``` method to ```StructuralMapDiv``` which will move shared metadata entries to the structural map div from child digital objects and structural map divs recursively.
 
 Changed
 ^^^^^^^
