@@ -16,7 +16,18 @@ Changed
 ^^^^^^^
 - Rename MetadataBase class to Metadata
 - Make Metadata an abstract base class
-- Rename ``DigitalObject`` attribute ``sip_filepath`` to ``path``
+- Rename various class attributes
+  - ``DigitalObject``
+    - ``sip_filepath`` to ``path``
+  - ``DigitalProvenanceAgentMetadata``
+    - ``agent_note`` to ``note``
+    - ``agent_version`` to ``version``
+    - ``agent_name`` to ``name``
+  - ``DigitalProvenanceEventMetadata``
+    - ``event_datetime`` to ``datetime``
+    - ``event_outcome`` to ``outcome``
+    - ``event_outcome_detail`` to ``outcome_detail``
+    - ``event_detail`` to ``detail``
 
 Removed
 ^^^^^^^
