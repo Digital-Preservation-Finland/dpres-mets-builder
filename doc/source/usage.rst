@@ -123,8 +123,7 @@ If a digital object has streams (for example video files often consist of video 
 
     audio_stream = DigitalObjectStream(metadata=[audio_bitstream_md, audio_md])
     video_stream = DigitalObjectStream(metadata=[video_bitstream_md, video_md])
-    movie.add_stream(audio_stream)
-    movie.add_stream(video_stream)
+    movie.add_streams([audio_stream, video_stream])
 
 Create/generate a structural map organizing the digital objects to a wanted structure
 -------------------------------------------------------------------------------------

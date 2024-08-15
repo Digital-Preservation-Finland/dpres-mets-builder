@@ -98,12 +98,12 @@ def test_use_attribute():
 
 
 def test_add_stream_to_digital_object():
-    """Test adding stream to a digital object."""
+    """Test adding streams to a digital object."""
     digital_object = DigitalObject(path="path")
     assert digital_object.streams == set()
 
     stream = DigitalObjectStream()
-    digital_object.add_stream(stream)
+    digital_object.add_streams([stream])
     assert digital_object.streams == {stream}
 
 

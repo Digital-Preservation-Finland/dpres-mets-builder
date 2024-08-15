@@ -95,8 +95,7 @@ video_bitstream_md = TechnicalBitstreamObjectMetadata(
 )
 audio_stream = DigitalObjectStream(metadata=[audio_bitstream_md, audio_md])
 video_stream = DigitalObjectStream(metadata=[video_bitstream_md, video_md])
-movie.add_stream(audio_stream)
-movie.add_stream(video_stream)
+movie.add_streams([audio_stream, video_stream])
 
 # Structure of the digital objects can be documented with the StructuralMap
 # class, dividing the digital objects to wanted groups with StructuralMapDiv

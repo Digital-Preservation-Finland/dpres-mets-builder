@@ -57,7 +57,7 @@ class DigitalObjectStream(DigitalObjectBase):
     include separate video and audio streams. A DigitalObject instance should
     be created for the file, whereas the streams should be added to the
     DigitalObject instance as DigitalObjectStream instances using the
-    DigitalObject class constructor or the `add_stream` method. Metadata
+    DigitalObject class constructor or the `add_streams` method. Metadata
     objects describing a stream should be added to the individual stream
     objects, instead of adding them to the DigitalObject.
     """
@@ -90,7 +90,7 @@ class DigitalObject(DigitalObjectBase):
     include separate video and audio streams. A DigitalObject instance should
     be created for the file, whereas the streams should be added to the
     DigitalObject instance as DigitalObjectStream instances using the
-    DigitalObject class constructor or using the `add_stream` method. Metadata
+    DigitalObject class constructor or using the `add_streams` method. Metadata
     objects describing a stream should be added to the individual stream
     objects, instead of adding them to the DigitalObject.
     """
@@ -163,9 +163,10 @@ class DigitalObject(DigitalObjectBase):
 
         self._path = str(path)
 
-    def add_stream(self, stream: DigitalObjectStream) -> None:
+    def add_streams(self, streams: Iterable[DigitalObjectStream]) -> None:
         """Add a stream to this digital object.
 
-        :param stream: The stream object that is added to this digital object.
+        :param stream: The iterable containing stream objects that are added to
+            this digital object.
         """
-        self.streams.add(stream)
+        self.streams |= set(streams)
