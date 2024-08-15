@@ -136,8 +136,7 @@ def mets_object():
         pid="pid1",
         pid_type="pidtype"
     )
-    mets.add_structural_map(structural_map_1)
-    mets.add_structural_map(structural_map_2)
+    mets.add_structural_maps([structural_map_1, structural_map_2])
 
     # File references
     mets.generate_file_references()

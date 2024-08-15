@@ -112,7 +112,7 @@ movies_div = StructuralMapDiv(
 root_div.add_divs([pictures_div, movies_div])
 
 structural_map = StructuralMap(root_div=root_div)
-mets.add_structural_map(structural_map)
+mets.add_structural_maps([structural_map])
 
 # When metadata applies to all digital objects found in a division, the
 # metadata can be applied to the division. For example digital provenance

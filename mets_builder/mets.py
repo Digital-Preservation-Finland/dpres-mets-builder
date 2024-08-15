@@ -3,7 +3,7 @@ from collections import namedtuple
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import List, NamedTuple, Optional, Set, Union
+from typing import List, NamedTuple, Optional, Set, Union, Iterable
 
 from mets_builder import serialize
 from mets_builder.digital_object import DigitalObject
@@ -407,13 +407,16 @@ class METS:
             self.digital_objects
         )
 
-    def add_structural_map(self, structural_map: StructuralMap) -> None:
+    def add_structural_maps(
+        self,
+        structural_maps: Iterable[StructuralMap]
+    ) -> None:
         """Add a structural map to this METS.
 
         :param structural_map: The StructuralMap instance that is added to this
             METS.
         """
-        self.structural_maps.add(structural_map)
+        self.structural_maps |= set(structural_maps)
 
     def to_xml(self) -> bytes:
         """Serialize this METS object into XML-formatted bytestring."""

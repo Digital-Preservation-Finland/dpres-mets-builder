@@ -136,7 +136,7 @@ A structural map can be generated according to the directory structure inferred 
     from mets_builder import StructuralMap, StructuralMapDiv
 
     structural_map = StructuralMap.from_directory_structure([picture, movie])
-    mets.add_structural_map(structural_map)
+    mets.add_structural_maps([structural_map])
 
 However, it is possible to build the structural map manually if different structure for the files is needed:
 
@@ -148,7 +148,7 @@ However, it is possible to build the structural map manually if different struct
     root_div.add_divs([pictures_div, movies_div])
 
     structural_map = StructuralMap(root_div=root_div)
-    mets.add_structural_map(structural_map)
+    mets.add_structural_maps([structural_map])
 
 
 Metadata that applies to all digital objects in a division can be added to the division. For example digital provenance event information could describe all digital files, so that could be written to the root div of the structural map:

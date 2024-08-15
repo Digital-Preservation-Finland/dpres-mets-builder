@@ -298,7 +298,6 @@ def test_get_metadata():
         metadata=[md_structural_map_1]
     )
     structural_map_1 = StructuralMap(root_div=root_div_1)
-    mets.add_structural_map(structural_map_1)
 
     subdiv = StructuralMapDiv(
         div_type="test_type",
@@ -310,7 +309,8 @@ def test_get_metadata():
         divs=[subdiv]
     )
     structural_map_2 = StructuralMap(root_div=root_div_2)
-    mets.add_structural_map(structural_map_2)
+
+    mets.add_structural_maps([structural_map_1, structural_map_2])
 
     # Check that mets contains metadata that was added
     added_metadata = {
@@ -350,7 +350,7 @@ def test_get_digital_objects():
         "test_type", digital_objects=root_div_digital_objects, divs=[subdiv]
     )
     structural_map = StructuralMap(root_div=root_div)
-    mets.add_structural_map(structural_map)
+    mets.add_structural_maps([structural_map])
 
     assert mets.digital_objects == all_digital_objects
 
@@ -389,7 +389,7 @@ def test_generating_file_references():
 
     root_div = StructuralMapDiv("test_type", digital_objects=digital_objects)
     structural_map = StructuralMap(root_div=root_div)
-    mets.add_structural_map(structural_map)
+    mets.add_structural_maps([structural_map])
 
     assert mets.file_references is None
     mets.generate_file_references()
@@ -414,9 +414,9 @@ def test_adding_structural_map():
     structural_map_2 = StructuralMap(root_div=root_div)
 
     assert mets.structural_maps == set()
-    mets.add_structural_map(structural_map_1)
+    mets.add_structural_maps([structural_map_1])
     assert mets.structural_maps == {structural_map_1}
-    mets.add_structural_map(structural_map_2)
+    mets.add_structural_maps([structural_map_2])
     assert mets.structural_maps == {structural_map_1, structural_map_2}
 
 
