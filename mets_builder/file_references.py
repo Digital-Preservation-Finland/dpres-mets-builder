@@ -32,16 +32,16 @@ class FileGroup:
             digital_objects = set()
         self.digital_objects = set(digital_objects)
 
-    def add_digital_object(
+    def add_digital_objects(
         self,
-        digital_object: DigitalObject
+        digital_objects: Iterable[DigitalObject]
     ) -> None:
-        """Add a digital object to this file group.
+        """Add a digital objects to this file group.
 
-        :param digital_object: The DigitalObject that is added to the file
-            group.
+        :param digital_object: The iterable containing digital object that are
+            added to the file group.
         """
-        self.digital_objects.add(digital_object)
+        self.digital_objects |= set(digital_objects)
 
 
 class FileReferences:

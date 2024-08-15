@@ -21,7 +21,7 @@ def test_add_digital_object_to_file_group():
     assert group.digital_objects == set()
 
     digital_object = DigitalObject("file_path")
-    group.add_digital_object(digital_object)
+    group.add_digital_objects([digital_object])
     assert group.digital_objects == {digital_object}
 
 
