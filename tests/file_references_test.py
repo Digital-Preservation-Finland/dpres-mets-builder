@@ -11,7 +11,7 @@ def test_add_file_group_to_file_references():
     assert file_references.file_groups == set()
 
     group = FileGroup()
-    file_references.add_file_group(group)
+    file_references.add_file_groups([group])
     assert file_references.file_groups == {group}
 
 

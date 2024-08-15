@@ -149,8 +149,7 @@ file_references = FileReferences()
 
 picture_group = FileGroup(use="picture", digital_objects=[picture])
 video_group = FileGroup(use="video", digital_objects=[movie])
-file_references.add_file_group(picture_group)
-file_references.add_file_group(video_group)
+file_references.add_file_groups([picture_group, video_group])
 
 mets.add_file_references(file_references)
 

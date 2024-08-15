@@ -193,8 +193,7 @@ If the file references section needs a special structure, the file references ca
 
     production_group = FileGroup(use="production", digital_objects=[movie])
     master_group = FileGroup(use="master", digital_objects=[picture])
-    file_references.add_file_group(production_group)
-    file_references.add_file_group(master_group)
+    file_references.add_file_groups([production_group, master_group])
 
     mets.add_file_references(file_references)
 

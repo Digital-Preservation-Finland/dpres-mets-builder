@@ -76,13 +76,13 @@ class FileReferences:
             file_groups = set()
         self.file_groups = set(file_groups)
 
-    def add_file_group(self, file_group: FileGroup) -> None:
-        """Add a file group to these file references.
+    def add_file_groups(self, file_groups: Iterable[FileGroup]) -> None:
+        """Add a file groups to these file references.
 
-        :param file_group: The FileGroup instance that is added to this
-            FileReferences instance.
+        :param file_group: The iterable containing FileGroup instances that are
+            added to this FileReferences instance.
         """
-        self.file_groups.add(file_group)
+        self.file_groups |= set(file_groups)
 
     @classmethod
     def generate_file_references(
