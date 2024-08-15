@@ -52,8 +52,7 @@ image_md = TechnicalImageMetadata(
     byte_order="little endian"
 )
 
-picture.add_metadata(object_md)
-picture.add_metadata(image_md)
+picture.add_metadata([object_md, image_md])
 
 # Already existing metadata can be imported with ImportedMetadata class
 audio_md = ImportedMetadata(
@@ -139,7 +138,7 @@ event_md.link_agent_metadata(
     agent_role="executing program"
 )
 # The agent linked to the event is added to metadata automatically
-root_div.add_metadata(event_md)
+root_div.add_metadata([event_md])
 
 # File references can be generated with the following command
 mets.generate_file_references()

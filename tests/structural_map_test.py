@@ -101,7 +101,7 @@ def test_add_metadata_to_div():
         other_format="PAS-special",
         format_version="1.0",
     )
-    div.add_metadata(metadata)
+    div.add_metadata([metadata])
     assert div.metadata == {metadata}
 
 
@@ -129,7 +129,7 @@ def test_add_linked_metadata_to_div():
     )
 
     # The agent metadata should be automatically added to div
-    div.add_metadata(event)
+    div.add_metadata([event])
     assert div.metadata == {event, agent}
 
 
@@ -353,18 +353,12 @@ def test_structural_map_div_metadata_bundling():
 
     dos = [do_1, do_2, do_3, do_4, do_5, do_6]
 
-    do_2.add_metadata(unshared_event)
-    do_2.add_metadata(unshared_agent)
-
-    do_5.add_metadata(partly_shared_event)
-    do_5.add_metadata(partly_shared_agent)
-
-    do_6.add_metadata(partly_shared_event)
-    do_6.add_metadata(partly_shared_agent)
+    do_2.add_metadata([unshared_event, unshared_agent])
+    do_5.add_metadata([partly_shared_event, partly_shared_agent])
+    do_6.add_metadata([partly_shared_event, partly_shared_agent])
 
     for do in dos:
-        do.add_metadata(shared_event)
-        do.add_metadata(shared_agent)
+        do.add_metadata([shared_event, shared_agent])
 
     root_div = StructuralMapDiv("test_type")
     div1 = StructuralMapDiv("test_type")

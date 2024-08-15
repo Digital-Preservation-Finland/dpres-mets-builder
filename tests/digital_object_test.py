@@ -21,7 +21,7 @@ def test_add_metadata():
         other_format="PAS-special",
         format_version="1.0"
     )
-    digital_object.add_metadata(data)
+    digital_object.add_metadata([data])
     assert digital_object.metadata == {data}
 
 
@@ -41,7 +41,7 @@ def test_add_descriptive_metadata():
     )
 
     with pytest.raises(ValueError) as error:
-        digital_object.add_metadata(data)
+        digital_object.add_metadata([data])
     assert str(error.value) == (
         "Added metadata is descriptive metadata. Descriptive metadata should "
         "be added to a div in a structural map."
@@ -73,7 +73,7 @@ def test_add_linked_metadata():
 
     # The agent metadata should be automatically added to digital
     # object, when the event is added
-    digital_object.add_metadata(event)
+    digital_object.add_metadata([event])
     assert digital_object.metadata == {event, agent}
 
 

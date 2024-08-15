@@ -74,8 +74,7 @@ A ``DigitalObject`` instance should be created for each digital object that shou
         byte_order="little endian"
     )
 
-    picture.add_metadata(object_md)
-    picture.add_metadata(image_md)
+    picture.add_metadata([object_md, image_md])
 
 Metadata that has been prepared earlier can be imported using the ``ImportedMetadata`` class:
 
@@ -175,8 +174,7 @@ Metadata that applies to all digital objects in a division can be added to the d
         agent_metadata=agent_md,
         agent_role="executing program"
     )
-    root_div.add_metadata(event_md)
-    root_div.add_metadata(agent_md)
+    root_div.add_metadata([event_md, agent_md])
 
 Create/generate file references
 -------------------------------

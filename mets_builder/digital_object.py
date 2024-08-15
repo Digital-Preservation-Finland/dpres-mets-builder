@@ -26,27 +26,28 @@ class DigitalObjectBase:
         """
         self.metadata: Set[Metadata] = set()
         if metadata is not None:
-            for data in metadata:
-                self.add_metadata(data)
+            self.add_metadata(metadata)
 
-    def add_metadata(self, metadata: Metadata) -> None:
+    def add_metadata(self, metadata: Iterable[Metadata]) -> None:
         """Add administrative metadata to this object.
 
         Any descriptive metadata should be added to a div in structural map
         (StructuralMapDiv in a StructuralMap)
 
-        :param metadata: The metadata object that is added to this object.
+        :param metadata: The iterable containing metadata objects that are
+            added to this object.
 
         :raises ValueError: If the given metadata is descriptive metadata.
         """
-        if metadata.is_descriptive:
-            raise ValueError(
-                "Added metadata is descriptive metadata. Descriptive metadata "
-                "should be added to a div in a structural map."
-            )
-        self.metadata.add(metadata)
-        for linked_metadata in metadata.linked_metadata:
-            self.add_metadata(linked_metadata)
+        for metadata_element in metadata:
+            if metadata_element.is_descriptive:
+                raise ValueError(
+                    "Added metadata is descriptive metadata. Descriptive "
+                    "metadata should be added to a div in a structural map."
+                )
+        self.metadata |= set(metadata)
+        for metadata_element in metadata:
+            self.metadata |= set(metadata_element.linked_metadata)
 
 
 class DigitalObjectStream(DigitalObjectBase):
