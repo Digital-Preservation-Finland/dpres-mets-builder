@@ -1,12 +1,122 @@
 """Module for ImportedMetadata class."""
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
-from typing import Optional, Union
+from typing import BinaryIO, Optional, Union
 
 import xml_helpers.utils
 from lxml import etree
 
+from mets_builder.defaults import UNAV
 from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
+
+METS_MDTYPES = {
+    'http://purl.org/dc/elements/1.1': {
+        'format': 'DC', 'version': '2008'
+    },
+    'http://www.loc.gov/MARC21/slim': {
+        'format': 'MARC', 'version': 'marcxml=1.2; marc=marc21'
+    },
+    'http://www.loc.gov/mods/v3': {
+        'format': 'MODS', 'version': '3.8'
+    },
+    'urn:isbn:1-931666-22-9': {
+        'format': 'EAD', 'version': '2002'
+    },
+    'http://ead3.archivists.org/schema': {
+        'format': 'OTHER', 'otherformat': 'EAD3', 'version': '1.1.1'
+    },
+    'urn:isbn:1-931666-33-4': {
+        'format': 'EAC-CPF', 'version': '2010_revised'
+    },
+    'https://archivists.org/ns/eac/v2': {
+        'format': 'EAC-CPF', 'version': '2.0'
+    },
+    'http://www.lido-schema.org': {
+        'format': 'LIDO', 'version': '1.1'
+    },
+    'ddi:instance:3_3': {
+        'format': 'DDI', 'version': '3.3'
+    },
+    'ddi:instance:3_2': {
+        'format': 'DDI', 'version': '3.2'
+    },
+    'ddi:instance:3_1': {
+        'format': 'DDI', 'version': '3.1'
+    },
+    'ddi:codebook:2_5': {
+        'format': 'DDI', 'version': '2.5.1'
+    },
+    'http://www.icpsr.umich.edu/DDI': {
+        'format': 'DDI', 'version': '2.1'
+    },
+    'http://www.vraweb.org/vracore4.htm': {
+        'format': 'VRA', 'version': '4.0'
+    },
+    'http://www.arkivverket.no/standarder/addml': {
+        'format': 'OTHER', 'otherformat': 'ADDML', 'version': '8.3'
+    },
+    'http://datacite.org/schema/kernel-4': {
+        'format': 'OTHER', 'otherformat': 'DATACITE', 'version': '4.1'
+    },
+    'http://www.loc.gov/audioMD': {
+        'format': 'OTHER', 'otherformat': 'AudioMD', 'version': '2.0'
+    },
+    'http://www.loc.gov/videoMD': {
+        'format': 'OTHER', 'otherformat': 'VideoMD', 'version': '2.0'
+    },
+    'urn:ebu:metadata-schema:ebucore': {
+        'format': 'OTHER', 'otherformat': 'EBUCORE', 'version': '1.10'
+    }
+}
+
+
+def _detect_metadata_options(xml_stream: BinaryIO) -> Optional[dict]:
+    """
+    Automatically detect the XML schema used in an XML document and provide
+    the correct keyword arguments to be passed to `ImportedMetadata`
+    """
+    et_iter = etree.iterparse(xml_stream, events=("start",))
+
+    try:
+        # Only read the root element
+        _, et = next(et_iter)
+        schemas = set(
+            et.attrib[
+                "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation"
+            ].split(" ")
+        )
+    except KeyError:
+        # No schema definitions set
+        schemas = set()
+
+    # Iterate the list of recognized metadata formats and pick the one that
+    # matches
+    for schema_uri in schemas:
+        schema_uri_ = schema_uri.strip("/")  # Strip the slash from the end
+
+        if schema_uri_ not in METS_MDTYPES:
+            continue
+
+        options = METS_MDTYPES[schema_uri_]
+
+        metadata_type = MetadataType.DESCRIPTIVE
+        metadata_format = options.get("format", MetadataFormat.OTHER)
+        format_version = options.get("version", UNAV)
+        other_format = None
+
+        if "otherformat" in options:
+            metadata_format = MetadataFormat.OTHER
+            other_format = options["otherformat"]
+
+        return {
+            "metadata_type": metadata_type,
+            "metadata_format": metadata_format,
+            "format_version": format_version,
+            "other_format": other_format
+        }
+
+    return None
 
 
 class ImportedMetadata(Metadata):
@@ -76,6 +186,44 @@ class ImportedMetadata(Metadata):
             self.data_path = data_path
         elif data_string is not None:
             self.data_string = data_string
+
+    @classmethod
+    def from_string(cls, string: bytes):
+        """Create ImportedMetadata class from an XML string.
+
+        Metadata type, format and format version will be determined
+        automatically by checking the XML schema in use.
+        """
+        metadata_options = _detect_metadata_options(BytesIO(string))
+
+        if metadata_options:
+            return cls(
+                **metadata_options,
+                data_string=string
+            )
+
+        raise ValueError(
+            "Could not recognize the metadata schema of the XML document. You "
+            "can try manually constructing the `ImportedMetadata` instance "
+            "instead."
+        )
+
+    @classmethod
+    def from_path(cls, path: Union[str, Path]):
+        with Path(path).open("rb") as file_:
+            metadata_options = _detect_metadata_options(file_)
+
+        if metadata_options:
+            return cls(
+                **metadata_options,
+                data_path=path
+            )
+
+        raise ValueError(
+            "Could not recognize the metadata schema of the XML document. You "
+            "can try manually constructing the `ImportedMetadata` instance "
+            "instead."
+        )
 
     def _to_xml_element_tree(self, state) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
