@@ -154,7 +154,7 @@ def test_parse_mets(mets_object):
     """
     # Serialize the entire mets, then read it to lxml.etree._Element for
     # inspection
-    serialized = serialize.to_xml_string(mets_object)
+    serialized = serialize._to_xml_string(mets_object)
     element = etree.fromstring(serialized)
 
     assert len(element) == 6
@@ -359,7 +359,7 @@ def test_written_file_references(mets_object):
     """
     # Serialize the entire mets, then read it to lxml.etree._Element for
     # inspection
-    serialized = serialize.to_xml_string(mets_object)
+    serialized = serialize._to_xml_string(mets_object)
     element = etree.fromstring(serialized)
     filesec = element.find("mets:fileSec", namespaces=NAMESPACES)
 
@@ -380,7 +380,7 @@ def test_written_structural_maps(mets_object):
     """Test that structural maps are written correctly."""
     # Serialize the entire mets, then read it to lxml.etree._Element for
     # inspection
-    serialized = serialize.to_xml_string(mets_object)
+    serialized = serialize._to_xml_string(mets_object)
     element = etree.fromstring(serialized)
     structmaps = element.findall("mets:structMap", namespaces=NAMESPACES)
 
@@ -649,7 +649,7 @@ def test_to_xml_string(mets_object):
     The contents of the string is tested very lightly as the content is tested
     more thoroughly in other tests.
     """
-    xml = serialize.to_xml_string(mets_object)
+    xml = serialize._to_xml_string(mets_object)
     assert b"<mets:mets" in xml
     assert b"</mets:mets>" in xml
 
@@ -715,7 +715,7 @@ def test_utf8(mets_object, tmp_path):
 
 def test_use_attribute(mets_object):
     """Test adding USE attribute to a file."""
-    serialized = serialize.to_xml_string(mets_object)
+    serialized = serialize._to_xml_string(mets_object)
     element = etree.fromstring(serialized)
 
     # One of the file elements should have USE attribute

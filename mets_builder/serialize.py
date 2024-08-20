@@ -432,7 +432,7 @@ def _write_mets(mets, output_file):
     return output_file
 
 
-def to_xml_string(mets: "METS") -> bytes:
+def _to_xml_string(mets: "METS") -> bytes:
     """Serialize METS object to XML string.
 
     :param mets: METS object
@@ -446,6 +446,6 @@ def to_xml_string(mets: "METS") -> bytes:
     return result
 
 
-def write_to_file(mets: "METS", output_filepath: str) -> None:
+def _write_to_file(mets: "METS", output_filepath: str) -> None:
     """Serialize METS object to XML and write to given file path."""
     _write_mets(mets, output_filepath)

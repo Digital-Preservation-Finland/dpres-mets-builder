@@ -417,8 +417,8 @@ class METS:
 
     def to_xml(self) -> bytes:
         """Serialize this METS object into XML-formatted bytestring."""
-        return serialize.to_xml_string(self)
+        return serialize._to_xml_string(self)
 
     def write(self, output_filepath: Union[str, Path]) -> None:
         """Serialize METS object to XML and write to given file path.."""
-        return serialize.write_to_file(self, str(output_filepath))
+        return serialize._write_to_file(self, str(output_filepath))
