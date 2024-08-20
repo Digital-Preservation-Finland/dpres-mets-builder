@@ -29,6 +29,12 @@ Changed
     - ``event_outcome`` to ``outcome``
     - ``event_outcome_detail`` to ``outcome_detail``
     - ``event_detail`` to ``detail``
+- Make several functions take an iterable as an argument instead of a single object. Rename functions to reflect this.
+  - ``DigitalObject.add_metadata`` and ``StructuralMapDiv.add_metadata`` methods take an iterable containing metadata objects as an argument instead of a single metadata object
+  - ``DigitalObject.add_stream`` to ``DigitalObject.add_streams``
+  - ``FileGroup.add_digital_object`` to ``FileGroup.add_digital_objects``
+  - ``FileReferences.add_file_group`` to ``FileReferences.add_file_groups``
+  - ``METS.add_structural_map`` to ``METS.add_structural_maps``
 
 Removed
 ^^^^^^^
