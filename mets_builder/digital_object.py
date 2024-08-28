@@ -57,9 +57,9 @@ class DigitalObjectStream(DigitalObjectBase):
     include separate video and audio streams. A DigitalObject instance should
     be created for the file, whereas the streams should be added to the
     DigitalObject instance as DigitalObjectStream instances using the
-    DigitalObject class constructor or the `add_streams` method. Metadata
-    objects describing a stream should be added to the individual stream
-    objects, instead of adding them to the DigitalObject.
+    DigitalObject class constructor or the :meth:`DigitalObject.add_streams`
+    method. Metadata objects describing a stream should be added to the
+    individual stream objects, instead of adding them to the DigitalObject.
     """
     def __init__(
         self,
@@ -90,9 +90,10 @@ class DigitalObject(DigitalObjectBase):
     include separate video and audio streams. A DigitalObject instance should
     be created for the file, whereas the streams should be added to the
     DigitalObject instance as DigitalObjectStream instances using the
-    DigitalObject class constructor or using the `add_streams` method. Metadata
-    objects describing a stream should be added to the individual stream
-    objects, instead of adding them to the DigitalObject.
+    DigitalObject class constructor or using the
+    :meth:`DigitalObject.add_streams` method. Metadata objects describing a
+    stream should be added to the individual stream objects, instead of adding
+    them to the DigitalObject.
     """
     def __init__(
         self,
@@ -130,7 +131,6 @@ class DigitalObject(DigitalObjectBase):
         self.streams = set(streams)
 
         if identifier is None:
-            # Generate identifier if identifier is not given
             identifier = underscore_uuid()
         self.identifier = identifier
 
@@ -164,7 +164,7 @@ class DigitalObject(DigitalObjectBase):
         self._path = str(path)
 
     def add_streams(self, streams: Iterable[DigitalObjectStream]) -> None:
-        """Add a stream to this digital object.
+        """Add streams to this digital object.
 
         :param stream: The iterable containing stream objects that are added to
             this digital object.

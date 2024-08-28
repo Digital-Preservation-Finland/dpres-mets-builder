@@ -1,4 +1,4 @@
-"""Tests for technical csv metadata."""
+"""Tests for technical CSV metadata."""
 from pathlib import Path
 
 import pytest

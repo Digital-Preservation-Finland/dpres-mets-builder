@@ -120,7 +120,15 @@ def _detect_metadata_options(xml_stream: BinaryIO) -> Optional[dict]:
 
 
 class ImportedMetadata(Metadata):
-    """Class for importing metadata files."""
+    """Class for importing metadata files.
+
+    .. note::
+
+        :meth:`ImportedMetadata.from_path` or
+        :meth:`ImportedMetadata.from_string` can be used to automatically
+        detect the correct metadata and construct the `ImportedMetadata`
+        instance
+    """
 
     def __init__(
             self,
@@ -189,7 +197,7 @@ class ImportedMetadata(Metadata):
 
     @classmethod
     def from_string(cls, string: bytes):
-        """Create ImportedMetadata class from an XML string.
+        """Create ImportedMetadata instance from an XML string.
 
         Metadata type, format and format version will be determined
         automatically by checking the XML schema in use.
@@ -210,6 +218,11 @@ class ImportedMetadata(Metadata):
 
     @classmethod
     def from_path(cls, path: Union[str, Path]):
+        """Create ImportedMetadata class from an external XML file.
+
+        Metadata type, format and format version will be determined
+        automatically by checking the XML schema in use.
+        """
         with Path(path).open("rb") as file_:
             metadata_options = _detect_metadata_options(file_)
 
@@ -228,7 +241,7 @@ class ImportedMetadata(Metadata):
     def _to_xml_element_tree(self, state) -> etree._Element:
         """Serialize this metadata object to XML using lxml elements.
 
-        :returns: The root element of the metadata serialized into XML.
+        :returns: The root element of the XML document
         """
         if hasattr(self, 'data_path'):
             return xml_helpers.utils.readfile(str(self.data_path)).getroot()

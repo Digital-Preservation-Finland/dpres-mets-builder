@@ -134,9 +134,10 @@ class DigitalProvenanceAgentMetadata(Metadata):
         return name
 
     def _to_xml_element_tree(self, state) -> etree._Element:
-        """Serialize this metadata object to XML using lxml elements.
+        """Serialize this metadata object to an intermediate XML representation
+        using lxml.
 
-        :returns: The root element of the metadata serialized into XML.
+        :returns: The root element of the XML document
         """
         agent_identifier_elem = premis.identifier(
             identifier_type=self.agent_identifier_type,

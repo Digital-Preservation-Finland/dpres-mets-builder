@@ -231,6 +231,7 @@ class Metadata(ComparableMixin, metaclass=abc.ABCMeta):
     @property
     def is_administrative(self) -> bool:
         """Tells if this metadata is administrative metadata.
+        All non-descriptive metadata is administrative metadata.
 
         :returns: True if this metadata is administrative metadata, otherwise
             False.
@@ -248,16 +249,18 @@ class Metadata(ComparableMixin, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _to_xml_element_tree(self, state) -> etree._Element:
-        """Serialize this metadata object to XML using lxml elements.
+        """Serialize this metadata object to an intermediate XML
+        representation using lxml.
 
-        :returns: The root element of the metadata serialized into XML.
+        :returns: The root element of the XML document
         """
         pass
 
     def to_xml_element_tree(self) -> etree._Element:
-        """Serialize this metadata object to XML using lxml elements.
+        """Serialize this metadata object to an intermediate XML representation
+        using lxml.
 
-        :returns: The root element of the metadata serialized into XML.
+        :returns: The root element of the XML document
         """
         from mets_builder.serialize import _SerializerState
 

@@ -20,7 +20,7 @@ class StructuralMapDiv:
 
     def __iter__(self):
         """Iterates through all nested divs in this div. The ordering is not
-        quaranteed.
+        guaranteed.
         """
         for div in self.divs:
             yield div
@@ -64,8 +64,8 @@ class StructuralMapDiv:
             actionable (e.g., it would support 'go to page ___' function), and
             it should not be used as a replacement/substitute for the 'label'
             attribute. To understand the differences between 'order',
-            'orderlabel' and 'label', imagine a text with 10 roman numbered
-            pages followed by 10 arabic numbered pages. Page iii would have an
+            'orderlabel' and 'label', imagine a text with 10 Roman numbered
+            pages followed by 10 Arabic numbered pages. Page iii would have an
             'order' of 3, an 'orderlabel' of 'iii' and a label of 'Page iii',
             while page 3 would have an 'order' of 13, an 'orderlabel' of '3'
             and a 'label' of 'Page 3'.
@@ -130,8 +130,10 @@ class StructuralMapDiv:
     def add_divs(self, divs: Iterable["StructuralMapDiv"]) -> None:
         """Add a further divisions to this division.
 
-        Note that it is much more performant add multiple divs at once, rather
-        than adding divs one by one.
+        .. note::
+
+            Note that it is much more performant add multiple divs at once,
+            rather than adding divs one by one.
 
         :param divs: An iterable of StructuralMapDivs that are added to this
             div.
@@ -196,8 +198,10 @@ class StructuralMapDiv:
     ) -> None:
         """Add digital objects to this div.
 
-        Note that it is much more performant add multiple digital objects at
-        once, rather than adding them one by one.
+        .. note::
+
+            Note that it is much more performant add multiple digital objects
+            at once, rather than adding them one by one.
 
         :param digital_objects: Iterable of DigitalObjects that are added to
             this div.
@@ -291,7 +295,7 @@ class StructuralMap:
 
     def __iter__(self):
         """Iterate through all nested divs in this structural map. The ordering
-        is not quaranteed.
+        is not guaranteed.
         """
         yield self.root_div
         yield from self.root_div

@@ -23,8 +23,7 @@ class FileGroup:
         :param use: Describe the purpose of the files in this file group.  The
             recommended vocabulary can be found here:
             https://digitalpreservation.fi/specifications/vocabularies
-        :param digital_objects: The DigitalObjects that are added to the file
-            group.
+        :param digital_objects: The DigitalObjects to add to the file group.
         """
         self.use = use
 
@@ -36,10 +35,10 @@ class FileGroup:
         self,
         digital_objects: Iterable[DigitalObject]
     ) -> None:
-        """Add a digital objects to this file group.
+        """Add digital objects to this file group.
 
-        :param digital_object: The iterable containing digital object that are
-            added to the file group.
+        :param digital_object: The iterable containing digital objects to add
+            to the file group.
         """
         self.digital_objects |= set(digital_objects)
 
@@ -60,8 +59,8 @@ class FileReferences:
     file group in the file references.
 
     If no special structure for file references are needed, they can be
-    generated automatically using `FileReferences.generate_file_references`
-    class method.
+    generated automatically using
+    :meth:`FileReferences.generate_file_references` class method.
     """
 
     def __init__(
@@ -79,8 +78,8 @@ class FileReferences:
     def add_file_groups(self, file_groups: Iterable[FileGroup]) -> None:
         """Add a file groups to these file references.
 
-        :param file_group: The iterable containing FileGroup instances that are
-            added to this FileReferences instance.
+        :param file_group: The iterable containing FileGroup instances to add
+            to this FileReferences instance.
         """
         self.file_groups |= set(file_groups)
 
@@ -94,8 +93,8 @@ class FileReferences:
         Returns a FileReferences instance where given digital objects have been
         grouped into a single file group.
 
-        :param digital_objects: The DigitalObject instances that are included
-            in the file references.
+        :param digital_objects: The DigitalObject instances to include in the
+            file references.
         """
         if not digital_objects:
             raise ValueError(

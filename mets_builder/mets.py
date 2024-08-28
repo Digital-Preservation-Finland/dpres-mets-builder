@@ -128,8 +128,8 @@ class METS:
             profile. The allowed values can be found from MetsProfile
             documentation.
         :param contract_id: Contract identifier of a DPS contract to which the
-            package content belongs. Attribute value should be expressed in
-            printable US-ASCII characters.
+            package content belongs. Attribute value should be an UUID
+            expressed as a string.
         :param creator_name: Name of the person or entity who created the
             information package.
         :param creator_type: The type of creator, given as AgentType enum or
@@ -423,5 +423,5 @@ class METS:
         return serialize._to_xml_string(self)
 
     def write(self, output_filepath: Union[str, Path]) -> None:
-        """Serialize METS object to XML and write to given file path.."""
+        """Serialize METS object to XML and write to given file path."""
         return serialize._write_to_file(self, str(output_filepath))
