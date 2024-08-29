@@ -25,12 +25,6 @@ METS
 .. automodule:: mets_builder.mets
    :members:
 
-Serialization
--------------
-
-.. automodule:: mets_builder.serialize
-   :members:
-
 Structural map
 --------------
 

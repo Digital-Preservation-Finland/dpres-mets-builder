@@ -196,7 +196,7 @@ class ImportedMetadata(Metadata):
             self.data_string = data_string
 
     @classmethod
-    def from_string(cls, string: bytes):
+    def from_string(cls, string: bytes) -> "ImportedMetadata":
         """Create ImportedMetadata instance from an XML string.
 
         Metadata type, format and format version will be determined
@@ -217,8 +217,8 @@ class ImportedMetadata(Metadata):
         )
 
     @classmethod
-    def from_path(cls, path: Union[str, Path]):
-        """Create ImportedMetadata class from an external XML file.
+    def from_path(cls, path: Union[str, Path]) -> "ImportedMetadata":
+        """Create ImportedMetadata instance from an external XML file.
 
         Metadata type, format and format version will be determined
         automatically by checking the XML schema in use.
