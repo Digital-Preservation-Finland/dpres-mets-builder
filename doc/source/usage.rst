@@ -173,7 +173,7 @@ Metadata that applies to all digital objects in a division can be added to the d
         agent_metadata=agent_md,
         agent_role="executing program"
     )
-    root_div.add_metadata([event_md, agent_md])
+    root_div.add_metadata([event_md])
 
 Create/generate file references
 -------------------------------
