@@ -4,13 +4,14 @@ from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import List, NamedTuple, Optional, Set, Union, Iterable
+import uuid
 
 from mets_builder import serialize
 from mets_builder.digital_object import DigitalObject
 from mets_builder.file_references import FileReferences
 from mets_builder.metadata import Metadata
 from mets_builder.structural_map import StructuralMap
-from mets_builder.uuid import uuid
+import mets_builder.uuid
 
 METS_CATALOG = "1.7.6"
 METS_SPECIFICATION = "1.7.6"
@@ -190,7 +191,7 @@ class METS:
             create_date = datetime.now(tz=timezone.utc)
 
         if package_id is None:
-            package_id = uuid()
+            package_id = mets_builder.uuid.uuid()
 
         self.mets_profile = MetsProfile(mets_profile)
         self.package_id = package_id
@@ -235,12 +236,15 @@ class METS:
         if value is None:
             raise ValueError("contract_id can not be None")
 
-        if not (value.isascii() and value.isprintable()):
+        # Raise exception if provided value is not valid UUID
+        try:
+            valid_uuid_string = str(uuid.UUID(value))
+        except ValueError as uuid_error:
             raise ValueError(
-                f"contract_id '{value}' contains characters that are not "
-                "printable US-ASCII characters"
-            )
-        self._contract_id = value
+                f"contract_id '{value}' is not valid UUID"
+            ) from uuid_error
+
+        self._contract_id = f"urn:uuid:{valid_uuid_string}"
 
     @property
     def content_id(self) -> Optional[str]:

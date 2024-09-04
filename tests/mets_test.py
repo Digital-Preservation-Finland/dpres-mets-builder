@@ -15,6 +15,8 @@ from mets_builder.mets import (METS,
                                MetsRecordStatus)
 from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
+TEST_CONTRACT_ID = "urn:uuid:123e4567-e89b-12d3-a456-426614174000"
+
 
 def test_invalid_mets_profile():
     """Test that initializing METS instance with invalid METS profile raises
@@ -24,7 +26,7 @@ def test_invalid_mets_profile():
         METS(
             mets_profile="invalid",
             package_id="package_id",
-            contract_id="contract_id",
+            contract_id=TEST_CONTRACT_ID,
             creator_name="Mr. Foo",
             creator_type=AgentType.INDIVIDUAL
         )
@@ -49,7 +51,7 @@ def test_invalid_package_id(invalid_value, error_message):
         METS(
             mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id=invalid_value,
-            contract_id="contract_id",
+            contract_id=TEST_CONTRACT_ID,
             creator_name="Mr. Foo",
             creator_type=AgentType.INDIVIDUAL
         )
@@ -57,11 +59,34 @@ def test_invalid_package_id(invalid_value, error_message):
 
 
 @pytest.mark.parametrize(
+    "value",
+    [
+        TEST_CONTRACT_ID,
+        TEST_CONTRACT_ID.removeprefix("urn:uuid:"),
+    ]
+)
+def test_valid_contract_id(value):
+    """Test initializing METS with valid contract identifier.
+
+    Check that contract identifier is stored in correct format.
+    """
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        package_id="package_id",
+        contract_id=value,
+        creator_name="Mr. Foo",
+        creator_type=AgentType.INDIVIDUAL
+    )
+
+    assert mets.contract_id == TEST_CONTRACT_ID
+
+
+@pytest.mark.parametrize(
     ["invalid_value", "error_message"],
     [
         (None, "contract_id can not be None"),
-        ("ä", ("contract_id 'ä' contains characters that are not printable "
-               "US-ASCII characters"))
+        ("a", "contract_id 'a' is not valid UUID"),
+        ("ä", "contract_id 'ä' is not valid UUID")
     ]
 )
 def test_invalid_contract_id(invalid_value, error_message):
@@ -87,7 +112,7 @@ def test_invalid_content_id():
         METS(
             mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
-            contract_id="contract_id",
+            contract_id=TEST_CONTRACT_ID,
             creator_name="Mr. Foo",
             creator_type=AgentType.INDIVIDUAL,
             content_id="ä"
@@ -106,7 +131,7 @@ def test_invalid_record_status():
         METS(
             mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
-            contract_id="contract_id",
+            contract_id=TEST_CONTRACT_ID,
             creator_name="Mr. Foo",
             creator_type=AgentType.INDIVIDUAL,
             record_status="invalid"
@@ -122,7 +147,7 @@ def test_no_specification_or_catalog_version():
         METS(
             mets_profile=MetsProfile.CULTURAL_HERITAGE,
             package_id="package_id",
-            contract_id="contract_id",
+            contract_id=TEST_CONTRACT_ID,
             creator_name="Mr. Foo",
             creator_type=AgentType.INDIVIDUAL,
             catalog_version=None,
@@ -138,7 +163,7 @@ def test_default_values():
     # Create METS with only required arguments
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL,
     )
@@ -161,7 +186,7 @@ def test_add_agent():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -202,7 +227,7 @@ def test_add_agent_invalid_arguments(
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -224,7 +249,7 @@ def test_add_agent_with_other_role_and_type():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -251,7 +276,7 @@ def test_get_metadata():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -326,7 +351,7 @@ def test_get_digital_objects():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -360,7 +385,7 @@ def test_add_file_references():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -376,7 +401,7 @@ def test_generating_file_references():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -405,7 +430,7 @@ def test_adding_structural_map():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -428,7 +453,7 @@ def test_mets_to_xml():
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -437,7 +462,7 @@ def test_mets_to_xml():
 
     # bytes.index raises ValueError if subsection is not found
     result.index(b"package_id")
-    result.index(b"contract_id")
+    result.index(TEST_CONTRACT_ID.encode("ascii"))
     result.index(b"Mr. Foo")
 
 
@@ -449,7 +474,7 @@ def test_writing_mets(tmp_path):
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
         package_id="package_id",
-        contract_id="contract_id",
+        contract_id=TEST_CONTRACT_ID,
         creator_name="Mr. Foo",
         creator_type=AgentType.INDIVIDUAL
     )
@@ -461,5 +486,5 @@ def test_writing_mets(tmp_path):
 
     # bytes.index raises ValueError if subsection is not found
     result.index("package_id")
-    result.index("contract_id")
+    result.index(TEST_CONTRACT_ID)
     result.index("Mr. Foo")
