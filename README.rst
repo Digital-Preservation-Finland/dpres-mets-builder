@@ -1,5 +1,3 @@
-To give feedback, please open a GitHub issue or pull request.
-
 METS builder
 ============
 A library for easy composing of METS files that conform to the Finnish national METS schema.
