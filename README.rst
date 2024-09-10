@@ -22,7 +22,9 @@ After the repository has been added, the package can be installed by running the
 
 Usage
 -----
-See documentation under ``doc/``.
+See the `online documentation`_.
+
+.. _online documentation: https://digital-preservation-finland.github.io/dpres-mets-builder
 
 Installation using Python Virtualenv for development purposes
 -------------------------------------------------------------
