@@ -13,8 +13,8 @@ from mets_builder.metadata import Metadata
 from mets_builder.structural_map import StructuralMap
 import mets_builder.uuid
 
-METS_CATALOG = "1.7.6"
-METS_SPECIFICATION = "1.7.6"
+METS_CATALOG = "1.7.7"
+METS_SPECIFICATION = "1.7.7"
 
 
 class MetsProfile(Enum):

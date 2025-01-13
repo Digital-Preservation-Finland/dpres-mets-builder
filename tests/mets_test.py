@@ -176,8 +176,8 @@ def test_default_values():
         - mets.create_date < datetime.timedelta(minutes=1)
 
     # Catalog version, specification and recored status should be set
-    assert mets.catalog_version == "1.7.6"
-    assert mets.specification == "1.7.6"
+    assert mets.catalog_version == "1.7.7"
+    assert mets.specification == "1.7.7"
     assert mets.record_status == MetsRecordStatus.SUBMISSION
 
 
