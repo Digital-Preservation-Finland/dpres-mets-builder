@@ -19,6 +19,7 @@ Source0:        %{file_prefix}-v%{file_version}%{?file_release_tag}-%{file_build
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-setuptools_scm
 BuildRequires:  %{py3_dist pip}
 BuildRequires:  %{py3_dist setuptools}
 BuildRequires:  %{py3_dist wheel}
