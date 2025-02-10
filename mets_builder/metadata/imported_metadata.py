@@ -57,7 +57,7 @@ METS_MDTYPES = {
         'format': 'OTHER', 'otherformat': 'ADDML', 'version': '8.3'
     },
     'http://datacite.org/schema/kernel-4': {
-        'format': 'OTHER', 'otherformat': 'DATACITE', 'version': '4.1'
+        'format': 'OTHER', 'otherformat': 'DATACITE', 'version': '4.3'
     },
     'http://www.loc.gov/audioMD': {
         'format': 'OTHER', 'otherformat': 'AudioMD', 'version': '2.0'
