@@ -8,9 +8,12 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Unreleased
 ----------
 
+1.1.0 - 2025-02-26
+------------------
 Changed
 ^^^^^^^
 - Update to meet specifications version 1.7.7
+- Set default version of Datacite metadata to 4.3
 
 
 1.0.0 - 2024-09-09
