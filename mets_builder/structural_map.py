@@ -5,6 +5,34 @@ from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import Metadata, MetadataType
 
 
+def _is_migration_or_conversion_event(metadata_elem):
+    """
+    Check if the given metadata element is a migration or conversion
+    event as described in DPRES File Formats specification,
+    section B.2.
+
+    Such events have to _always_ be linked to the mets:file element
+    specifically and cannot be bundled.
+    """
+    # Metadata element is an event
+    try:
+        event_type = metadata_elem.event_type
+    except AttributeError:  # Not an event
+        return False
+
+    # Event type is either "migration", "normalization" or "conversion"
+    if event_type not in ("migration", "normalization", "conversion"):
+        return False
+
+    object_roles = {
+        linked_object.object_role
+        for linked_object in metadata_elem.linked_objects
+    }
+
+    # Contains linked objects with roles 'source' and 'outcome'
+    return object_roles >= {"source", "outcome"}
+
+
 class StructuralMapDiv:
     """Class representing a div element in structMap in METS.
 
@@ -230,7 +258,11 @@ class StructuralMapDiv:
         map div tree is traversed depth-first in post-order i.e. starting from
         the leaves and moving towards the root (self). This way the shared
         metadata can be propagated as close to the root (self) as possible.
+
+        Migration or conversion events as described in DPRES File Formats
+        section B.2. are exempt from bundling.
         """
+
         # Apply this function recursively to child divs. If there are no child
         # divs left unvisited the rest of the function body is executed.
         for subdiv in self.divs:
@@ -243,6 +275,7 @@ class StructuralMapDiv:
         shared_metadata = set(
             metadata for metadata in child.metadata
             if metadata.metadata_type != MetadataType.TECHNICAL
+            and not _is_migration_or_conversion_event(metadata)
         )
 
         # Remove the unshared metadata. If 'shared_metadata' is empty it is not
@@ -251,6 +284,7 @@ class StructuralMapDiv:
             shared_metadata &= set(
                 metadata for metadata in child.metadata
                 if metadata.metadata_type != MetadataType.TECHNICAL
+                and not _is_migration_or_conversion_event(metadata)
             )
             if not shared_metadata:
                 return

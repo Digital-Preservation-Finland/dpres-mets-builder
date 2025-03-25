@@ -396,3 +396,69 @@ def test_structural_map_div_metadata_bundling():
 
     assert shared_agent not in do_metadata
     assert shared_agent in root_div.metadata
+
+
+def test_structural_map_div_migration_event_not_bundled():
+    """
+    Test that conversion or migration events are not bundled when running
+    `StructuralMapDiv.bundle_metadata`
+    """
+    normalization_event = mets_builder.metadata.DigitalProvenanceEventMetadata(
+        event_type="normalization",
+        detail="Normalization event",
+        outcome="success",
+        outcome_detail="baz",
+    )
+    source_techmd = mets_builder.metadata.TechnicalFileObjectMetadata(
+        file_format="image/x-proprietary-image-format",
+        file_format_version="3.00",
+        checksum_algorithm="MD5",
+        checksum="4b05bb123f3a00187d3b1b130d67af1c",
+        file_created_date="2000-12-24T22:00:00"
+    )
+    outcome_techmd = mets_builder.metadata.TechnicalFileObjectMetadata(
+        file_format="image/jpeg",
+        file_format_version="1.01",
+        checksum_algorithm="MD5",
+        checksum="14758f1afd44c09b7992073ccf00b43d",
+        file_created_date="2000-12-24T22:00:00"
+    )
+    agent = mets_builder.metadata.DigitalProvenanceAgentMetadata(
+        name="FileDetector 2000",
+        agent_type="software"
+    )
+
+    source_file = DigitalObject("path/source.img")
+    outcome_file = DigitalObject("path/outcome.jpg")
+    source_file.add_metadata([source_techmd, agent])
+    outcome_file.add_metadata([outcome_techmd, agent])
+
+    normalization_event.link_object_metadata(
+        source_techmd,
+        object_role="source"
+    )
+    normalization_event.link_object_metadata(
+        outcome_techmd,
+        object_role="outcome"
+    )
+
+    source_file.add_metadata([normalization_event])
+    outcome_file.add_metadata([normalization_event])
+
+    root_div = StructuralMapDiv("test_type")
+    div = StructuralMapDiv("test_type")
+
+    root_div.add_divs([div])
+    div.add_digital_objects([source_file, outcome_file])
+
+    root_div.bundle_metadata()
+
+    # Normalization event is not bundled
+    assert normalization_event in source_file.metadata
+    assert normalization_event in outcome_file.metadata
+    assert normalization_event not in root_div.metadata
+
+    # The agent is shared by both files and is bundled
+    assert agent in root_div.metadata
+    assert agent not in source_file.metadata
+    assert agent not in outcome_file.metadata
