@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Iterable, Optional, Set, Union
 
-from mets_builder.metadata import Metadata
+from mets_builder.metadata import Metadata, MetadataFormat
 from mets_builder.uuid import underscore_uuid
 
 
@@ -46,8 +46,15 @@ class DigitalObjectBase:
                     "metadata should be added to a div in a structural map."
                 )
         self.metadata |= set(metadata)
+
+        # Automatically add any linked agents as well
         for metadata_element in metadata:
-            self.metadata |= set(metadata_element.linked_metadata)
+            self.metadata |= {
+                linked_metadata for linked_metadata
+                in metadata_element.linked_metadata
+                if linked_metadata.METADATA_FORMAT
+                == MetadataFormat.PREMIS_AGENT
+            }
 
 
 class DigitalObjectStream(DigitalObjectBase):

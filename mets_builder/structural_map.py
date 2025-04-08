@@ -2,7 +2,7 @@
 from typing import Iterable, Optional, Set
 
 from mets_builder.digital_object import DigitalObject
-from mets_builder.metadata import Metadata, MetadataType
+from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 
 
 def _is_migration_or_conversion_event(metadata_elem):
@@ -152,8 +152,15 @@ class StructuralMapDiv:
             added to this div.
         """
         self.metadata |= set(metadata)
+
+        # Automatically add any linked agents as well
         for metadata_element in metadata:
-            self.metadata |= set(metadata_element.linked_metadata)
+            self.metadata |= {
+                linked_metadata for linked_metadata
+                in metadata_element.linked_metadata
+                if linked_metadata.METADATA_FORMAT
+                == MetadataFormat.PREMIS_AGENT
+            }
 
     def add_divs(self, divs: Iterable["StructuralMapDiv"]) -> None:
         """Add a further divisions to this division.
