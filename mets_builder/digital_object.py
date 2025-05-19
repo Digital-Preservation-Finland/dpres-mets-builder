@@ -158,11 +158,7 @@ class DigitalObject(DigitalObjectBase):
                 f"Given SIP file path '{path}' is not a relative path."
             )
 
-        # TODO: Replace with Path.is_relative_to in Python 3.9+
-        try:
-            # This will raise ValueError on paths that are not relative
-            path.resolve().relative_to(Path(".").resolve())
-        except ValueError:
+        if not path.resolve().is_relative_to(Path(".").resolve()):
             raise ValueError(
                 f"Given SIP file path '{path}' points outside the "
                 "SIP root directory."
