@@ -301,19 +301,11 @@ def _parse_file_references_file(
         if metadata.is_administrative
     )
 
-    def _url_encode_filename_from_path() -> str:
-        """:returns: path as string"""
-        do_path_list = digital_object.path.split("/")
-        if len(do_path_list[:-1]) == 0:
-            return f"file:///{quote_plus(digital_object.path)}"
-        return (f"file:///{'/'.join(do_path_list[:-1])}/"
-                f"{quote_plus(do_path_list[-1])}")
-
     digital_object_element = mets_elements.file_elem(
         file_id=digital_object.identifier,
         admid_elements=administrative_metadata_identifiers,
         loctype="URL",
-        xlink_href=_url_encode_filename_from_path(),
+        xlink_href=f"file:///{quote_plus(digital_object.path, safe='/')}",
         xlink_type="simple",
         use=digital_object.use
     )
