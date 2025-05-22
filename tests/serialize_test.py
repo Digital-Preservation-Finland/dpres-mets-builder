@@ -375,6 +375,54 @@ def test_written_file_references(mets_object):
     assert len(group.findall("mets:file", namespaces=NAMESPACES)) == 2
 
 
+@pytest.mark.parametrize("filename, expected_encoding", [
+    ("2[with]?special=symbols",
+     "2%5Bwith%5D%3Fspecial%3Dsymbols"),
+    ("test_file_gen_delims_:?#[]@.txt",
+        "test_file_gen_delims_%3A%3F%23%5B%5D%40.txt"),
+    ("test_file_sub_delims_!$&'()*+,;=.txt",
+        "test_file_sub_delims_%21%24%26%27%28%29%2A%2B%2C%3B%3D.txt"),
+    ("test_file_reserved% .txt",
+        "test_file_reserved%25+.txt")
+
+])
+def test_file_path_encoding(filename, expected_encoding):
+    """
+    Test that file reference containing URI is correctly escaped during
+    serialization. Regression test for TPASPKT-1505.
+    """
+    # Create METS containing one structural map containing one file
+    mets = METS(
+        mets_profile=MetsProfile.CULTURAL_HERITAGE,
+        contract_id="urn:uuid:5b1afac8-4b51-4d2f-8c77-c7e9ddbdd019",
+        creator_name="Mr. Foo",
+        creator_type="INDIVIDUAL",
+    )
+
+    do = DigitalObject(path="path/" + filename)
+
+    root_div = StructuralMapDiv(
+        div_type="test_type",
+        digital_objects=[do]
+    )
+    structural_map = StructuralMap(root_div=root_div)
+    mets.add_structural_maps([structural_map])
+
+    mets.generate_file_references()
+
+    # Serialize the METS
+    serialized = serialize._to_xml_string(mets)
+    element = etree.fromstring(serialized)
+
+    # Look up the file and check that the file URI is correctly escaped
+    files = element.xpath("//mets:file", namespaces=NAMESPACES)
+    assert len(files) == 1
+    # Check that the URL was correctly escaped
+    locat = files[0].xpath("mets:FLocat", namespaces=NAMESPACES)[0]
+    assert "file:///path/" + expected_encoding \
+        in locat.attrib.values()
+
+
 def test_written_structural_maps(mets_object):
     """Test that structural maps are written correctly."""
     # Serialize the entire mets, then read it to lxml.etree._Element for
