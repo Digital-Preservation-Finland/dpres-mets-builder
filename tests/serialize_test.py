@@ -389,7 +389,7 @@ def test_written_file_references(mets_object):
 def test_file_path_encoding(filename, expected_encoding):
     """
     Test that file reference containing URI is correctly escaped during
-    serialization. Regression test for TPASPKT-1505.
+    serialization.
     """
     # Create METS containing one structural map containing one file
     mets = METS(
