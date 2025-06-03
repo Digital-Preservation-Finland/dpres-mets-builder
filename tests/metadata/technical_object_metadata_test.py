@@ -4,9 +4,12 @@ from pathlib import Path
 import pytest
 import xml_helpers.utils
 
-from mets_builder.metadata import (TechnicalBitstreamObjectMetadata,
-                                   TechnicalFileObjectMetadata,
-                                   TechnicalObjectMetadata)
+from mets_builder.metadata import (
+    TechnicalBitstreamObjectMetadata,
+    TechnicalFileObjectMetadata,
+    TechnicalObjectMetadata,
+    TechnicalRepresentationObjectMetadata,
+)
 from mets_builder.serialize import NAMESPACES
 
 
@@ -119,6 +122,42 @@ def test_bitstream_serialization():
     ).read_text(encoding="utf-8")
 
     assert result == expected_xml
+
+
+def test_representation_serialization():
+    """Test serializing the technical representation metadata"""
+    representation_obj = TechnicalRepresentationObjectMetadata(
+        object_identifier_type="UUID",
+        object_identifier="00000000-0000-0000-0000-000000000000",
+    )
+
+    result = xml_helpers.utils.serialize(
+        representation_obj.to_xml_element_tree()
+    ).decode("utf-8")
+
+    assert "premis:representation" in result
+    assert "premis:objectCharacteristics" not in result
+
+
+def test_alternative_id_serialization():
+    """Test that alternative identifier gets serialized."""
+    representation_obj = TechnicalRepresentationObjectMetadata(
+        object_identifier_type="UUID",
+        object_identifier="00000000-0000-0000-0000-000000000000",
+    )
+    representation_obj.add_alternative_identifier(
+        identifier_type="local",
+        identifier="my-alt-identifier",
+    )
+
+    result = xml_helpers.utils.serialize(
+        representation_obj.to_xml_element_tree()
+    ).decode("utf-8")
+
+    assert "UUID" in result
+    assert "00000000-0000-0000-0000-000000000000" in result
+    assert "local" in result
+    assert "my-alt-identifier" in result
 
 
 def test_generate_object_identifier():
