@@ -185,14 +185,15 @@ class ImportedMetadata(Metadata):
 
         if data_path is None and data_string is None:
             raise ValueError("No data path or data string given")
-        elif data_path is not None and data_string is not None:
+        if data_path is not None and data_string is not None:
             raise ValueError("Both data path and data string given.")
-        elif data_path is not None:
+
+        if data_path is not None:
             data_path = Path(data_path).resolve()
             if not data_path.is_file():
                 raise ValueError(f"Given path '{data_path}' is not a file.")
             self.data_path = data_path
-        elif data_string is not None:
+        else:
             self.data_string = data_string
 
     @classmethod
