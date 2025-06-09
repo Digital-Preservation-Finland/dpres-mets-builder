@@ -17,6 +17,12 @@ METS_CATALOG = "1.7.7"
 METS_SPECIFICATION = "1.7.7"
 
 
+METSAgent = namedtuple(
+    "METSAgent",
+    ["name", "agent_role", "other_role", "agent_type", "other_type"]
+)
+
+
 class MetsProfile(Enum):
     """Enum for METS profiles."""
 
@@ -380,10 +386,6 @@ class METS:
                 "agent."
             )
 
-        METSAgent = namedtuple(
-            "METSAgent",
-            ["name", "agent_role", "other_role", "agent_type", "other_type"]
-        )
         agent = METSAgent(name, agent_role, other_role, agent_type, other_type)
         self.agents.append(agent)
 
