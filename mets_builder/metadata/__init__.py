@@ -8,13 +8,19 @@ from mets_builder.metadata.metadata import (ComparableMixin,  # isort:skip
                                             MetadataType,
                                             PREMISObjectType)
 from mets_builder.metadata.technical_object_metadata import (  # isort:skip
-    TechnicalBitstreamObjectMetadata, TechnicalFileObjectMetadata,
-    TechnicalObjectMetadata)
+    TechnicalBitstreamObjectMetadata,
+    TechnicalFileObjectMetadata,
+    TechnicalObjectMetadata,
+    TechnicalRepresentationObjectMetadata,
+)
 
 from mets_builder.metadata.digital_provenance_agent_metadata import \
     DigitalProvenanceAgentMetadata
 from mets_builder.metadata.digital_provenance_event_metadata import (
     DigitalProvenanceEventMetadata, EventOutcome)
+from mets_builder.metadata.digital_provenance_object_metadata import (
+    DigitalProvenanceObjectMetadata
+)
 from mets_builder.metadata.imported_metadata import ImportedMetadata
 from mets_builder.metadata.technical_audio_metadata import \
     TechnicalAudioMetadata
@@ -38,9 +44,11 @@ __all__ = [
     "TechnicalVideoMetadata",
     "DigitalProvenanceAgentMetadata",
     "DigitalProvenanceEventMetadata",
+    "DigitalProvenanceObjectMetadata",
     "TechnicalObjectMetadata",
     "TechnicalFileObjectMetadata",
     "TechnicalBitstreamObjectMetadata",
+    "TechnicalRepresentationObjectMetadata",
     "EventOutcome",
     "PREMISObjectType"
 ]

@@ -31,6 +31,7 @@ class _Relationship():
     """Class for storing information about relationships between technical
     object metadata.
     """
+
     def __init__(
         self,
         object_identifier_type: str,
@@ -117,16 +118,13 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
     METADATA_FORMAT = MetadataFormat.PREMIS_OBJECT
     METADATA_FORMAT_VERSION = "2.3"
 
-    REQUIRED_PROPERTIES = (
-        "file_format",
-        "file_format_version"
-    )
+    REQUIRED_PROPERTIES = ()
 
     @abc.abstractmethod
     def __init__(
         self,
-        file_format: str,
-        file_format_version: str,
+        file_format: str = None,
+        file_format_version: str = None,
         checksum_algorithm: Optional[Union[ChecksumAlgorithm, str]] = None,
         checksum: Optional[str] = None,
         file_created_date: Optional[str] = None,
@@ -157,6 +155,7 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
             creating_application, creating_application_version
         )
 
+        self.alternative_identifiers: List[tuple[str, str]] = []
         self.relationships: List[_Relationship] = []
 
         super().__init__(
@@ -198,7 +197,9 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
 
     def _vars(self):
         vars_ = super()._vars()
-
+        vars_["alternative_identifiers"] = tuple(
+            vars_["alternative_identifiers"]
+        )
         vars_["relationships"] = tuple(vars_["relationships"])
 
         return vars_
@@ -257,6 +258,26 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
             charset = Charset(charset)
         self._charset = charset
 
+    @property
+    def object_identifier_type(self):
+        """Getter for object_identifier_type."""
+        return self._object_identifier_type
+
+    @object_identifier_type.setter
+    def object_identifier_type(self, object_identifier_type):
+        """Setter for object_identifier_type."""
+        self._object_identifier_type = object_identifier_type
+
+    @property
+    def object_identifier(self):
+        """Getter for object_identifier."""
+        return self._object_identifier
+
+    @object_identifier.setter
+    def object_identifier(self, object_identifier):
+        """Setter for object_identifier."""
+        self._object_identifier = object_identifier
+
     def add_relationship(
         self,
         technical_object_metadata: "TechnicalObjectMetadata",
@@ -282,6 +303,17 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
         )
 
         self.relationships.append(relationship)
+
+    def add_alternative_identifier(
+        self,
+        identifier_type: str,
+        identifier: str,
+    ) -> None:
+        """Add alternative identifier to the object.
+        :param identifier_type: Identifier type
+        :param identifier: Identifier
+        """
+        self.alternative_identifiers.append((identifier_type, identifier))
 
     def _set_object_identifier_and_type(self, identifier_type, identifier):
         """Resolve object identifier and identifier type.
@@ -325,7 +357,7 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
         self.format_registry_key = registry_key
 
     def _set_creating_application_name_and_version(
-            self, creating_application, creating_application_version
+        self, creating_application, creating_application_version
     ):
         """Resolve creating application and its version.
 
@@ -400,7 +432,16 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
             identifier_type=self.object_identifier_type,
             identifier_value=self.object_identifier
         )
+        alt_object_ids = []
+        for alt_type, alt_id in self.alternative_identifiers:
+            alt_object_ids.append(
+                premis.identifier(
+                    identifier_type=alt_type,
+                    identifier_value=alt_id,
+                )
+            )
 
+        premis_object_child_elements = []
         object_characteristics_elems = []
 
         # Create 'fixity' if possible
@@ -411,56 +452,61 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
             )
             object_characteristics_elems.append(fixity)
 
-        # Create 'format'. This *always* exists.
-        format_child_elements = []
-        format_version: Optional[str] = self.file_format_version
-        if format_version == UNAP:
-            # If format version is given as (:unap), it should be left out of
-            # the serialized metadata, as PAS interprets it as invalid value
-            # for premis:formatVersion
-            format_version = None
-        format_designation = premis.format_designation(
-            format_name=self._resolve_serialized_format_name(),
-            format_version=format_version
-        )
-        format_child_elements.append(format_designation)
-        if self.format_registry_name and self.format_registry_key:
-            format_registry = premis.format_registry(
-                registry_name=self.format_registry_name,
-                registry_key=self.format_registry_key
+        # Create 'format' and potentially other fields;
+        # these are only used for file and bitstreams which
+        # require file format to be provided.
+        if self.file_format:
+            format_child_elements = []
+            format_version: Optional[str] = self.file_format_version
+            if format_version == UNAP:
+                # If format version is given as (:unap), it should be left out
+                # of the serialized metadata, as PAS interprets it as invalid
+                # value for premis:formatVersion
+                format_version = None
+            format_designation = premis.format_designation(
+                format_name=self._resolve_serialized_format_name(),
+                format_version=format_version
             )
-            format_child_elements.append(format_registry)
-        format_ = premis.format(child_elements=format_child_elements)
-        object_characteristics_elems.append(format_)
-
-        # Create 'creatingApplication' if possible
-        application_child_elements = []
-        if self.creating_application:
-            application_child_elements.append(
-                premis.creating_application_name(self.creating_application)
-            )
-        if self.creating_application_version:
-            application_child_elements.append(
-                premis.creating_application_version(
-                    self.creating_application_version
+            format_child_elements.append(format_designation)
+            if self.format_registry_name and self.format_registry_key:
+                format_registry = premis.format_registry(
+                    registry_name=self.format_registry_name,
+                    registry_key=self.format_registry_key
                 )
-            )
-        if self.file_created_date:
-            application_child_elements.append(
-                premis.date_created(self.file_created_date)
-            )
+                format_child_elements.append(format_registry)
+            format_ = premis.format(child_elements=format_child_elements)
+            object_characteristics_elems.append(format_)
 
-        if application_child_elements:
-            creating_application = premis.creating_application(
-                child_elements=application_child_elements
-            )
-            object_characteristics_elems.append(creating_application)
+            # Create 'creatingApplication' if possible
+            application_child_elements = []
+            if self.creating_application:
+                application_child_elements.append(
+                    premis.creating_application_name(self.creating_application)
+                )
+            if self.creating_application_version:
+                application_child_elements.append(
+                    premis.creating_application_version(
+                        self.creating_application_version
+                    )
+                )
+            if self.file_created_date:
+                application_child_elements.append(
+                    premis.date_created(self.file_created_date)
+                )
 
-        object_characteristics = premis.object_characteristics(
-            child_elements=object_characteristics_elems
-        )
+            if application_child_elements:
+                creating_application = premis.creating_application(
+                    child_elements=application_child_elements
+                )
+                object_characteristics_elems.append(creating_application)
+
+            object_characteristics = premis.object_characteristics(
+                child_elements=object_characteristics_elems
+            )
+            premis_object_child_elements += [object_characteristics]
+
         relationships = self._serialize_relationships_to_xml_elements()
-        premis_object_child_elements = [object_characteristics] + relationships
+        premis_object_child_elements += relationships
 
         # TODO: Make PREMIS object type in 'premis' library less awkward to
         # define. Enum should be used instead of booleans.
@@ -470,6 +516,7 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
 
         premis_object = premis.object(
             object_id=object_id,
+            alt_ids=alt_object_ids,
             original_name=self.original_name,
             child_elements=premis_object_child_elements,
             # If neither 'bitstream' or 'representation' is set, 'file' is used
@@ -584,6 +631,44 @@ class TechnicalBitstreamObjectMetadata(TechnicalObjectMetadata):
             **kwargs)
 
     __init__.__doc__ = f"""Constructor for TechnicalBitstreamObjectMetadata.
+
+        For advanced configurations keyword arguments for Metadata class
+        can be given here as well. Look Metadata documentation for more
+        information.
+
+        {_OBJECT_PARAMETERS_DOC}
+        """
+
+
+class TechnicalRepresentationObjectMetadata(TechnicalObjectMetadata):
+    """Class for creating technical object metadata for a file presentation
+    that are not packed together in SIP. Metadata type will be set as
+    digital provenance.
+
+    The Object entity aggregates information about a digital object held by a
+    preservation repository and describes those characteristics relevant to
+    preservation management.
+    """
+    METADATA_TYPE = MetadataType.DIGITAL_PROVENANCE
+    PREMIS_OBJECT_TYPE = PREMISObjectType.REPRESENTATION
+    REQUIRED_PROPERTIES = (
+        "object_identifier_type",
+        "object_identifier"
+    )
+
+    def __init__(
+        self,
+        object_identifier_type: str,
+        object_identifier: str,
+        **kwargs
+    ) -> None:
+        super().__init__(
+            object_identifier_type=object_identifier_type,
+            object_identifier=object_identifier,
+            **kwargs)
+
+    __init__.__doc__ = f"""Constructor for
+        TechnicalRepresentationObjectMetadata.
 
         For advanced configurations keyword arguments for Metadata class
         can be given here as well. Look Metadata documentation for more
