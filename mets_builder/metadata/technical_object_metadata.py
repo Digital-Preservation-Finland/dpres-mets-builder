@@ -509,7 +509,7 @@ class TechnicalObjectMetadata(Metadata, metaclass=abc.ABCMeta):
         premis_object_child_elements += relationships
 
         # TODO: Make PREMIS object type in 'premis' library less awkward to
-        # define. Enum should be used instead of booleans.
+        # define. Enum should be used instead of booleans (TPASPKT-1514).
         is_bitstream = self.PREMIS_OBJECT_TYPE is PREMISObjectType.BITSTREAM
         is_representation = \
             self.PREMIS_OBJECT_TYPE is PREMISObjectType.REPRESENTATION
