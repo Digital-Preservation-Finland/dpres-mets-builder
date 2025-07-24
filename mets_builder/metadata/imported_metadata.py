@@ -9,66 +9,7 @@ from lxml import etree
 
 from mets_builder.defaults import UNAV
 from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
-
-METS_MDTYPES = {
-    'http://purl.org/dc/elements/1.1': {
-        'format': 'DC', 'version': '2008'
-    },
-    'http://www.loc.gov/MARC21/slim': {
-        'format': 'MARC', 'version': 'marcxml=1.2; marc=marc21'
-    },
-    'http://www.loc.gov/mods/v3': {
-        'format': 'MODS', 'version': '3.8'
-    },
-    'urn:isbn:1-931666-22-9': {
-        'format': 'EAD', 'version': '2002'
-    },
-    'http://ead3.archivists.org/schema': {
-        'format': 'OTHER', 'otherformat': 'EAD3', 'version': '1.1.1'
-    },
-    'urn:isbn:1-931666-33-4': {
-        'format': 'EAC-CPF', 'version': '2010_revised'
-    },
-    'https://archivists.org/ns/eac/v2': {
-        'format': 'EAC-CPF', 'version': '2.0'
-    },
-    'http://www.lido-schema.org': {
-        'format': 'LIDO', 'version': '1.1'
-    },
-    'ddi:instance:3_3': {
-        'format': 'DDI', 'version': '3.3'
-    },
-    'ddi:instance:3_2': {
-        'format': 'DDI', 'version': '3.2'
-    },
-    'ddi:instance:3_1': {
-        'format': 'DDI', 'version': '3.1'
-    },
-    'ddi:codebook:2_5': {
-        'format': 'DDI', 'version': '2.5.1'
-    },
-    'http://www.icpsr.umich.edu/DDI': {
-        'format': 'DDI', 'version': '2.1'
-    },
-    'http://www.vraweb.org/vracore4.htm': {
-        'format': 'VRA', 'version': '4.0'
-    },
-    'http://www.arkivverket.no/standarder/addml': {
-        'format': 'OTHER', 'otherformat': 'ADDML', 'version': '8.3'
-    },
-    'http://datacite.org/schema/kernel-4': {
-        'format': 'OTHER', 'otherformat': 'DATACITE', 'version': '4.3'
-    },
-    'http://www.loc.gov/audioMD': {
-        'format': 'OTHER', 'otherformat': 'AudioMD', 'version': '2.0'
-    },
-    'http://www.loc.gov/videoMD': {
-        'format': 'OTHER', 'otherformat': 'VideoMD', 'version': '2.0'
-    },
-    'urn:ebu:metadata-schema:ebucore': {
-        'format': 'OTHER', 'otherformat': 'EBUCORE', 'version': '1.10'
-    }
-}
+from mets_builder.metadata.mets_metadata import METS_MDTYPES
 
 
 def _detect_metadata_options(xml_stream: BinaryIO) -> Optional[dict]:
@@ -103,11 +44,7 @@ def _detect_metadata_options(xml_stream: BinaryIO) -> Optional[dict]:
         metadata_type = MetadataType.DESCRIPTIVE
         metadata_format = options.get("format", MetadataFormat.OTHER)
         format_version = options.get("version", UNAV)
-        other_format = None
-
-        if "otherformat" in options:
-            metadata_format = MetadataFormat.OTHER
-            other_format = options["otherformat"]
+        other_format = options.get("other_format", None)
 
         return {
             "metadata_type": metadata_type,
