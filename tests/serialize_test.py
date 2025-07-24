@@ -289,6 +289,45 @@ def test_parse_metadata_element(metadata_type, root_element_tag):
     assert metadata_element[1].tag == "sub2"
 
 
+def test_parse_metadata_element_without_root():
+
+    data = metadata.ImportedMetadata(
+        data_path=Path("tests/data/valid_dc.xml"),
+        metadata_type=metadata.MetadataType.DESCRIPTIVE,
+        metadata_format="DC",
+        format_version="1.0",
+        identifier="identifier",
+        created=datetime(2000, 1, 2, 3, 4, 5, 6, tzinfo=timezone.utc)
+    )
+
+    state = _SerializerState()
+
+    root_element = serialize._parse_metadata_element(
+            data, state, remove_root=True
+        )
+
+    assert root_element.tag == _use_namespace("mets", "dmdSec")
+
+    # The root element wraps mdWrap element
+    assert len(root_element) == 1
+    md_wrap = root_element[0]
+    assert md_wrap.tag == _use_namespace("mets", "mdWrap")
+    assert md_wrap.get("MDTYPE").capitalize() == "Dc"
+    assert md_wrap.get("MDTYPEVERSION") == "1.0"
+
+    # Which wraps xmlData element
+    assert len(md_wrap) == 1
+    xml_data = md_wrap[0]
+    assert xml_data.tag == _use_namespace("mets", "xmlData")
+
+    assert len(xml_data) == 4
+    namespace = "{http://purl.org/dc/elements/1.1/}"
+    assert xml_data[0].tag == "%stitle" % namespace
+    assert xml_data[1].tag == "%sdescription" % namespace
+    assert xml_data[2].tag == "%spublisher" % namespace
+    assert xml_data[3].tag == "%sidentifier" % namespace
+
+
 def test_parse_metadata_with_estimated_create_time():
     """Test that if estimated create time is given to metadata, it is written
     using fi:CREATED attribute and CREATED attribute does not exist.

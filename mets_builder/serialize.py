@@ -1,4 +1,6 @@
 """Module for serializing METS objects."""
+from __future__ import annotations
+
 from collections import defaultdict
 from datetime import datetime, timezone
 from io import BytesIO
@@ -11,7 +13,7 @@ from lxml import etree
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    DigitalProvenanceEventMetadata,
-                                   Metadata, MetadataType)
+                                   Metadata, MetadataType, MetadataFormat)
 from mets_builder.uuid import uuid, underscore_uuid
 
 # Prevent circular import caused by type hints with special
@@ -33,6 +35,11 @@ NAMESPACES = {
     "audiomd": "http://www.loc.gov/audioMD/",
     "videomd": "http://www.loc.gov/videoMD/"
 }
+# Metadata formats which don't require root elements
+ROOTLESS_FORMATS = [
+    MetadataFormat.DC
+]
+
 _METS_FI_SCHEMA = "http://digitalpreservation.fi/schemas/mets/mets.xsd"
 
 
@@ -188,7 +195,11 @@ def _parse_mets_header(mets):
     return mets_header
 
 
-def _parse_metadata_element(metadata: Metadata, state: _SerializerState):
+def _parse_metadata_element(
+    metadata: Metadata,
+    state: _SerializerState,
+    remove_root: bool = False
+):
     """Parse given metadata object.
 
     :param metadata: The metadata object that should be parsed.
@@ -198,10 +209,16 @@ def _parse_metadata_element(metadata: Metadata, state: _SerializerState):
         etc.) as lxml.etree._Element
     """
     # Serialize metadata
-    serialized_metadata = metadata._to_xml_element_tree(state)
+    root_node = metadata._to_xml_element_tree(state)
+
+    serialized_metadata_list = [root_node]
+    if remove_root:
+        serialized_metadata_list = list(root_node)
 
     # Metadata has to be wrapped in mdWrap and xmlData elements
-    xml_data = mets_elements.xmldata(child_elements=[serialized_metadata])
+    xml_data: etree._Element = mets_elements.xmldata(
+        child_elements=[*serialized_metadata_list]
+    )
     md_wrap = mets_elements.mdwrap(
         mdtype=metadata.metadata_format.value,
         mdtypeversion=metadata.format_version,
@@ -249,12 +266,15 @@ def _parse_metadata_element(metadata: Metadata, state: _SerializerState):
 
 def _write_descriptive_metadata(xml, mets, state: _SerializerState):
     """Write descriptive metadata to the given XML file."""
-    descriptive_metadata = list(set(
+    descriptive_metadata: list[Metadata] = list(set(
         metadata for metadata in mets.metadata
         if metadata.is_descriptive
     ))
     for metadata in descriptive_metadata:
-        metadata_element = _parse_metadata_element(metadata, state)
+        root_removal = (metadata.metadata_format in ROOTLESS_FORMATS)
+        metadata_element = _parse_metadata_element(
+            metadata, state, remove_root=root_removal
+        )
         xml.write(metadata_element)
 
 
@@ -386,7 +406,7 @@ def _write_structural_map(xml, structural_map, state: _SerializerState):
         _write_structural_map_div(xml, structural_map.root_div, state)
 
 
-def _write_mets(mets, output_file):
+def _write_mets(mets, output_file: BytesIO | str):
     """Write METS object to file serialized as XML.
 
     :param mets: METS object to serialize
