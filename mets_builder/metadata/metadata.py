@@ -1,8 +1,17 @@
 """Module for Metadata class and associated enums."""
+# Required with TYPE_CHECKING to to postpone the annotation check
+from __future__ import annotations
 import abc
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union
+from typing import Optional, Union, TYPE_CHECKING
+
+# Prevent circular import caused by type hints with special
+# typing.TYPE_CHECKING constant. See
+# https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING for more
+# info
+if TYPE_CHECKING:
+    from mets_builder.serialize import _SerializerState
 
 from lxml import etree
 
@@ -248,9 +257,12 @@ class Metadata(ComparableMixin, metaclass=abc.ABCMeta):
         return self.metadata_type == MetadataType.DESCRIPTIVE
 
     @abc.abstractmethod
-    def _to_xml_element_tree(self, state) -> etree._Element:
-        """Serialize this metadata object to an intermediate XML
+    def _to_xml_element_tree(self, state: _SerializerState) -> etree._Element:
+        """
+        Serialize this metadata object to an intermediate XML
         representation using lxml.
+        :param state: state used during the serialization process
+            to prevent identifier duplication.
 
         :returns: The root element of the XML document
         """
