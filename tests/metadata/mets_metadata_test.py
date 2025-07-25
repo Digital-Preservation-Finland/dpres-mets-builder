@@ -27,7 +27,7 @@ def test_valid_metadata_with_other_format():
 
 
 def test_missing_required_fields_raises_assertion():
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         # uri missing
         MetsMetadataType(
             mdt_format=mdf.OTHER,

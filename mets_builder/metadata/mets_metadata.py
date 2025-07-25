@@ -1,15 +1,15 @@
+from __future__ import annotations
 from mets_builder.metadata.metadata import MetadataFormat as mdf
 
 
 class MetsMetadataType:
     def __init__(
-        self,
-        uri: str = None,
-        mdt_format: mdf = None,
-        version: str = None,
-        other_format: str = None,
+        self, *,
+        uri: str,
+        mdt_format: mdf,
+        version: str,
+        other_format: str | None = None,
     ):
-        assert None not in [uri, mdt_format, version]
         if other_format:
             mdt_format = mdf.OTHER
         if mdt_format == mdf.OTHER and not other_format:
