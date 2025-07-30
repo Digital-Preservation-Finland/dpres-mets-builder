@@ -21,7 +21,7 @@ from mets_builder.uuid import uuid, underscore_uuid
 # https://docs.python.org/3/library/typing.html#typing.TYPE_CHECKING for more
 # info
 if TYPE_CHECKING:
-    from mets_builder.mets import METS
+    from mets_builder.mets import METS, FileReferences, StructuralMap
 
 NAMESPACES = {
     "mets": "http://www.loc.gov/METS/",
@@ -59,7 +59,7 @@ class _SerializerState:
         self._metadata2agent_identifier = defaultdict(lambda: uuid())
         self._metadata2event_identifier = defaultdict(lambda: uuid())
 
-    def get_identifier(self, metadata: Metadata):
+    def get_identifier(self, metadata: Metadata) -> defaultdict:
         """
         Get identifier for a metadata object. If the metadata object has no
         identifier, generate an unique identifier that will be shared with all
@@ -73,7 +73,7 @@ class _SerializerState:
         # data
         return self._metadata2identifier[metadata]
 
-    def get_created(self, metadata: Metadata):
+    def get_created(self, metadata: Metadata) -> str:
         """
         Get creation date for a metadata object. If the metadata object has
         no creation date, use a datetime that corresponds to the start of the
@@ -84,7 +84,7 @@ class _SerializerState:
         else:
             return self.now.isoformat()
 
-    def get_datetime(self, metadata: Metadata):
+    def get_datetime(self, metadata: Metadata) -> str:
         """
         Get event datetime for a metadata object. If no event datetime exists,
         use a datetime that corresponds to the start of the serialization
@@ -94,7 +94,10 @@ class _SerializerState:
         else:
             return self.now.isoformat()
 
-    def get_event_identifier(self, metadata: DigitalProvenanceEventMetadata):
+    def get_event_identifier(
+        self,
+        metadata: DigitalProvenanceEventMetadata
+    ) -> defaultdict:
         """
         Get identifier for a digital provenance event object.
         If the metadata object has no identifier,
@@ -105,7 +108,10 @@ class _SerializerState:
             return metadata.event_identifier
         return self._metadata2event_identifier[metadata]
 
-    def get_agent_identifier(self, metadata: DigitalProvenanceAgentMetadata):
+    def get_agent_identifier(
+        self,
+        metadata: DigitalProvenanceAgentMetadata
+    ) -> defaultdict:
         """
         Get identifier for a digital provenance agent object.
         If the metadata object has no identifier,
@@ -122,7 +128,7 @@ def _use_namespace(namespace, attribute):
     return f"{{{NAMESPACES[namespace]}}}{attribute}"
 
 
-def _parse_mets_root_element(mets):
+def _parse_mets_root_element(mets: METS) -> etree._Element:
     """Parse root element for given METS object.
 
     :param mets: METS object
@@ -160,7 +166,7 @@ def _parse_mets_root_element(mets):
     return mets_root
 
 
-def _parse_mets_header(mets):
+def _parse_mets_header(mets: METS) -> etree._Element:
     """Parse metsHdr for given METS object.
 
     :param mets: METS object
@@ -199,7 +205,7 @@ def _parse_metadata_element(
     metadata: Metadata,
     state: _SerializerState,
     remove_root: bool = False
-):
+) -> etree._Element:
     """Parse given metadata object.
 
     :param metadata: The metadata object that should be parsed.
@@ -264,9 +270,13 @@ def _parse_metadata_element(
     return metadata_element
 
 
-def _write_descriptive_metadata(xml, mets, state: _SerializerState):
+def _write_descriptive_metadata(
+    xml: etree._serializer._IncrementalFileWriter,
+    mets: METS,
+    state: _SerializerState
+) -> None:
     """Write descriptive metadata to the given XML file."""
-    descriptive_metadata: list[Metadata] = list(set(
+    descriptive_metadata = list(set(
         metadata for metadata in mets.metadata
         if metadata.is_descriptive
     ))
@@ -278,7 +288,11 @@ def _write_descriptive_metadata(xml, mets, state: _SerializerState):
         xml.write(metadata_element)
 
 
-def _write_administrative_metadata(xml, mets, state: _SerializerState):
+def _write_administrative_metadata(
+    xml: etree._serializer._IncrementalFileWriter,
+    mets: METS,
+    state: _SerializerState
+) -> None:
     """Write administrative metadata to the given XML file."""
     administrative_metadata = list(set(
         metadata for metadata in mets.metadata
@@ -302,7 +316,9 @@ def _write_administrative_metadata(xml, mets, state: _SerializerState):
 
 
 def _parse_file_references_file(
-        digital_object: DigitalObject, state: _SerializerState):
+    digital_object: DigitalObject,
+    state: _SerializerState
+) -> etree._Element:
     """Parse given digital object as file element in file references."""
     # Streams
     streams = []
@@ -335,7 +351,11 @@ def _parse_file_references_file(
     return digital_object_element
 
 
-def _write_file_references(xml, file_references, state: _SerializerState):
+def _write_file_references(
+    xml: etree._serializer._IncrementalFileWriter,
+    file_references: FileReferences,
+    state: _SerializerState
+) -> None:
     """Write file references to the given XML file."""
     file_references_root = mets_elements.filesec()
     with xml.element(file_references_root.tag, file_references_root.attrib):
@@ -348,7 +368,11 @@ def _write_file_references(xml, file_references, state: _SerializerState):
                     )
 
 
-def _write_structural_map_div(xml, div, state):
+def _write_structural_map_div(
+    xml: etree._serializer._IncrementalFileWriter,
+    div: etree._Element,
+    state: _SerializerState
+) -> None:
     """Write a structural map div and recursively its nested divs to the given
     xml file.
     """
@@ -385,7 +409,10 @@ def _write_structural_map_div(xml, div, state):
             _write_structural_map_div(xml, nested_div, state)
 
 
-def _write_structural_map(xml, structural_map, state: _SerializerState):
+def _write_structural_map(
+    xml: etree._serializer._IncrementalFileWriter,
+    structural_map: StructuralMap, state: _SerializerState
+) -> None:
     """Write structural map to the given XML file."""
     structural_map_root = mets_elements.structmap(
         type_attr=structural_map.structural_map_type,
@@ -406,7 +433,7 @@ def _write_structural_map(xml, structural_map, state: _SerializerState):
         _write_structural_map_div(xml, structural_map.root_div, state)
 
 
-def _write_mets(mets, output_file: BytesIO | str):
+def _write_mets(mets: METS, output_file: BytesIO | str) -> BytesIO | str:
     """Write METS object to file serialized as XML.
 
     :param mets: METS object to serialize
@@ -454,7 +481,7 @@ def _write_mets(mets, output_file: BytesIO | str):
     return output_file
 
 
-def _to_xml_string(mets: "METS") -> bytes:
+def _to_xml_string(mets: METS) -> bytes:
     """Serialize METS object to XML string.
 
     :param mets: METS object
@@ -468,6 +495,6 @@ def _to_xml_string(mets: "METS") -> bytes:
     return result
 
 
-def _write_to_file(mets: "METS", output_filepath: str) -> None:
+def _write_to_file(mets: METS, output_filepath: str) -> None:
     """Serialize METS object to XML and write to given file path."""
     _write_mets(mets, output_filepath)
