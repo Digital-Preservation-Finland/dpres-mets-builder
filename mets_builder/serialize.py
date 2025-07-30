@@ -271,9 +271,9 @@ def _write_descriptive_metadata(xml, mets, state: _SerializerState):
         if metadata.is_descriptive
     ))
     for metadata in descriptive_metadata:
-        root_removal = (metadata.metadata_format in ROOTLESS_FORMATS)
         metadata_element = _parse_metadata_element(
-            metadata, state, remove_root=root_removal
+            metadata, state,
+            remove_root=metadata.metadata_format in ROOTLESS_FORMATS
         )
         xml.write(metadata_element)
 
