@@ -216,8 +216,8 @@ def _parse_metadata_element(
         serialized_metadata_list = list(root_node)
 
     # Metadata has to be wrapped in mdWrap and xmlData elements
-    xml_data: etree._Element = mets_elements.xmldata(
-        child_elements=[*serialized_metadata_list]
+    xml_data = mets_elements.xmldata(
+        child_elements=serialized_metadata_list
     )
     md_wrap = mets_elements.mdwrap(
         mdtype=metadata.metadata_format.value,
