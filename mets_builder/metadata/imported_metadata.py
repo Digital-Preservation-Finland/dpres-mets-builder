@@ -7,12 +7,11 @@ from typing import BinaryIO, Optional, Union
 import xml_helpers.utils
 from lxml import etree
 
-from mets_builder.defaults import UNAV
 from mets_builder.metadata import Metadata, MetadataFormat, MetadataType
 from mets_builder.metadata.mets_metadata import METS_MDTYPES
 
 
-def _detect_metadata_options(xml_stream: BinaryIO) -> Optional[dict]:
+def _detect_mets_metadata_properties(xml_stream: BinaryIO) -> Optional[dict]:
     """
     Automatically detect the XML schema used in an XML document and provide
     the correct keyword arguments to be passed to `ImportedMetadata`
@@ -39,18 +38,15 @@ def _detect_metadata_options(xml_stream: BinaryIO) -> Optional[dict]:
         if schema_uri_ not in METS_MDTYPES:
             continue
 
-        options = METS_MDTYPES[schema_uri_]
+        mets_metadata = METS_MDTYPES[schema_uri_]
 
         metadata_type = MetadataType.DESCRIPTIVE
-        metadata_format = options.get("format", MetadataFormat.OTHER)
-        format_version = options.get("version", UNAV)
-        other_format = options.get("other_format", None)
 
         return {
             "metadata_type": metadata_type,
-            "metadata_format": metadata_format,
-            "format_version": format_version,
-            "other_format": other_format
+            "metadata_format": mets_metadata.mdt_format,
+            "format_version": mets_metadata.version,
+            "other_format": mets_metadata.other_format
         }
 
     return None
@@ -140,11 +136,11 @@ class ImportedMetadata(Metadata):
         Metadata type, format and format version will be determined
         automatically by checking the XML schema in use.
         """
-        metadata_options = _detect_metadata_options(BytesIO(string))
+        metadata_properties = _detect_mets_metadata_properties(BytesIO(string))
 
-        if metadata_options:
+        if metadata_properties:
             return cls(
-                **metadata_options,
+                **metadata_properties,
                 data_string=string
             )
 
@@ -162,11 +158,11 @@ class ImportedMetadata(Metadata):
         automatically by checking the XML schema in use.
         """
         with Path(path).open("rb") as file_:
-            metadata_options = _detect_metadata_options(file_)
+            metadata_properties = _detect_mets_metadata_properties(file_)
 
-        if metadata_options:
+        if metadata_properties:
             return cls(
-                **metadata_options,
+                **metadata_properties,
                 data_path=path
             )
 
