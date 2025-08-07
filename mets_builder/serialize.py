@@ -433,7 +433,7 @@ def _write_structural_map(
         _write_structural_map_div(xml, structural_map.root_div, state)
 
 
-def _write_mets(mets: METS, output_file: BytesIO | str) -> BytesIO | str:
+def _write_mets(mets: METS, output_file: BytesIO | str) -> str:
     """Write METS object to file serialized as XML.
 
     :param mets: METS object to serialize
@@ -481,7 +481,7 @@ def _write_mets(mets: METS, output_file: BytesIO | str) -> BytesIO | str:
     return output_file
 
 
-def _to_xml_string(mets: METS) -> bytes:
+def _to_xml_string(mets: METS) -> str:
     """Serialize METS object to XML string.
 
     :param mets: METS object

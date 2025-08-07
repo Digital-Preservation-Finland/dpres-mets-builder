@@ -424,7 +424,7 @@ class METS:
         """
         self.structural_maps |= set(structural_maps)
 
-    def to_xml(self) -> bytes:
+    def to_xml(self) -> str:
         """Serialize this METS object into XML-formatted bytestring."""
         return serialize._to_xml_string(self)
 
