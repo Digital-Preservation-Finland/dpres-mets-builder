@@ -20,7 +20,7 @@ from mets_builder.structural_map import StructuralMap, StructuralMapDiv
 
 
 @pytest.fixture()
-def mets_object():
+def mets_object() -> METS:
     """Get valid METS object."""
     mets = METS(
         mets_profile=MetsProfile.CULTURAL_HERITAGE,
@@ -45,8 +45,8 @@ def mets_object():
     # digital objects and metadata
     md_1 = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
-        metadata_type="technical",
-        metadata_format="other",
+        metadata_type=metadata.MetadataType.TECHNICAL,
+        metadata_format=metadata.MetadataFormat.OTHER,
         other_format="PAS-special",
         format_version="1.0",
         identifier="_1"
@@ -66,8 +66,8 @@ def mets_object():
 
     md_2 = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
-        metadata_type="technical",
-        metadata_format="other",
+        metadata_type=metadata.MetadataType.TECHNICAL,
+        metadata_format=metadata.MetadataFormat.OTHER,
         other_format="PAS-special",
         format_version="1.0",
         identifier="_2"
@@ -81,8 +81,8 @@ def mets_object():
     # Structural map
     md_3 = metadata.ImportedMetadata(
         data_path=Path("tests/data/imported_metadata.xml"),
-        metadata_type="descriptive",
-        metadata_format="other",
+        metadata_type=metadata.MetadataType.DESCRIPTIVE,
+        metadata_format=metadata.MetadataFormat.OTHER,
         other_format="PAS-special",
         format_version="1.0",
         identifier="_3"
@@ -121,22 +121,64 @@ def mets_object():
         divs=[sub1, sub2],
         metadata=[md_3]
     )
-    # Add the map twice to test that multiple structural maps are supported
+    # test descriptive_metadata handling depending on the type of metadata:
+    dublin_core = metadata.ImportedMetadata(
+        data_path=Path("tests/data/valid_dc.xml"),
+        metadata_type=metadata.MetadataType.DESCRIPTIVE,
+        metadata_format=metadata.MetadataFormat.DC,
+        format_version="2008",
+        identifier="_4"
+    )
+    marc = metadata.ImportedMetadata(
+        data_path=Path("tests/data/valid_marc.xml"),
+        metadata_type=metadata.MetadataType.DESCRIPTIVE,
+        metadata_format=metadata.MetadataFormat.MARC,
+        format_version="marcxml=1.2; marc=marc21",
+        identifier="_5"
+    )
+
+    descriptive_md1 = StructuralMapDiv(
+        div_type="dublin_core",
+        order=1,
+        label="testing_dublin_core",
+        orderlabel="first",
+        metadata=[dublin_core]
+    )
+    descriptive_md2 = StructuralMapDiv(
+        div_type="marc",
+        order=2,
+        label="testing_marc",
+        orderlabel="second",
+        metadata=[marc]
+    )
+    root_div_2 = StructuralMapDiv(
+        div_type="test_type",
+        divs=[descriptive_md1, descriptive_md2]
+    )
+    # Add couple maps to test that multiple structural maps are supported
     structural_map_1 = StructuralMap(
         root_div=root_div,
         structural_map_type="test_structural_map",
-        label="logical",
+        label="test",
         pid="pid1",
         pid_type="pidtype"
     )
     structural_map_2 = StructuralMap(
         root_div=root_div,
         structural_map_type="test_structural_map",
-        label="logical",
-        pid="pid1",
+        label="test",
+        pid="pid2",
         pid_type="pidtype"
     )
-    mets.add_structural_maps([structural_map_1, structural_map_2])
+    structural_map_3 = StructuralMap(
+        root_div=root_div_2,
+        structural_map_type="test_structural_map",
+        label="test",
+        pid="pid3",
+        pid_type="pidtype"
+    )
+    mets.add_structural_maps(
+        [structural_map_1, structural_map_2, structural_map_3])
 
     # File references
     mets.generate_file_references()
@@ -156,11 +198,11 @@ def test_parse_mets(mets_object):
     serialized = serialize._to_xml_string(mets_object)
     element = etree.fromstring(serialized)
 
-    assert len(element) == 6
+    assert len(element) == 9
     assert element.find("mets:metsHdr", namespaces=NAMESPACES) is not None
     assert element.find("mets:dmdSec", namespaces=NAMESPACES) is not None
     assert element.find("mets:fileSec", namespaces=NAMESPACES) is not None
-    assert len(element.findall("mets:structMap", namespaces=NAMESPACES)) == 2
+    assert len(element.findall("mets:structMap", namespaces=NAMESPACES)) == 3
 
     # Assert administrative metadata exists and contains other metadata than
     # descriptive metadata
@@ -289,7 +331,7 @@ def test_parse_metadata_element(metadata_type, root_element_tag):
     assert metadata_element[1].tag == "sub2"
 
 
-def test_parse_metadata_element_without_root():
+def test_parse_metadata_element_removes_root():
 
     data = metadata.ImportedMetadata(
         data_path=Path("tests/data/valid_dc.xml"),
@@ -326,6 +368,40 @@ def test_parse_metadata_element_without_root():
     assert xml_data[1].tag == "%sdescription" % namespace
     assert xml_data[2].tag == "%spublisher" % namespace
     assert xml_data[3].tag == "%sidentifier" % namespace
+
+
+def test_dublin_core_descriptive_metadata_has_no_root(mets_object):
+    """
+    Descriptive metadata should be generated without root if it's
+    the Dublin Core type.
+    """
+
+    def check_wrap(
+        dmdsec_element: etree._Element,
+        MDTYPE: str
+    ) -> etree._Element:
+        assert len(dmdsec_element) == 1
+        mdWrap = dmdsec_element[0]
+        assert mdWrap.get("MDTYPE") == MDTYPE
+        return mdWrap[0]
+
+    serialized = serialize._to_xml_string(mets_object)
+    element = etree.fromstring(serialized)
+    dmdsectors = element.findall("mets:dmdSec", namespaces=NAMESPACES)
+    assert len(dmdsectors) >= 2
+    sectors_visited = 0
+    for dmdsec in dmdsectors:
+        # dublin core
+        if dmdsec.get("ID") == "_4":
+            sectors_visited += 1
+            xmlData = check_wrap(dmdsec, "DC")
+            assert len(xmlData) > 1  # check that no root exists
+        # marc data:
+        if dmdsec.get("ID") == "_5":
+            sectors_visited += 1
+            xmlData = check_wrap(dmdsec, "MARC")
+            assert len(xmlData) == 1  # check for root
+    assert sectors_visited == 2
 
 
 def test_parse_metadata_with_estimated_create_time():
@@ -470,17 +546,14 @@ def test_written_structural_maps(mets_object):
     element = etree.fromstring(serialized)
     structmaps = element.findall("mets:structMap", namespaces=NAMESPACES)
 
-    assert len(structmaps) == 2
-
-    # The structmaps of the test mets_object are identical, so we can pick
-    # either one for assertion
-    structmap = structmaps.pop()
-
-    # Root element
+    assert len(structmaps) == 3
+    structmap = structmaps[0]  # Position in set is unreliable
+    for s in structmaps:
+        if s.get(_use_namespace("fi", "PID")) == "pid1":
+            structmap = s
     assert structmap.tag == _use_namespace("mets", "structMap")
     assert structmap.get("TYPE") == "test_structural_map"
-    assert structmap.get("LABEL") == "logical"
-    assert structmap.get(_use_namespace("fi", "PID")) == "pid1"
+    assert structmap.get("LABEL") == "test"
     assert structmap.get(_use_namespace("fi", "PIDTYPE")) == "pidtype"
 
     # root div
@@ -710,12 +783,8 @@ def test_metadata_created_generated():
 
     elem_a = serialize._parse_metadata_element(metadata_a, state)
 
-    # TODO: Replace this drudgery with `datetime.datetime.fromisoformat` once
-    # we're on Python 3.7+. Or RHEL9, which ships Python 3.9.
-    date_a = datetime.strptime(
-        elem_a.attrib[f"{{{NAMESPACES['fi']}}}CREATED"],
-        "%Y-%m-%dT%H:%M:%S.%f+00:00"
-    )
+    date_a = datetime.fromisoformat(
+        elem_a.attrib[f"{{{NAMESPACES['fi']}}}CREATED"])
     date_a = date_a.replace(tzinfo=timezone.utc)
 
     # Check that automatically generated creation date A is within two
