@@ -123,7 +123,7 @@ def mets_object() -> METS:
     )
     # test descriptive_metadata handling depending on the type of metadata:
     dublin_core = metadata.ImportedMetadata(
-        data_path=Path("tests/data/valid_dc.xml"),
+        data_path=Path("tests/data/valid_dc_with_root.xml"),
         metadata_type=metadata.MetadataType.DESCRIPTIVE,
         metadata_format=metadata.MetadataFormat.DC,
         format_version="2008",
@@ -334,7 +334,7 @@ def test_parse_metadata_element(metadata_type, root_element_tag):
 def test_parse_metadata_element_removes_root():
 
     data = metadata.ImportedMetadata(
-        data_path=Path("tests/data/valid_dc.xml"),
+        data_path=Path("tests/data/valid_dc_with_root.xml"),
         metadata_type=metadata.MetadataType.DESCRIPTIVE,
         metadata_format="DC",
         format_version="1.0",
@@ -344,9 +344,7 @@ def test_parse_metadata_element_removes_root():
 
     state = _SerializerState()
 
-    root_element = serialize._parse_metadata_element(
-            data, state, remove_root=True
-        )
+    root_element = serialize._parse_metadata_element(data, state)
 
     assert root_element.tag == _use_namespace("mets", "dmdSec")
 

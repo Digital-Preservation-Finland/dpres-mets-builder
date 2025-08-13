@@ -13,7 +13,7 @@ from lxml import etree
 from mets_builder.digital_object import DigitalObject
 from mets_builder.metadata import (DigitalProvenanceAgentMetadata,
                                    DigitalProvenanceEventMetadata,
-                                   Metadata, MetadataType, MetadataFormat)
+                                   Metadata, MetadataType)
 from mets_builder.uuid import uuid, underscore_uuid
 
 # Prevent circular import caused by type hints with special
@@ -35,10 +35,7 @@ NAMESPACES = {
     "audiomd": "http://www.loc.gov/audioMD/",
     "videomd": "http://www.loc.gov/videoMD/"
 }
-# Metadata formats which don't require root elements
-ROOTLESS_FORMATS = [
-    MetadataFormat.DC
-]
+
 
 _METS_FI_SCHEMA = "http://digitalpreservation.fi/schemas/mets/mets.xsd"
 
@@ -203,8 +200,7 @@ def _parse_mets_header(mets: METS) -> etree._Element:
 
 def _parse_metadata_element(
     metadata: Metadata,
-    state: _SerializerState,
-    remove_root: bool = False
+    state: _SerializerState
 ) -> etree._Element:
     """Parse given metadata object.
 
@@ -218,7 +214,7 @@ def _parse_metadata_element(
     root_node = metadata._to_xml_element_tree(state)
 
     serialized_metadata_list = [root_node]
-    if remove_root:
+    if metadata.metadata_format.is_rootless():
         serialized_metadata_list = list(root_node)
 
     # Metadata has to be wrapped in mdWrap and xmlData elements
@@ -281,10 +277,7 @@ def _write_descriptive_metadata(
         if metadata.is_descriptive
     ))
     for metadata in descriptive_metadata:
-        metadata_element = _parse_metadata_element(
-            metadata, state,
-            remove_root=metadata.metadata_format in ROOTLESS_FORMATS
-        )
+        metadata_element = _parse_metadata_element(metadata, state)
         xml.write(metadata_element)
 
 

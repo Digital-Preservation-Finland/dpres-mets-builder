@@ -145,6 +145,12 @@ class MetadataFormat(Enum):
     OTHER = "OTHER"
     """Use if none of the other options apply to the metadata format."""
 
+    def is_rootless(self) -> bool:
+        """return true if the metadataformat doesn't have a root"""
+        if self.name == "DC":
+            return True
+        return False
+
 
 class Metadata(ComparableMixin, metaclass=abc.ABCMeta):
     """Base class representing metadata elements in a METS document.
